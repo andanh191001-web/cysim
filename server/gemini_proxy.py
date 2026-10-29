@@ -1268,4 +1268,5 @@ if __name__ == "__main__":
     # debug=False là chủ đích: chế độ debug cho phép chạy code tuỳ ý qua trình
     # duyệt debugger, biến một proxy giữ key thành cửa sau.
     print(f"Gemini proxy -> http://{host}:{port}  (model: {MODEL}, key: {bool(os.environ.get('GEMINI_API_KEY'))})")
-    app.run(host=host, port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False)
+

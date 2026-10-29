@@ -988,8 +988,15 @@ một cách chính xác), vì host tĩnh không chạy giúp ai tiến trình n�
    trả lời của key hiện tại đo qua chính `handler()` hôm 29-10 là **202,7 giây** (HTTP
    200, 490 ký tự, model `gemini-flash-lite-latest`) — hàm sẽ chết hoặc tự cắt và báo
    `overloaded` ở mọi lượt. Thêm một file `.js` còn phá trần 52 file của mục 7 (và
-   `require("@google/genai")` đòi thêm `package.json`), nên đổi lại là: **không viết
-   hàm Netlify**.
+   `require("@google/genai")` đòi thêm `package.json`). Bản "thuần `fetch`, không cần
+   SDK" cũng không khá hơn: nó bắt health bằng `event.path === "/api/health"` trong khi
+   hai đường dẫn được viết lại về cùng một hàm nên phân biệt duy nhất đáng tin là
+   `httpMethod` (bản `.py` làm theo đúng cách đó), nó `JSON.parse(event.body)` mà bỏ
+   qua `isBase64Encoded`, nó trả `{reply}` thay vì `{ok,text,model}` nên `js/ai.js`
+   không đọc được, và `catch → {error: error.message}` in nguyên thông báo của Google
+   xuống trình duyệt — tức là đúng cái kiểu rò key qua body mà `--check` của dự án này
+   đo và khẳng định `KEY xuat hien trong body loi: False`. Kết luận: **không viết hàm
+   Netlify**.
    File `gemini.py` vẫn nằm lại repo vì hai việc thật: `--check` của proxy đối chiếu
    18 mục của nó **từng ký tự** (xoá file là hỏng bộ kiểm tra), và nó là khuôn cho host
    chạy Python thật. Ba biến môi trường (`GEMINI_API_KEY`, tuỳ chọn `GEMINI_MODEL` /
