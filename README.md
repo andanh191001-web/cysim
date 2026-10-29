@@ -1149,3 +1149,4 @@ nguyên trên Netlify vì chúng chỉ cần file tĩnh.
 - **Trung thực về kiểm thử**: `test/` phong toả máy chấm điểm và máy dịch; phần
   tương tác DOM của 15 lab vẫn chỉ được xác minh bằng tay trong trình duyệt, và
   điều đó ghi ngay trong mục `test/` chứ không ẩn đi.
+"# cysim" 
