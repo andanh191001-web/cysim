@@ -1,0 +1,78 @@
+# =========================================================
+# CySim — netlify.toml  ·  cấu hình host tĩnh cho bản web công khai
+#
+# LÀ GÌ   : Ba việc, và chỉ ba việc. (1) Nói Netlify rằng thư mục gốc của repo
+#           CHÍNH LÀ thư mục web (app này không có bước build: index.html + js/ +
+#           style.css chạy nguyên văn). (2) Nói nơi cất hàm serverless giữ key
+#           Gemini: netlify/functions/gemini.py. (3) Đi kèm hai đường dẫn mà
+#           js/ai.js gọi tới — /api/gemini và /api/health — vì Netlify chỉ phục vụ
+#           file tĩnh, nếu không viết hai khối redirect dưới đây thì chúng trả về
+#           trang 404 và khung chat báo "máy chủ AI không chạy được ở đây"; và chặn
+#           bốn đường không bao giờ được phép trở thành file tải về được (./.env,
+#           /server/*, /tools/*, /_legacy/*).
+#   KHÔNG CHỨA KEY. Key đặt trong Netlify -> Site configuration -> Environment
+#   variables (GEMINI_API_KEY). File này là file công khai: ai mở repo cũng đọc
+#   được, nên nó chỉ được chứa đường dẫn và tên biến.
+#
+# CHẠY    : Netlify đọc file này lúc deploy (Git-based hoặc `netlify deploy`).
+#           Muốn thử trên máy: npm i -g netlify-cli rồi `netlify dev` — lệnh này
+#           phục vụ cả site lẫn hàm, vào http://localhost:8888/api/health để xem
+#           hàm trả gì mà không cần đẩy lên mạng.
+#
+# CHẠM TỚI: js/ai.js (macDinh — mọi origin công khai đều gọi /api/gemini cùng
+#           origin), netlify/functions/gemini.py, server/gemini_proxy.py (máy chủ
+#           cục bộ, không đụng tới file này).
+#
+# BẪY ĐÃ BIẾT: đừng kéo-thả (drag & drop) cả thư mục dự án lên Netlify. Publish
+#           ở đây là "." nên mọi file trong thư mục đều được upload, kể cả .env —
+#           và .env chứa key thật. Deploy từ Git thì .gitignore giữ .env ở lại máy
+#           (khối chặn /.env dưới đây là lớp thứ hai, để lỡ tay upload vẫn không
+#           ai tải được key).
+# =========================================================
+
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+
+# js/ai.js gửi câu hỏi tới "/api/gemini" khi trang chạy trên host công khai, và hỏi
+# "/api/health" để vẽ dòng trạng thái. status=200 = rewrite: trình duyệt vẫn thấy
+# đường dẫn /api/..., key không lộ, và origin của trang vẫn là cùng origin nên
+# không cần CORS.
+[[redirects]]
+  from = "/api/gemini"
+  to = "/.netlify/functions/gemini"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/gemini"
+  status = 200
+
+# force=true mới chặn được file thật: Netlify ưu tiên file có thật nếu không ép.
+# 404 chứ không phải 200: kẻ dò đường phải không phân biệt được "file có mà bị
+# chặn" với "không có file".
+[[redirects]]
+  from = "/.env"
+  to = "/404-not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/server/*"
+  to = "/404-not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tools/*"
+  to = "/404-not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/_legacy/*"
+  to = "/404-not-found"
+  status = 404
+  force = true

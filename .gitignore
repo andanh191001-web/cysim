@@ -1,0 +1,12 @@
+# Khoá / secret — không bao giờ được commit
+.env
+.env.*
+!.env.example
+
+# Bộ nhớ đệm Python: tools/ sinh ra mỗi lần chạy, server/ cũng vậy
+__pycache__/
+*.pyc
+
+# Môi trường ảo (nếu bạn tạo để cài google-genai)
+.venv/
+venv/

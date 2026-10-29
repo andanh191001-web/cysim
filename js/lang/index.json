@@ -1,0 +1,42 @@
+{
+  "_doc": [
+    "Bảng đếm chuỗi dịch sẵn của từng ngôn ngữ — do tools/gen_translations.py sinh,",
+    "KHÔNG sửa tay. js/i18n.js đọc total + langs.<mã> để in '100% ✓' và phân biệt",
+    "'người đã duyệt' (review) với 'máy dịch' (machine) ngay cạnh tên lá cờ.",
+    "Từ điển thật nằm ở js/lang/<mã>.json; nguồn kiểm chứng nằm ở tools/translation_review.json."
+  ],
+  "total": 1004,
+  "generated": "2026-10-29",
+  "langs": {
+    "en": {
+      "review": 933,
+      "machine": 0,
+      "code": 71,
+      "missing": 0
+    },
+    "zh": {
+      "review": 922,
+      "machine": 0,
+      "code": 82,
+      "missing": 0
+    },
+    "fr": {
+      "review": 922,
+      "machine": 0,
+      "code": 82,
+      "missing": 0
+    },
+    "es": {
+      "review": 922,
+      "machine": 0,
+      "code": 82,
+      "missing": 0
+    },
+    "ja": {
+      "review": 922,
+      "machine": 0,
+      "code": 82,
+      "missing": 0
+    }
+  }
+}

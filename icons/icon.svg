@@ -1,0 +1,14 @@
+<!--
+  CySim — icons/icon.svg  ·  biểu tượng ứng dụng
+  LÀ GÌ   : Logo mảnh khiên + dấu tích, vẽ bằng SVG thuần (không raster),
+           viewBox 40x40 nhưng khai báo 512x512 để dùng làm icon PWA.
+  CHẠY    : manifest.json trỏ vào đây làm icon khi "cài app" lên màn hình;
+           sw.js liệt kê nó trong danh sách cache. index.html không nhúng
+           trực tiếp (không có thẻ favicon riêng).
+  TOÀN CẦU : không liên quan code — chỉ một file tĩnh.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="512" height="512">
+  <rect width="40" height="40" rx="7" fill="#070b14" />
+  <path d="M20 3.5l14 8v17L20 37 6 28.5v-17z" fill="#0d1424" stroke="#4de1ff" stroke-width="1.6" />
+  <path d="M13 20.5l5 5 9-11" fill="none" stroke="#6ee7a8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

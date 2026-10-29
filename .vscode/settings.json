@@ -1,0 +1,9 @@
+{
+  // CySim — .vscode/settings.json  ·  cấu hình trình soạn thảo, KHÔNG phải code chạy app
+  // LÀ GÌ   : Một thiết lập duy nhất: cổng 5505 cho extension "Live Server".
+  // CHẠY    : Chỉ Live Server đọc. Mở app bằng Live Server -> http://127.0.0.1:5505.
+  //         Nếu không cài extension, chạy: python -m http.server 8137 --bind 127.0.0.1
+  //         (Service Worker chỉ hoạt động qua http, không chạy bằng file://).
+  // TOÀN CẦU : app không đọc file này.
+  "liveServer.settings.port": 5505
+}

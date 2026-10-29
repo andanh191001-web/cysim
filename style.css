@@ -1,0 +1,703 @@
+/* =========================================================
+   CySim — style.css  ·  toàn bộ giao diện
+
+   LÀ GÌ   : Bảng màu "màn hình SOC" (biến CSS trong :root), layout
+             sidebar + lưới card, và style riêng cho từng phòng lab:
+             lưới IP DDoS, cổng tường lửa, mailbox OTP, dock tài khoản
+             góc phải, biển "không có internet" giữa đỉnh màn hình, khung
+             chat AI nổi góc trái dưới (kèm khay ảnh + chế độ phóng to),
+             thanh trượt mã độc, chế độ báo lỗi bản dịch.
+   CHẠY     : index.html nạp bằng một thẻ <link> ở <head>; không có build,
+             không có CSS framework, không @import. Muốn nhận ra style của
+             lab nào, tìm khối chú thích "=====" gần cuối file — mỗi khối
+             tương ứng một màn hình trong index.html.
+   TOÀN CẦU : chỉ dùng selector theo id/class có thật trong index.html.
+             Mã màu luôn lấy từ biến --bg/--panel/--cyan/--red/--ok để
+             đổi ngôn ngữ hay theme không làm lệch giao diện.
+             Responsive: breakpoint 860px khớp với điều kiện
+             window.innerWidth <= 860 trong app.js.
+   ========================================================= */
+
+:root{
+  --bg:#070b14; --panel:#0d1424; --raise:#141e38; --line:#222f4d;
+  --text:#e4ebf7; --mute:#8593b0; --cyan:#4de1ff; --red:#ff5c7a;
+  --amber:#ffb454; --ok:#6ee7a8;
+  --sans:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",Consolas,Monaco,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;color:var(--text);font:15px/1.6 var(--sans);
+  background:radial-gradient(ellipse 60% 40% at 80% -5%,rgba(77,225,255,.10),transparent),radial-gradient(ellipse 50% 40% at 0% 100%,rgba(255,92,122,.06),transparent),var(--bg);
+  overflow-x:hidden;
+}
+body::after {
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,0.25) 50%);
+  background-size:100% 4px;z-index:999;opacity:0.3;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(77,225,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(77,225,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);
+  -webkit-mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);
+}
+button,input{font:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+svg{display:block}
+
+.app{position:relative;z-index:1;display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+aside{
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:22px;
+  padding:24px 16px;border-right:1px solid var(--line);
+  background:rgba(7,11,20,.75);backdrop-filter:blur(10px);z-index:1000;
+  transition:transform .3s ease;
+}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.brand b{font-size:21px;letter-spacing:.5px}
+.brand small{display:block;color:var(--mute);font-size:11px;line-height:1.2}
+nav{display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+.nav-btn{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:10px;color:var(--mute);background:none;cursor:pointer;text-align:left;transition:background .15s,color .15s,box-shadow .15s;}
+.nav-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn:hover{color:var(--text);background:var(--raise)}
+.nav-btn.active{color:var(--cyan);background:rgba(77,225,255,.10);box-shadow:inset 3px 0 0 var(--cyan),0 0 12px rgba(77,225,255,0.4);}
+.nav-btn .tick{margin-left:auto;color:var(--ok);font-size:13px;opacity:0;transition:opacity .3s,transform .3s;transform:scale(.6)}
+.nav-btn.done .tick{opacity:1;transform:scale(1)}
+
+.rank{margin-top:auto;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,rgba(77,225,255,.05),var(--panel));}
+.rank .lv{font-weight:700;font-size:16px}
+.rank .sub{color:var(--mute);font-size:12px;margin-bottom:12px}
+.xp{height:6px;border-radius:9px;background:var(--raise);overflow:hidden;position:relative}
+.xp i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .6s ease;box-shadow:0 0 10px rgba(77,225,255,.6)}
+.rank .xpn{display:flex;justify-content:space-between;margin-top:8px;color:var(--mute);font:12px var(--mono)}
+
+main{padding:68px 36px 20px;max-width:1180px;width:100%}
+.view{display:none}
+.view.active{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.s12{grid-column:span 12}.s8{grid-column:span 8}.s7{grid-column:span 7}
+.s6{grid-column:span 6}.s5{grid-column:span 5}.s4{grid-column:span 4}.s3{grid-column:span 3}
+
+.card{background:linear-gradient(180deg,rgba(255,255,255,.015),transparent 40%),var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .25s,box-shadow .25s;}
+.card:hover{border-color:#2d3d63}
+h1{margin:0 0 12px;font-size:clamp(26px,4vw,42px);line-height:1.1;letter-spacing:-.5px}
+h2{margin:0 0 6px;font-size:24px;letter-spacing:-.2px}
+h3{margin:0 0 6px;font-size:16px}
+h4{margin:0}
+p{margin:0 0 14px;color:#a9b6cf;max-width:62ch}
+.mute{color:var(--mute)}
+.pagehead{margin-bottom:20px}
+.pagehead p{margin:0}
+code{font:13px var(--mono);color:var(--cyan);background:rgba(77,225,255,.08);padding:2px 6px;border-radius:4px}
+
+.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;overflow:hidden;background:linear-gradient(135deg,#0f1930,var(--panel) 60%);}
+.radar{flex:none;width:220px;aspect-ratio:1;border-radius:50%;position:relative;border:1px solid var(--line);background:radial-gradient(circle,rgba(77,225,255,.12) 0 2px,transparent 3px),repeating-radial-gradient(circle,transparent 0 30px,var(--line) 30px 31px);}
+.radar::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 75%,rgba(77,225,255,.38));animation:spin 5s linear infinite;}
+.radar::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.blip{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blip 5s infinite;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blip{0%,12%{opacity:1;transform:scale(1.5)}30%{background:var(--ok);box-shadow:0 0 12px var(--ok);opacity:.9;transform:scale(1)}100%{background:var(--ok);opacity:.25}}
+
+.mission{cursor:pointer;text-align:left;color:inherit;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;}
+.mission:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 24px -12px rgba(77,225,255,.35)}
+.chip{align-self:flex-start;margin-top:auto;padding:4px 11px;border-radius:99px;font:12px var(--mono);color:var(--mute);border:1px solid var(--line);transition:all .3s;}
+.mission.done .chip{color:var(--ok);border-color:rgba(110,231,168,.4);background:rgba(110,231,168,.08)}
+.mission .goal{color:var(--mute);font-size:13px;margin-bottom:16px}
+
+.row{display:flex;gap:10px;flex-wrap:wrap}
+input[type="text"],input[type="password"]{width:100%;min-width:0;color:var(--text);background:#060a12;border:1px solid #2b3a5c;border-radius:10px;padding:12px 14px;font:14px var(--mono);transition:border-color .2s,box-shadow .2s;}
+input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+.btn{cursor:pointer;border:1px solid var(--cyan);border-radius:10px;padding:11px 18px;font-weight:700;white-space:nowrap;color:#04121a;background:var(--cyan);transition:filter .15s,transform .15s,box-shadow .15s;}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 0 12px rgba(77,225,255,0.4);}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
+.btn.ghost{color:var(--cyan);background:none}
+.btn.danger{color:#fff;background:#c22f4d;border-color:var(--red)}
+.btn.danger:hover{box-shadow:0 0 12px rgba(255,92,122,0.4)}
+.btn.success{color:#04121a;background:var(--ok);border-color:var(--ok)}
+.btn.sm{padding:6px 12px;font-size:12px;border-radius:8px}
+
+.notice{margin-top:16px;padding:11px 14px;border-left:3px solid var(--amber);background:rgba(255,180,84,.07);color:#cdc3ae;font-size:13px;border-radius:0 8px 8px 0;}
+.query{margin-top:18px;padding:16px;border-radius:12px;background:#060a12;border:1px solid var(--line);font:13px/1.8 var(--mono);color:#9fb0d0;overflow-wrap:anywhere;}
+.query .inj{color:#fff;background:rgba(255,92,122,.3);border-radius:4px;padding:1px 3px;box-shadow:0 0 0 1px var(--red)}
+.query .val{color:var(--cyan)}
+
+.term{position:relative;margin-top:14px;border:1px solid #1d3b2f;border-radius:12px;background:#02060a;overflow:hidden;box-shadow:0 0 34px rgba(110,231,168,.08);}
+.term-bar{display:flex;align-items:center;gap:7px;padding:9px 12px;background:#0a1118;border-bottom:1px solid #16261f;font:12px var(--mono);color:var(--mute);}
+.term-bar i{width:10px;height:10px;border-radius:50%;background:#ff5c7a}
+.term-bar i:nth-child(2){background:#ffb454}
+.term-bar i:nth-child(3){background:#6ee7a8}
+.term-body{position:relative;height:310px;overflow:auto;padding:14px;font:12.5px/1.65 var(--mono);color:#9be8bb;text-shadow:0 0 6px rgba(110,255,176,.3);white-space:pre-wrap;}
+.term-body::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(110,231,168,.025) 2px,rgba(110,231,168,.025) 3px);}
+.term-body .t-ok{color:#7dffb0}
+.term-body .t-info{color:var(--cyan)}
+.term-body .t-warn{color:var(--amber)}
+.term-body .t-err{color:var(--red)}
+
+.cursor{display:inline-block;width:8px;height:14px;background:var(--ok);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:4px;}
+@keyframes blink{50%{opacity:0;}}
+
+.verdict{margin-top:14px;padding:14px 16px;border-radius:12px;font-weight:700;display:none;text-align:center;font-family:var(--mono);}
+.verdict.show{display:block;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.verdict.bad{background:rgba(255,92,122,.1);border:1px solid var(--red);color:#ffb3c1;animation:shake .4s}
+.verdict.good{background:rgba(110,231,168,.08);border:1px solid rgba(110,231,168,.5);color:var(--ok)}
+.verdict.warn{background:rgba(255,180,84,.1);border:1px solid var(--amber);color:#ffd9a0}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+.db-leak-container{width:100%;overflow-x:auto;margin-top:15px;border:1px solid var(--line);border-radius:10px}
+.db-table{width:100%;border-collapse:collapse;font:13px var(--mono);min-width:480px}
+.db-table th,.db-table td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+.db-table th{background:rgba(255,92,122,.15);color:var(--red);border-bottom:2px solid var(--red)}
+.db-table td{color:#a9b6cf}
+.db-table tr:hover td{background:rgba(255,255,255,.02)}
+
+.phish-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.browser-mock{border:1px solid var(--line);border-radius:12px;background:#0a0f1d;overflow:hidden;display:flex;flex-direction:column}
+.browser-bar{background:#141e38;padding:8px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.url-bar{flex:1;background:#060a12;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font:12px var(--mono);color:var(--mute);display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.url-bar.clickable{cursor:pointer}
+.url-bar.clickable:hover{border-color:var(--cyan)}
+.phish-body{padding:20px;flex:1;display:flex;align-items:center;justify-content:center;background:#0b1326}
+.phish-card{background:#141e38;border:1px solid var(--line);padding:20px;border-radius:12px;width:100%;max-width:280px;text-align:center;}
+.spot-target{border:2px dashed rgba(255,180,84,.4);padding:4px;border-radius:6px;cursor:pointer;transition:all .2s}
+.spot-target:hover{border-color:var(--amber);background:rgba(255,180,84,.1)}
+.spot-target.found{border-color:var(--ok)!important;background:rgba(110,231,168,.15)!important;border-style:solid!important}
+
+.ddos-monitor{background:#04070d;border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.metric-bar{height:16px;border-radius:8px;background:var(--raise);overflow:hidden;margin-top:6px}
+.metric-bar i{display:block;height:100%;width:0;background:var(--cyan);transition:width .3s,background .3s}
+.metric-bar.danger i{background:var(--red);animation:pulse-red 1s infinite}
+@keyframes pulse-red{0%,100%{opacity:1}50%{opacity:.55}}
+.ip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px;min-height:180px;max-height:240px;overflow-y:auto;padding:6px;border:1px solid var(--line);border-radius:10px;background:#02050b;}
+.ip-card{background:rgba(255,92,122,.15);border:1px solid var(--red);border-radius:8px;padding:8px;font:12px var(--mono);color:#ffb3c1;text-align:center;cursor:pointer;transition:transform .1s,background .2s;display:flex;flex-direction:column;align-items:center;gap:4px;animation:pop-in .25s ease;}
+@keyframes pop-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.ip-card:hover{transform:scale(1.05);background:rgba(255,92,122,.25)}
+.ip-card button{border:0;background:var(--red);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;font-weight:700;}
+
+.meter{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:18px 0 10px}
+.meter i{height:8px;border-radius:9px;background:var(--raise);transition:background .25s}
+.check{padding:0;margin:16px 0 0;list-style:none}
+.check li{margin:8px 0;color:var(--mute);transition:color .2s}
+.check li::before{content:"○";margin-right:10px;color:var(--red)}
+.check li.pass{color:var(--text)}
+.check li.pass::before{content:"✓";color:var(--ok)}
+
+.fwline{display:flex;align-items:center;gap:14px;margin:6px 0 20px}
+.switch{appearance:none;flex:none;width:54px;height:30px;border-radius:99px;background:#5a2233;position:relative;cursor:pointer;transition:background .2s;}
+.switch::after{content:"";position:absolute;width:22px;height:22px;left:4px;top:4px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.switch:checked{background:#157a56}
+.switch:checked::after{transform:translateX(24px)}
+.ports{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.port{padding:12px;border-radius:12px;background:#060a12;border:1px solid var(--line);transition:all .25s}
+.port b{display:block;font:600 18px var(--mono)}
+.port span{font-size:12px;color:var(--mute)}
+.port em{display:block;margin-top:6px;font:12px var(--mono);color:var(--mute);font-style:normal}
+.port.scan{border-color:var(--cyan);background:rgba(77,225,255,.08)}
+.port.blocked{border-color:rgba(110,231,168,.6);background:rgba(110,231,168,.07)}
+.port.blocked em{color:var(--ok)}
+.port.open{border-color:rgba(255,180,84,.6);background:rgba(255,180,84,.07)}
+.port.open em{color:var(--amber)}
+.port.exposed{border-color:var(--red);background:rgba(255,92,122,.12)}
+.port.exposed em{color:var(--red)}
+.legend{margin-top:14px;min-height:48px;color:#a9b6cf;font-size:14px}
+
+.balance-box{font-family:var(--mono);font-size:24px;color:var(--cyan);background:#060a12;padding:20px;border-radius:12px;border:1px solid var(--line);text-align:center;margin:16px 0;}
+.attacker-site{background:#141e38;padding:20px;border-radius:12px;border:1px dashed var(--red);text-align:center;}
+
+#idorInput{outline:none;border-bottom:1px solid var(--cyan)!important;}
+
+.siem-log{height:400px;overflow-y:auto;background:#02060a;border:1px solid #1d3b2f;border-radius:12px;padding:12px;font:12.5px/1.6 var(--mono);}
+.siem-line{padding:4px 8px;border-radius:4px;cursor:pointer;color:#9be8bb;transition:background .15s;user-select:none;}
+.siem-line:hover{background:rgba(77,225,255,.08);}
+.siem-line.flagged{background:rgba(255,180,84,.18);border-left:3px solid var(--amber);color:#ffd9a0;}
+.siem-line.flagged::before{content:"⚑ ";color:var(--amber);}
+.siem-line .ts{color:var(--mute);margin-right:8px;}
+.siem-line .lvl-info{color:#7fb0e0;font-weight:600;margin-right:6px;}
+.siem-line .lvl-warn{color:var(--amber);font-weight:600;margin-right:6px;}
+.siem-line .lvl-crit{color:var(--red);font-weight:600;margin-right:6px;}
+
+.cert-frame{background:linear-gradient(135deg,#0d1424 0%,#0a1929 50%,#0d1424 100%);border:3px solid var(--cyan);border-radius:16px;padding:4px;box-shadow:0 0 40px rgba(77,225,255,0.25);}
+.cert-inner{border:1px solid rgba(77,225,255,0.35);border-radius:10px;padding:38px 30px;text-align:center;position:relative;overflow:hidden;}
+.cert-inner::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(77,225,255,0.03) 20px,rgba(77,225,255,0.03) 21px);pointer-events:none;}
+.cert-brand{font-size:20px;color:var(--cyan);letter-spacing:4px;font-weight:700;margin-bottom:6px;}
+.cert-title{font-size:30px;font-weight:700;color:var(--text);letter-spacing:3px;margin-top:14px;}
+.cert-sub{font-size:14px;color:var(--mute);letter-spacing:2px;margin-top:6px;text-transform:uppercase;}
+.cert-name{font-size:36px;font-weight:700;color:var(--ok);margin:26px 0 6px;text-shadow:0 0 20px rgba(110,231,168,0.4);}
+.cert-rank{font-size:16px;color:var(--cyan);font-style:italic;}
+.cert-stats{font:14px var(--mono);color:var(--mute);margin-top:12px;}
+.cert-footer{display:flex;justify-content:space-between;margin-top:30px;padding-top:16px;border-top:1px dashed var(--line);font-size:13px;color:var(--mute);flex-wrap:wrap;gap:8px;}
+.cert-grade{display:inline-block;margin-top:10px;padding:4px 14px;border-radius:999px;border:1px solid rgba(110,231,168,.5);color:var(--ok);font:12px var(--mono);letter-spacing:.5px;}
+
+/* ============== Trang Lý thuyết (12 chủ đề × 4 mục) ============== */
+/* Nhãn "Khái niệm / Cơ chế / Dấu hiệu / Phòng thủ" lặp lại 12 lần trong cùng
+   một kiểu thẻ, nên chỉ cần một quy ước nhìn: chữ nhỏ hoa màu nhạt, kẹp sát
+   đoạn văn bên dưới để mắt đọc hết nhãn rồi mới tới nội dung. */
+.theory-k{margin:14px 0 2px;color:var(--mute);font:11px var(--mono);letter-spacing:1.4px;text-transform:uppercase;}
+.theory-k + p{margin:0 0 4px;}
+
+/* ============== Kỳ thi tốt nghiệp (màn hình Chứng chỉ) ============== */
+.exam-part{margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
+.exam-q{margin:0 0 18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.015);}
+.exam-h{margin:0 0 10px;font-weight:600;}
+.exam-opt{display:flex;gap:9px;align-items:flex-start;margin:0 0 7px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .15s;}
+.exam-opt:hover{background:rgba(77,225,255,.06)}
+.exam-opt input{margin-top:4px;flex:none;accent-color:var(--cyan)}
+.exam-dung{color:var(--ok);font-weight:700}
+.exam-sai{color:var(--red);font-weight:700}
+.exam-note{margin:8px 0 0;font:12px var(--mono);color:var(--mute)}
+.exam-ta{width:100%;min-width:0;color:var(--text);background:#060a12;border:1px solid #2b3a5c;border-radius:10px;padding:11px 13px;font:14px/1.55 var(--sans);resize:vertical;transition:border-color .2s,box-shadow .2s;}
+.exam-ta:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+.exam-ta:disabled{opacity:.6}
+.exam-y{margin:10px 0 0;padding-left:4px;list-style:none;}
+.exam-y li{margin:0 0 4px;font:13px var(--sans);}
+.exam-y li.dat{color:var(--ok)}
+.exam-y li.thieu{color:var(--mute)}
+.exam-kq{margin-top:16px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:rgba(77,225,255,.04);}
+.exam-kq[data-dat="0"]{border-color:var(--red);background:rgba(255,92,122,.07)}
+.exam-kq[data-dat="1"]{border-color:rgba(110,231,168,.5);background:rgba(110,231,168,.06)}
+.exam-bang{font-size:17px;font-weight:700;color:var(--cyan)}
+/* Dòng "12 / 12 nhiệm vụ đã hoàn thành" trong khung thi khi còn khoá — dùng
+   font mono để bộ đếm thẳng hàng, màu hổ phách báo "chưa tới lượt thi". */
+.exam-lock{margin:14px 0 0;padding:10px 14px;border:1px dashed var(--amber);border-radius:10px;
+  background:rgba(255,180,84,.06);color:var(--amber);font:14px var(--mono);letter-spacing:.4px}
+/* Thanh trạng thái khi đang ngồi trong phòng thi: nhắc học viên là điều hướng
+   đang bị khoá và đặt hai lối ra (toàn màn hình / rời phòng) ngay tầm mắt. */
+.exam-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;
+  padding:11px 14px;border:1px solid var(--amber);border-radius:10px;
+  background:rgba(255,180,84,.08);color:var(--amber);font-size:13px}
+.exam-bar span{flex:1 1 220px;min-width:0}
+.exam-bar .btn{flex:none;padding:6px 12px;font-size:12px}
+/* Dòng đỏ ở cửa phòng: lượt trước đã bị huỷ vì thoát toàn màn hình / rời phòng,
+   bài làm bị xoá. Đứng riêng chứ không gộp vào .exam-lock (hổ phách) vì đây là
+   hậu quả đã xảy ra, không phải nội quy. */
+.exam-huy{margin:10px 0 0;padding:10px 14px;border:1px solid var(--red);border-radius:10px;
+  background:rgba(255,92,122,.08);color:#ffb3c1;font-size:13px}
+/* Hàng chọn lượt: thi THẬT (tính điểm, cấp bằng) và thi THỬ (không tính điểm).
+   Nút đang chọn tô viền cyan để phân biệt mà không phải nghĩ thêm màu mới. */
+.exam-che{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.exam-che .btn.on{border-color:var(--cyan);color:var(--cyan);background:rgba(77,225,255,.1)}
+/* Đồng hồ hết giờ nằm trong .exam-bar: font mono để chữ số không đổi bề rộng
+   mỗi giây (nhịp đếm mà làm cả thanh nhảy là người viết bài mất tập trung).
+   flex:0 0 auto đè lên ".exam-bar span{flex:1}" ở trên để nó không giãn ra. */
+.exam-hg{font:13px var(--mono);letter-spacing:.5px;flex:0 0 auto}
+.exam-hg-cap{color:var(--red);font-weight:700}
+/* Dòng giải thích lượt thử. Cố ý dùng đường viền xám + vạch cyan chứ không lấy
+   màu xanh "đỗ" hay hổ phách "khoá": một lượt không tính điểm thì không được
+   trông giống kết quả thật, cũng không được trông như lỗi. */
+.exam-thu{margin:10px 0 0;padding:10px 14px;border:1px solid var(--line);border-left:3px solid var(--cyan);
+  border-radius:10px;background:rgba(255,255,255,.03);color:var(--mute);font-size:13px}
+
+.lb-table{width:100%;border-collapse:collapse;margin-top:10px;font:13px var(--mono)}
+.lb-table th,.lb-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.lb-table th{color:var(--cyan);background:rgba(77,225,255,.05)}
+.lb-table tr:hover td{background:rgba(255,255,255,.02)}
+.lb-table tr.me td{background:rgba(77,225,255,.08);font-weight:700}
+/* Dòng nói thẳng: mấy hạng kia là chữ do app tự đặt, không phải người thật. */
+.lb-note{margin:10px 2px 0;font:12px var(--sans);line-height:1.5}
+
+footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
+
+.toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#123a32;border:1px solid var(--ok);color:#d8ffec;font-weight:700;transform:translateY(120px);opacity:0;transition:.4s cubic-bezier(.2,.9,.3,1.3);z-index:9999;box-shadow:0 12px 40px -12px rgba(110,231,168,.5);}
+.toast.show{transform:none;opacity:1}
+
+.mobile-menu-btn{display:none;position:fixed;top:15px;left:15px;z-index:1002;background:var(--panel);border:1px solid var(--line);color:var(--cyan);font-size:24px;padding:6px 12px;border-radius:8px;cursor:pointer;}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;backdrop-filter:blur(2px);opacity:0;transition:opacity 0.3s;}
+.mobile-overlay.active{display:block;opacity:1;}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .mobile-menu-btn{display:block;}
+  aside{position:fixed;top:0;left:0;height:100vh;width:260px;transform:translateX(-100%);border-right:1px solid var(--line);box-shadow:4px 0 24px rgba(0,0,0,0.5);}
+  aside.open{transform:translateX(0);}
+  aside nav{flex-direction:column;overflow-y:auto;width:100%;padding-bottom:0;}
+  .nav-btn{width:100%;white-space:normal;}
+  .rank{margin-top:auto;width:100%;}
+  main{padding:70px 16px 20px}
+  .s8,.s7,.s5,.s4,.s6,.s3{grid-column:span 12}
+  .phish-container{grid-template-columns:1fr}
+  .ip-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
+  .ip-card{padding:14px 8px;font-size:14px}
+  .ip-card button{padding:8px 12px;font-size:12px;width:100%;margin-top:6px}
+  .hero{flex-direction:column-reverse;text-align:center}
+  .radar{margin:0 auto;width:180px}
+  .cert-name{font-size:26px;}
+  .cert-title{font-size:22px;}
+}
+@media (max-width:480px){
+  h1{font-size:24px}
+  h2{font-size:20px}
+  .row{flex-direction:column}
+  .row .btn{width:100%}
+  .ports{grid-template-columns:1fr 1fr}
+  .term-body{height:240px}
+}
+
+/* ============== Language switcher ============== */
+.lang-switch{display:flex;flex-direction:column;gap:5px;padding:0 8px;margin-top:-8px}
+.lang-switch label{font-size:11px;color:var(--mute);letter-spacing:.5px;text-transform:uppercase}
+.lang-switch select{background:#060a12;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.lang-switch select:hover{border-color:#2d3d63}
+.lang-switch select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+
+/* ============== Antivirus lab ============== */
+.av-progress{height:6px;border-radius:99px;background:var(--raise);overflow:hidden;margin:14px 0 10px}
+.av-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .25s}
+.av-stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font:13px var(--mono);color:var(--mute)}
+.av-stats b{font-size:16px;margin-left:4px}
+.av-results{max-height:360px;overflow-y:auto;margin-top:12px;border:1px solid var(--line);border-radius:10px;background:#04070d}
+.av-row{display:grid;grid-template-columns:26px 1.4fr 90px 2.2fr;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font:13px var(--mono);align-items:center}
+.av-row:last-child{border-bottom:0}
+.av-row .av-icon{text-align:center}
+.av-row .av-name{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av-row .av-size{color:var(--mute);text-align:right;font-size:12px}
+.av-row .av-reason{color:var(--mute);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av-clean{border-left:3px solid transparent}
+.av-clean .av-name{color:var(--ok)}
+.av-sus{border-left:3px solid var(--amber);background:rgba(255,180,84,.05)}
+.av-sus .av-name{color:var(--amber)}
+.av-mal{border-left:3px solid var(--red);background:rgba(255,92,122,.08);animation:shake .4s}
+.av-mal .av-name{color:var(--red)}
+@media (max-width:640px){
+  .av-row{grid-template-columns:22px 1fr;gap:4px 8px}
+  .av-row .av-size{grid-column:2;text-align:left;font-size:11px}
+  .av-row .av-reason{grid-column:2;white-space:normal}
+}
+/* Nút SQLMap và Deep Scan */
+#runSqlmap, #avDeepScan {
+  background: linear-gradient(135deg, #ff5c7a, #c22f4d);
+  border-color: #ff5c7a;
+  color: #fff;
+  animation: pulse-red 2s infinite;
+}
+
+/* ===== Đăng nhập / xác minh email ===== */
+[hidden]{display:none!important}
+.auth-locked .app,.auth-locked .mobile-menu-btn{display:none}
+.auth-overlay{display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;background:radial-gradient(ellipse 60% 45% at 50% 0%,rgba(77,225,255,.12),transparent),rgba(7,11,20,.97)}
+.auth-locked .auth-overlay{display:flex}
+.auth-card{width:100%;max-width:420px;padding:28px;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:0 24px 60px -24px rgba(0,0,0,.8)}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.auth-brand b{font-size:21px}
+.auth-card h2{margin:0 0 4px;font-size:22px}
+.auth-card p{margin:0 0 14px}
+.auth-form{display:flex;flex-direction:column;gap:6px}
+.auth-form label{font-size:13px;color:var(--mute);margin-top:6px}
+.auth-form .btn{margin-top:14px}
+.auth-form .row .btn{margin-top:0}
+.auth-form .auth-switch{margin:14px 0 0;font-size:13px}
+.linkbtn{background:none;border:0;padding:0;color:var(--cyan);cursor:pointer;text-decoration:underline}
+.auth-msg{min-height:20px;margin-top:12px;font-size:13px}
+.auth-msg.err{color:var(--red)}
+.auth-msg.ok{color:var(--ok)}
+#authCode{text-align:center;letter-spacing:10px;font-size:24px}
+.mailbox{margin-top:14px;border:1px dashed var(--amber);border-radius:12px;background:rgba(255,180,84,.06);overflow:hidden}
+.mailbox-bar{padding:8px 12px;font:12px var(--mono);color:var(--amber);border-bottom:1px dashed rgba(255,180,84,.4)}
+.mailbox-body{padding:12px;font-size:13px}
+.mailbox-body strong{font:700 22px var(--mono);letter-spacing:6px;color:var(--text)}
+.mailbox-body small{display:block;margin-top:6px;color:var(--mute)}
+.userbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.userbox .avatar{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#04121a;background:var(--cyan)}
+.userbox .uinfo{min-width:0;flex:1}
+.userbox .uinfo b,.userbox .uinfo small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.userbox .uinfo small{color:var(--mute);font-size:11px}
+.userbox .btn{width:100%}
+
+/* ===== Dock tài khoản: góc trên bên phải màn hình =====
+   Cùng bộ .userbox nhưng nằm trong lớp cố định nên phải bỏ kiểu "chiếm
+   hết chiều ngang" của bản trong sidebar: viên thuốc gọn, chữ co ellipsis. */
+.acct-dock{position:fixed;top:14px;right:16px;z-index:998;display:flex;justify-content:flex-end}
+.auth-locked .acct-dock{display:none}
+.acct-dock .userbox{flex-wrap:nowrap;align-items:center;gap:8px;padding:6px 8px;border-radius:999px;
+  background:rgba(13,20,36,.9);backdrop-filter:blur(10px);box-shadow:0 12px 32px -18px rgba(0,0,0,.95)}
+.acct-dock .userbox .avatar{width:28px;height:28px;font-size:13px}
+.acct-dock .userbox .uinfo{flex:0 1 200px;min-width:0}
+.acct-dock .userbox .btn{width:auto;padding:6px 12px;font-size:12px;border-radius:999px}
+.acct-dock .userbox.signed-in{border-color:rgba(77,225,255,.55)}
+@media (max-width:860px){
+  .acct-dock{top:12px;right:12px}
+  .acct-dock .userbox .uinfo{display:none}
+}
+@media (max-width:520px){
+  /* trên điện thoại chỉ còn avatar + Đăng xuất, nút Tài khoản đã có trong menu */
+  .acct-dock #accountBtn{display:none}
+}
+
+/* ===== Biển "không có internet" (js/app.js, #netFlag) =====
+   Đỉnh - giữa màn hình: bên trái chừa chỗ cho nút menu (15px), bên phải chừa
+   dock tài khoản (16px), còn khối này chỉ hiện khi thực sự mất mạng nên không
+   bao giờ chiếm chỗ lâu. Không nằm trong .app nên vẫn thấy trên màn hình đăng
+   nhập — mất mạng thì EmailJS cũng không gửi được mã, người dùng phải biết. */
+.net-flag{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:998;
+  max-width:min(620px,calc(100vw - 48px));margin:0;padding:8px 16px;border-radius:999px;
+  border:1px solid rgba(255,180,84,.5);background:rgba(13,20,36,.94);backdrop-filter:blur(10px);
+  color:var(--amber);font:12px/1.45 var(--sans);text-align:center;
+  box-shadow:0 12px 32px -18px rgba(0,0,0,.95)}
+.net-flag[hidden]{display:none}
+@media (max-width:860px){
+  /* tụt xuống dưới nút ☰ để không đè lên nó */
+  .net-flag{top:58px}
+}
+
+/* ===== Hướng dẫn ===== */
+.guide-steps{margin:0;padding:0;list-style:none;counter-reset:g;display:grid;gap:14px}
+.guide-steps li{counter-increment:g;display:grid;grid-template-columns:34px 1fr;column-gap:12px}
+.guide-steps li::before{content:counter(g);grid-row:span 2;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:700 14px var(--mono);color:var(--cyan);border:1px solid var(--cyan)}
+.guide-steps span{color:#a9b6cf;font-size:14px}
+.guide-ranks{list-style:none;margin:8px 0 0;padding:0}
+.guide-ranks li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.guide-ranks li:last-child{border-bottom:0}
+.guide-ranks em{font:600 13px var(--mono);color:var(--cyan);font-style:normal}
+.table-scroll{overflow-x:auto}
+.guide-table{width:100%;border-collapse:collapse;font-size:14px}
+.guide-table th,.guide-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.guide-table th{color:var(--mute);font-weight:500}
+.guide-table td:first-child{white-space:nowrap;font-weight:700}
+details{border-bottom:1px solid var(--line);padding:10px 0}
+details:last-child{border-bottom:0}
+details summary{cursor:pointer;font-weight:700}
+details p{margin:8px 0 0;color:#a9b6cf}
+
+/* ===== Thông báo chế độ đăng nhập (demo / email thật) ===== */
+.auth-notice{display:flex;gap:10px;align-items:flex-start;margin:0 0 16px;padding:11px 13px;border-radius:10px;font-size:12.5px;line-height:1.55}
+.auth-notice[hidden]{display:none}
+.auth-notice p{margin:0!important}
+.auth-notice-icon{flex:none;font-size:15px;line-height:1.2}
+.auth-notice.demo{border:1px solid rgba(255,180,84,.5);background:rgba(255,180,84,.08);color:#ffd9a0}
+.auth-notice.real{border:1px solid rgba(110,231,168,.45);background:rgba(110,231,168,.07);color:#c8f7dd}
+.auth-remember{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--mute);margin-top:12px;cursor:pointer}
+.auth-remember input{width:16px;height:16px;flex:none}
+/* Danh sách tài khoản đang nằm trong localStorage — trả lời câu hỏi
+   "đăng ký xong tải lại trang thấy tài khoản biến đâu mất". */
+.auth-saved{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.auth-saved:empty{display:none}
+.auth-saved-head{margin:0;font-size:12px;color:var(--mute);line-height:1.5;overflow-wrap:anywhere}
+.auth-saved-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chipbtn{font:12px var(--mono);color:var(--cyan);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);border-radius:999px;padding:5px 10px;cursor:pointer}
+.chipbtn:hover{background:rgba(34,211,238,.16)}
+.chipbtn.current{border-color:var(--ok);color:var(--ok);background:rgba(110,231,168,.1)}
+
+/* Ô mã demo: mờ tới khi bấm để người nhìn trộm không đọc được */
+#authDemoCode{filter:blur(5px);cursor:pointer;transition:filter .2s;user-select:none}
+#authDemoCode.revealed{filter:none;user-select:text}
+
+/* ===== Toast ===== */
+.toast{display:flex;align-items:center;gap:10px;max-width:min(78vw,420px)}
+.toast .toast-xp{flex:none;font:700 12px var(--mono);padding:3px 9px;border-radius:99px;background:var(--ok);color:#04121a}
+.toast .toast-xp[hidden]{display:none}
+.toast #toastMsg{font-weight:600;font-size:14px;text-align:left}
+
+/* ===== Bẫy phishing: nhắc khi đã bấm nộp mật khẩu ===== */
+.caught{margin-top:14px;padding:11px 14px;border-radius:10px;border:1px solid var(--red);background:rgba(255,92,122,.12);color:#ffb3c1;font-size:13px;text-align:center;animation:pop .3s ease}
+.caught[hidden]{display:none}
+
+/* ===== Bảng cấu hình ở trang Hướng dẫn ===== */
+.settings-form{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.settings-form label{font-size:12px;color:var(--mute);margin-top:8px}
+.settings-form input{width:100%}
+.settings-form .row input{flex:1;min-width:0}
+.settings-form code{font:12px var(--mono);color:var(--cyan)}
+.guide-details{margin-top:16px;border-bottom:0}
+.guide-details summary{color:var(--cyan)}
+.guide-details .guide-steps{margin-top:14px}
+.cfg-status{min-height:20px;margin-top:12px;font-size:13px;color:var(--mute);overflow-wrap:anywhere}
+.cfg-status.ok{color:var(--ok)}
+.cfg-status.warn{color:var(--amber)}
+.cfg-status.err{color:var(--red)}
+.i18n-coverage{margin-top:10px;font:12px var(--mono);color:var(--mute);overflow-wrap:anywhere}
+#i18nBar{height:8px!important;width:0;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .25s;grid-column:1/-1!important}
+.i18n-h4{margin:18px 0 4px;font-size:14px;color:var(--cyan)}
+.i18n-files{margin:0 0 12px;padding-left:18px;list-style:none;font:12px var(--mono);color:var(--mute)}
+.i18n-files li{margin:4px 0}
+.i18n-files li::before{content:">";margin-right:8px;color:var(--ok)}
+
+/* ===== Chế độ báo lỗi bản dịch ===== */
+/* Khi bật, mọi chữ trên màn hình thành ô nhập: con trỏ + viền nét đứt báo
+   "bấm vào đây để sửa" mà không cần thêm lớp phủ nào chặn tương tác. */
+body.report-mode{cursor:crosshair}
+body.report-mode :not(#i18nReportMode):not(#i18nReportMode *):not(.fix-box):not(.fix-box *):hover{text-decoration:underline dashed var(--amber);text-underline-offset:3px;cursor:pointer}
+#i18nReportMode.active{color:#04121a;background:var(--amber);border-color:var(--amber)}
+#i18nReportMode.active:hover{filter:brightness(1.08)}
+
+/* ===== Ô sửa bản dịch ===== */
+/* Không phải window.prompt: trang mở trong iframe có sandbox là hộp đó bị chặn
+   im lặng, người bấm vào chữ sai không thấy gì. Ô này nằm sát dòng chữ vừa
+   bấm, đóng bằng Esc/Huỷ, Enter để lưu. */
+.fix-box{position:absolute;z-index:9998;width:min(360px,calc(100vw - 24px));display:grid;gap:9px;padding:13px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--amber);box-shadow:0 18px 44px -18px rgba(0,0,0,.85);}
+.fix-box p{margin:0;font:12px/1.6 var(--mono);color:var(--mute);white-space:pre-wrap;overflow-wrap:anywhere}
+.fix-box input{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:#060a12;color:var(--text);font:13px var(--sans);}
+.fix-box input:focus{outline:0;border-color:var(--amber);box-shadow:0 0 0 3px rgba(255,180,84,.14)}
+.fix-box-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* ===== Ô kết quả tính thời gian bẻ khoá ===== */
+#timeToCrackBox{display:grid;gap:6px}
+#timeToCrackBox .k{color:var(--mute);margin-right:8px}
+#timeToCrackBox small{display:block;margin-top:8px;line-height:1.5}
+
+/* ===== Các lớp text động trong lab ===== */
+.term-body .t-muted{color:var(--mute)}
+.siem-line .siem-ip{color:var(--cyan)}
+.sqlmap{margin:0;font:12px/1.6 var(--mono);color:#9be8bb;white-space:pre-wrap;overflow-wrap:anywhere}
+.av-busy,.av-demo-note{padding:12px;font:12px var(--mono);color:var(--mute)}
+.av-demo-note{color:var(--amber)}
+
+/* ===== Sidebar: khác biệt khi chưa đăng nhập ===== */
+.userbox.signed-in{border-color:rgba(77,225,255,.4);box-shadow:0 0 18px -8px rgba(77,225,255,.5)}
+.userbox:not(.signed-in) .avatar{background:var(--raise);color:var(--mute)}
+
+/* select ở mọi nơi theo đúng chủ đề tối (trước đây chỉ .lang-switch được style) */
+select{appearance:none;-webkit-appearance:none;background:#060a12 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%234de1ff'/></svg>") no-repeat right 10px center;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 30px 9px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+select:hover{border-color:#2d3d63}
+select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+
+/* ===== Trợ lý AI: nút nổi + khung chat (js/ai.js) =====
+   Nút nằm ở đáy - trái, tính cả chiều sidebar (248px) để không đè lên menu.
+   Toast ở góc phải dưới nên hai khối không bao giờ chồng nhau. Panel cao theo
+   viewport, phần hội thoại tự cuộn; [hidden] phải thắng display:flex.
+   Ba khối phụ trong cùng một mục: khay ảnh đính kèm (#aiImages), ô độ sâu câu
+   trả lời (#aiDepth), nút phóng to (.ai-wide + resize) và dòng trạng thái "mất
+   internet" (data-state="no_net"). */
+.ai-fab{position:fixed;left:272px;bottom:22px;z-index:997;display:flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:999px;border:1px solid rgba(77,225,255,.55);background:rgba(13,20,36,.92);
+  color:var(--cyan);font:700 13px var(--sans);cursor:pointer;backdrop-filter:blur(8px);
+  box-shadow:0 12px 32px -14px rgba(77,225,255,.6);transition:transform .18s,filter .18s}
+.ai-fab:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.ai-fab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+body.ai-open .ai-fab{display:none}
+body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
+.ai-panel{position:fixed;left:272px;bottom:22px;z-index:998;display:flex;flex-direction:column;gap:10px;
+  width:min(430px,calc(100vw - 300px));max-height:min(640px,72vh);padding:14px;
+  border:1px solid var(--line);border-radius:16px;background:rgba(13,20,36,.97);backdrop-filter:blur(10px);
+  box-shadow:0 26px 64px -24px rgba(0,0,0,.85)}
+.ai-panel[hidden]{display:none}
+.ai-head{display:flex;align-items:flex-start;gap:8px}
+.ai-head-text{flex:1;min-width:0}
+.ai-head h3{margin:0;font-size:15px;line-height:1.25}
+.ai-head small{display:block;margin-top:2px;font-size:11.5px;line-height:1.35}
+.ai-head .btn{flex:none}
+/* Trạng thái máy chủ: vẽ bằng textContent trong js/ai.js, màu đổi theo
+   data-state để biết bệnh trước khi gõ câu hỏi. */
+.ai-status{display:flex;align-items:center;gap:7px;margin:0;padding:7px 10px;border-radius:10px;
+  border:1px solid var(--line);background:rgba(6,10,18,.7);font:12px var(--sans);line-height:1.4}
+.ai-status[hidden]{display:none}
+.ai-status i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.ai-status code{font:11.5px var(--mono);color:var(--text);background:rgba(255,255,255,.06);
+  padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
+.ai-status[data-state="ready"]{border-color:rgba(110,231,168,.45)}
+.ai-status[data-state="ready"] i{background:var(--ok)}
+.ai-status[data-state="no_key"]{border-color:rgba(255,180,84,.45)}
+.ai-status[data-state="no_key"] i{background:var(--amber)}
+.ai-status[data-state="offline"]{border-color:rgba(255,92,122,.45)}
+.ai-status[data-state="offline"] i{background:var(--red)}
+/* Mất internet (no_net) là màu hổ phách, khác "máy chủ chưa chạy" (đỏ): hai bệnh
+   khác nhau, cách sửa khác nhau — đỏ cho người ta đi bật lại proxy đang chạy tốt
+   là hướng dẫn sai. */
+.ai-status[data-state="no_net"]{border-color:rgba(255,180,84,.45)}
+.ai-status[data-state="no_net"] i{background:var(--amber)}
+/* "external": máy chủ công khai được KHAI nhưng không trả lời. Hổ phách chứ không
+   đỏ: host miễn phí thường ngủ, bấm Thử lại là đủ — sơn đỏ một thứ đang thức dậy
+   là hướng dẫn sai, giống đúng lý do no_net không dùng màu của offline. */
+.ai-status[data-state="external"]{border-color:rgba(255,180,84,.45)}
+.ai-status[data-state="external"] i{background:var(--amber)}
+.ai-status[data-state="checking"] i{animation:ai-blink 1s ease-in-out infinite}
+@keyframes ai-blink{50%{opacity:.25}}
+/* Ô hồ sơ tự chọn trong khung chat: gập lại theo mặc định để không chiếm chỗ,
+   mở ra mới thấy ô nhập. Nét viền giống #aiStatus vì cùng một loại khối. */
+.ai-profile{margin:0;padding:0;border:1px solid var(--line);border-radius:10px;
+  background:rgba(6,10,18,.7);font:12px var(--sans)}
+.ai-profile>summary{padding:7px 10px;cursor:pointer;list-style:none;color:var(--mute)}
+.ai-profile>summary::-webkit-details-marker{display:none}
+.ai-profile>summary::before{content:"▸ ";color:var(--accent)}
+.ai-profile[open]>summary::before{content:"▾ "}
+.ai-profile textarea{display:block;width:calc(100% - 20px);margin:0 10px 6px;padding:7px 8px;
+  border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);
+  color:var(--text);font:12px var(--sans);resize:vertical;min-height:64px}
+.ai-profile textarea:focus{outline:none;border-color:var(--accent)}
+.ai-profile-state{margin:0;padding:0 10px 8px;color:var(--mute);line-height:1.45}
+/* Nút "Thử lại" ngay trong dòng trạng thái: bật chay-ai.bat xong bấm là biết kết quả,
+   không phải đóng/mở panel. flex:none để dòng chữ dài không bẹp nút. */
+.ai-retry{flex:none;margin-left:auto;padding:3px 10px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.06);color:var(--text);font:11.5px var(--sans);cursor:pointer}
+.ai-retry:hover{border-color:var(--accent);color:var(--accent)}
+.ai-log{flex:1;min-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px;
+  border:1px solid var(--line);border-radius:12px;background:rgba(6,10,18,.7)}
+.ai-empty{margin:0;padding:10px 6px;text-align:center;font-size:12.5px}
+.ai-msg{max-width:92%;display:flex;flex-direction:column;gap:3px}
+.ai-msg b{font:600 10.5px var(--mono);letter-spacing:.4px;color:var(--mute)}
+.ai-msg p{margin:0;padding:9px 11px;border-radius:12px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-msg.user{align-self:flex-end;align-items:flex-end}
+.ai-msg.user p{background:rgba(77,225,255,.14);border:1px solid rgba(77,225,255,.4)}
+.ai-msg.model p{background:var(--raise);border:1px solid var(--line)}
+/* Dòng của chính app (lỗi mạng, đang chờ) — nét đứt, chữ nhỏ, không có nhãn
+   "CySim AI" để người đọc không nhầm đây là câu trả lời của mô hình. */
+.ai-msg.system{max-width:100%;align-self:stretch}
+.ai-msg.system p{border-style:dashed;border-color:#3a4a70;background:rgba(255,92,122,.07);
+  color:#f3cdd6;font-size:12.5px}
+/* .ai-msg.ai-pending: phải hai class mới thắng .ai-msg.system phía trên,
+   nếu không dòng "đang soạn" sẽ đỏ lòm như một lỗi. */
+.ai-msg.ai-pending p{background:transparent;border-color:var(--line);color:var(--mute);font-style:italic}
+.ai-note{margin:0;font-size:11.5px;line-height:1.45}
+.ai-form{display:flex;gap:8px}
+.ai-form input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line);
+  background:#060a12;color:var(--text);font:14px var(--sans)}
+.ai-form input:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+.ai-form .btn{flex:none}
+/* Nút "Đính ảnh": .btn mặc định không phải flex nên icon + chữ phải tự xếp. */
+.ai-image-btn{display:inline-flex;align-items:center;gap:6px}
+.ai-image-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* ---- ảnh đính kèm (khay trước khi gửi + thu nhỏ trong bong bóng) ----
+   Khay do veAnhKem() vẽ, mỗi tấm có nút ✕ để bỏ. Ảnh hiện trong bong bóng thì
+   chỉ là bản xem nhỏ: dữ liệu thật nằm trong RAM của đúng lượt hỏi vừa rồi. */
+.ai-images{display:flex;flex-wrap:wrap;gap:8px;padding:9px 10px;border:1px solid var(--line);
+  border-radius:12px;background:rgba(6,10,18,.7)}
+.ai-images[hidden]{display:none}
+.ai-img{position:relative;width:86px}
+.ai-img img{display:block;width:86px;height:86px;object-fit:cover;border-radius:9px;
+  border:1px solid var(--line);background:#060a12}
+.ai-img span{display:block;max-width:86px;margin-top:3px;font:10.5px var(--mono);color:var(--mute);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-img-bo{position:absolute;top:4px;right:4px;width:20px;height:20px;padding:0;border-radius:6px;
+  border:1px solid var(--line);background:rgba(6,10,18,.9);color:var(--text);font:11px/1 var(--sans);cursor:pointer}
+.ai-img-bo:hover{border-color:var(--red);color:var(--red)}
+.ai-image-state{margin:0;font-size:11.5px;line-height:1.45}
+.ai-thumbs{display:flex;flex-wrap:wrap;gap:6px}
+.ai-thumb{max-width:170px;max-height:170px;border-radius:10px;border:1px solid rgba(77,225,255,.4);
+  background:#060a12;object-fit:contain}
+/* Lượt hỏi cũ nạp từ localStorage: ảnh KHÔNG được lưu (xem js/ai.js), bong bóng
+   chỉ còn dòng ghi chú số ảnh — vẽ nghiêng, chữ nhỏ để không giống câu trả lời. */
+.ai-img-note{font-size:11.5px;font-style:italic;color:var(--mute)}
+/* Đồng hồ đo thật của một lượt hỏi (js/ai.js): nghiêng, chữ nhỏ, màu nhạt để nó
+   là chú thích về tốc độ chứ không phải một phần nội dung câu trả lời. */
+.ai-time{font-size:11px;font-style:italic;color:var(--mute)}
+/* Ô chọn độ sâu: hàng chữ nhỏ ngay trên nút "Gửi". KHÔNG đặt lại nền/viền ở đây:
+   thẻ <select> đã có quy ước chung (appearance:none + mũi tên vẽ bằng SVG data-
+   URI ở khối select phía trên); ghi đè `background` là mất luôn mũi tên. Chỉ sửa
+   cỡ chữ và padding cho khớp hàng chữ 11.5px, giữ mũi tên bằng background-position. */
+.ai-depth-row{display:flex;align-items:center;gap:8px;margin:0;padding:0 2px 6px;font-size:11.5px;color:var(--mute)}
+.ai-depth-row label{flex:none;font:600 10.5px var(--mono);letter-spacing:.4px}
+.ai-depth-row select{flex:1;min-width:0;padding:5px 26px 5px 8px;font-size:11.5px;background-position:right 8px center}
+/* Kéo-thả ảnh vào khung: viền nét đứt để phân biệt thật rõ với khung thường. */
+.ai-panel.ai-drop{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(77,225,255,.25),0 26px 64px -24px rgba(0,0,0,.85)}
+.ai-panel.ai-drop .ai-log{border-color:var(--cyan);border-style:dashed}
+/* ---- phóng to / kéo rộng ----
+   .ai-wide: cỡ rộng cố định, nhớ trong cysim-ai-rong, vẫn chừa sidebar 272px.
+   resize:both: to tuỳ ý theo tay kéo (góc dưới-phải), không ghi lại — ảnh cần
+   xem to thì kéo tạm, không phải bấm. Muốn resize hiện tay nắm thì overflow
+   phải khác "visible"; "hidden" giữ bo góc và không làm vỡ luồng cuộn của #aiLog.
+   #aiLog co giãn theo vì nó là flex:1 trong cột. */
+.ai-panel{resize:both;overflow:hidden}
+.ai-panel.ai-wide{width:min(1000px,calc(100vw - 300px));max-height:min(920px,92vh)}
+.ai-panel.ai-wide .ai-log{min-height:280px}
+@media (max-width:860px){
+  .ai-fab{left:16px;bottom:16px}
+  .ai-panel{left:16px;right:16px;width:auto;bottom:16px;max-height:74vh;
+    /* Trên điện thoại không có chuột để kéo góc; màn hình đã hẹp nên resize
+       chỉ tổ cho phép kéo khung bé xíu rồi mất nút Gửi. */
+    resize:none}
+  .ai-panel.ai-wide{left:8px;right:8px;bottom:8px;width:auto;max-height:92vh}
+  .ai-thumb{max-width:120px;max-height:120px}
+}
