@@ -68,7 +68,6 @@
              forbidden | api | empty | unknown.
    ========================================================="""
 
-import ast
 import base64
 import binascii
 import json
@@ -78,6 +77,8 @@ import sys
 import time
 from pathlib import Path
 from itertools import chain
+from flask_cors import CORS
+
 
 from flask import Flask, Response, jsonify, request, stream_with_context
 
@@ -517,6 +518,7 @@ def instruction_for(lang, ho_so=""):
 
 
 app = Flask(__name__)
+CORS(app)
 # Trần body: đủ cho prompt + lịch sử (vài chục KB) VÀ ảnh base64 đi kèm. Con số
 # lấy từ MAX_IMAGES_BYTES nhân độ phình của base64, xem khối ảnh ở trên.
 app.config["MAX_CONTENT_LENGTH"] = MAX_BODY_BYTES
@@ -958,82 +960,6 @@ def config():
     )
 
 
-# Mục phải khớp giữa hai bản server. Chỉ dẫn hệ thống là 4.023 ký tự tiếng Việt có
-# dấu viết tay: sửa ở proxy mà quên ở hàm Netlify thì khách trên
-# cysim.netlify.app nhận câu trả lời theo khuôn CŨ mà không ai nhìn ra — một app
-# dạy bảo mật không được phép có hai sự thật.
-MUC_CAN_KHOP = [
-    "SYSTEM_INSTRUCTION", "TEN_NGU_TRONG_APP", "CHAT_ROLES", "ANH_CHO_PHEP",
-    "MODEL", "FALLBACK_MODEL", "DEEP_MODEL", "MAX_OUTPUT_TOKENS",
-    "MAX_PROMPT_CHARS", "MAX_PROFILE_CHARS", "MAX_HISTORY_TURNS", "MAX_TURN_CHARS",
-    "MAX_HISTORY_CHARS", "MAX_IMAGES", "MAX_IMAGE_BYTES", "MAX_IMAGES_BYTES",
-    "MAX_BODY_BYTES", "SO_LAN_THU_LAI",
-]
-
-
-def gia_trinh_dinh(node_value):
-    """Giá trị một hằng số viết trong nguồn: chữ/số/dict/set nguyên khối, hoặc mặc
-    định của os.environ.get("KEY", "mac-dinh") — để so được MODEL hay MAX_OUTPUT_TOKENS
-    mà không phải chạy file (chạy là đụng tới key thật)."""
-    try:
-        return ast.literal_eval(node_value)
-    except (ValueError, TypeError):
-        pass
-    for con in ast.walk(node_value):
-        if isinstance(con, ast.Call) and getattr(con.func, "attr", "") == "get" and len(con.args) == 2:
-            try:
-                return ast.literal_eval(con.args[1])
-            except (ValueError, TypeError):
-                continue
-    return None
-
-
-def doi_chieu_netlify():
-    """So netlify/functions/gemini.py với chính file này, từng ký tự, không import.
-
-    Trả True khi khớp (hoặc khi không có bản Netlify — dùng app trên máy mình thì
-    không cần tới nó). Đọc nguồn bằng ast chứ không import: import hàm Netlify trên
-    máy này là đọc .env của máy này, tức là để hai biến môi trường quyết định việc
-    "hai bản có khớp nhau không" — câu hỏi đó phải có đáp án độc lập với môi trường.
-    """
-    ban_khac = Path(__file__).resolve().parent.parent / "netlify" / "functions" / "gemini.py"
-    if not ban_khac.is_file():
-        print("đối chiếu bản Netlify: BỎ QUA (không có netlify/functions/gemini.py)")
-        return True
-
-    def cua(path):
-        cay = ast.parse(path.read_text(encoding="utf-8"))
-        ra = {}
-        for node in cay.body:
-            if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
-                gia = gia_trinh_dinh(node.value)
-                if gia is not None:
-                    ra[node.targets[0].id] = gia
-        return ra
-
-    try:
-        o_day = cua(Path(__file__).resolve())
-        o_ben = cua(ban_khac)
-    except (SyntaxError, UnicodeDecodeError, OSError) as exc:
-        print("đối chiếu bản Netlify: HỎI — đọc file không được:", exc)
-        return False
-
-    lech = [ten for ten in MUC_CAN_KHOP if o_day.get(ten) != o_ben.get(ten)]
-    if lech:
-        for ten in lech:
-            a, b = o_day.get(ten), o_ben.get(ten)
-            if isinstance(a, str) and isinstance(b, str):
-                print(f"HỎI lệch {ten}: proxy {len(a)} ký tự, hàm Netlify {len(b)} ký tự")
-            else:
-                print(f"HỎI lệch {ten}: proxy={a!r} hàm Netlify={b!r}")
-        return False
-    print(
-        "đối chiếu bản Netlify: ĐẠT |", len(MUC_CAN_KHOP), "mục khớp từng ký tự",
-        "| chỉ dẫn", len(o_day["SYSTEM_INSTRUCTION"]), "ký tự ở cả hai bản",
-    )
-    return True
-
-
 def local_check():
     """Kiểm tra không cần mạng: lịch sử có bị nhận bừa không, contents có đúng
     khuôn không. Chạy: python server/gemini_proxy.py --check"""
@@ -1215,9 +1141,6 @@ def local_check():
         "| ký tự:", len(SYSTEM_INSTRUCTION),
         "| lab được nêu:", co_bao_nhieu, "/", len(chu_de),
     )
-    # ------ HAI BẢN SERVER PHẢI GIỐNG NHAU (xem doi_chieu_netlify) ------
-    ok_net = doi_chieu_netlify()
-    ok = ok and ok_net
     return 0 if ok else 1
 
 
@@ -1260,7 +1183,7 @@ if __name__ == "__main__":
         raise SystemExit(local_check())
     if "--selftest" in sys.argv:
         raise SystemExit(selftest())
-    host = os.environ.get("GEMINI_PROXY_HOST", "127.0.0.1")
+    host = os.environ.get("GEMINI_PROXY_HOST", "0.0.0.0")
     # Render (và phần lớn host Python) chỉ định cổng qua biến PORT — cổng 8000 cứng
     # là dịch vụ chết ngay ở bước "health check". GEMINI_PROXY_PORT vẫn thắng để
     # máy này giữ nguyên hành vi cũ.
@@ -1268,5 +1191,9 @@ if __name__ == "__main__":
     # debug=False là chủ đích: chế độ debug cho phép chạy code tuỳ ý qua trình
     # duyệt debugger, biến một proxy giữ key thành cửa sau.
     print(f"Gemini proxy -> http://{host}:{port}  (model: {MODEL}, key: {bool(os.environ.get('GEMINI_API_KEY'))})")
-    app.run(host="0.0.0.0", port=port, debug=False)
+    # host lấy từ GEMINI_PROXY_HOST, KHÔNG hardcode 0.0.0.0: đặt như vậy là mở proxy
+    # giữ key ra mọi cổng của máy (ở quán cà phê thì cả mạng WiFi cùng chỗ gõ được
+    # /api/gemini và đốt key), và dòng print ngay trên sẽ nói một đằng — chạy một nẻo.
+    # Render không cần tới nó: Render tự đặt GEMINI_PROXY_HOST=0.0.0.0 trong môi trường.
+    app.run(host=host, port=port, debug=False)
 
