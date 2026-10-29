@@ -180,7 +180,7 @@
   const noiGoi = (duongDan) => {
     const e = duongDan || endpoint();
     if (/^[a-z][a-z0-9+.-]*:\/\//i.test(e) || e.startsWith("//")) return e;
-    return (/^file:/.test(location.protocol) ? "http://127.0.0.1:8000" : location.origin) + (e.startsWith("/") ? e : "/" + e);
+    return (/^file:/.test(location.protocol) ? "https://cysim-backend.onrender.com" : location.origin) + (e.startsWith("/") ? e : "/" + e);
   };
   const mayChuCuaToi = () =>
     /^https?:\/\/((127\.0\.0\.1|localhost|\[::1\])(:|$))/i.test(noiGoi());
