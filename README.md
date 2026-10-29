@@ -9,7 +9,7 @@ hạng, khung chat AI **nhận kèm ảnh**, phóng to được, chọn được
 **in số giây đo thật** dưới từng câu (mục 5.1–5.2, 5.4), mở được cả khi
 **mất mạng** (mục 5.3), và 6 ngôn ngữ tự dịch. Không build, không thư viện — 52
 file, mở là chạy. Backend Python là tuỳ chọn, chỉ để gọi Gemini: `server/` cho máy
-này, `netlify/` cho bản web công khai (mục 5.5).
+này, `netlify/` cho cấu hình host tĩnh của bản web công khai (mục 5.5).
 
 ## 1. Chạy thử
 
@@ -69,7 +69,7 @@ Mỗi file source đều có khối chú thích đầu file theo **cùng một k
 | `icons/icon.svg` | 14 | Khiên + dấu tích, SVG thuần. `manifest.json` trỏ tới, `sw.js` cache. |
 | `.vscode/settings.json` | 9 | Một thiết lập: cổng 5505 cho Live Server. App không đọc file này. |
 | `chay-ai.bat` | 75 | Bật cầu nối Gemini **bằng một cú nháy đúp** (Windows): `cd /d "%~dp0"` → **ba lần kiểm tra trước khi chạy** (Python có trong `PATH` không → `python -c "import google.genai"` có import được không → `.env` có tồn tại không) → `python server\gemini_proxy.py` → giữ cửa sổ, và **vòng `:loop` tự bật lại sau 5 giây** nếu proxy chết bất thường (mọi mã thoát, trừ `0` và `3221225786` = người dùng bấm Ctrl+C / tắt cửa sổ). Lần kiểm tra thứ hai sinh ra vì "Python đã cài" ≠ "SDK đã cài": thiếu `google-genai` thì python chết ở `ImportError` trong vòng lặp, cửa sổ flash rồi tắt, và khung chat chỉ báo "máy chủ offline" — đúng cái triệu chứng mà file này tồn tại để chữa. In ra lệnh sửa (`python -m pip install -r server\requirements.txt`) rồi `pause` để người dùng kịp đọc. Không chứa key (proxy tự đọc `.env`). Viết tiếng Anh không dấu vì `cmd.exe` ở codepage 8-bit sẽ hỏi hoá mọi ký tự Unicode. Đây là file duy nhất không phải code app. |
-| `netlify.toml` | 78 | Cấu hình host tĩnh cho Netlify — **thêm ngày 29-10-2026, xem mục 5.5**. Bốn việc: `publish = "."` (app không có bước build nên thư mục gốc chính là thư mục web), `directory = "netlify/functions"`, hai rewrite `/api/gemini` + `/api/health` → `/.netlify/functions/gemini` với `status = 200` (để `js/ai.js` gọi **cùng nguồn**, không phải sửa code lần nữa), và bốn khối `force` chặn `/.env`, `/server/*`, `/tools/*`, `/_legacy/*` bằng 404. `force` là bắt buộc: Netlify ưu tiên file có thật nếu không ép, còn 404 (chứ không 200) để kẻ dò không phân biệt được "file có mà bị chặn" với "không có file". **Không chứa key** — file này ai mở repo cũng đọc được, nên nó chỉ chứa đường dẫn và tên biến. Bẫy ghi ngay trong header: kéo-thả cả thư mục lên Netlify Drop là upload luôn `.env` của máy bạn; deploy từ Git thì `.gitignore` giữ key ở lại máy, khối chặn `/.env` chỉ là lớp thứ hai cho lỡ tay. |
+| `netlify.toml` | 78 | Cấu hình host tĩnh cho Netlify — **thêm ngày 29-10-2026, xem mục 5.5**. Bốn việc: `publish = "."` (app không có bước build nên thư mục gốc chính là thư mục web), `directory = "netlify/functions"`, hai rewrite `/api/gemini` + `/api/health` → `/.netlify/functions/gemini` với `status = 200` — **hai khối này hiện chỉ tổ 404**: Netlify không chạy hàm Python (tài liệu 2026 chỉ nhận TypeScript / JavaScript / Go, và nhân viên host trả lời đúng như vậy trên diễn đàn của Netlify), nên bản web gọi máy chủ ở Render, mục 5.5 đường 2. Viết sẵn để một hàm JS tương lai chỉ cần tồn tại là khung chat sống, không phải sửa `js/ai.js`, và bốn khối `force` chặn `/.env`, `/server/*`, `/tools/*`, `/_legacy/*` bằng 404. `force` là bắt buộc: Netlify ưu tiên file có thật nếu không ép, còn 404 (chứ không 200) để kẻ dò không phân biệt được "file có mà bị chặn" với "không có file". **Không chứa key** — file này ai mở repo cũng đọc được, nên nó chỉ chứa đường dẫn và tên biến. Bẫy ghi ngay trong header: kéo-thả cả thư mục lên Netlify Drop là upload luôn `.env` của máy bạn; deploy từ Git thì `.gitignore` giữ key ở lại máy, khối chặn `/.env` chỉ là lớp thứ hai cho lỡ tay. |
 | `README.md` | — | File bạn đang đọc: bản đồ toàn dự án. |
 
 ### `js/` — nhân của app (nạp theo đúng thứ tự)
@@ -392,11 +392,11 @@ máy này → `http://127.0.0.1:8000/api/gemini`, domain công khai → `/api/ge
 cùng nguồn. Muốn đổi luôn cả lịch sử của một tài khoản: xoá
 `cysim-ai:<email>` (hoặc bấm "Xoá lịch sử" ngay trong khung chat).
 
-### `netlify/` — máy chủ AI cho bản web công khai (thêm 29-10-2026)
+### `netlify/` — cấu hình host tĩnh của bản web + bản serverless mà Netlify KHÔNG chạy
 
 | File | Dòng | Là gì · code của cái gì · như thế nào |
 | --- | --- | --- |
-| `netlify/functions/gemini.py` | 816 | Bản **serverless** của `server/gemini_proxy.py`: cùng hợp đồng (`POST /api/gemini` → `{ok,text,model}`, `GET /api/health` → `{ok,model,keyConfigured,depths,images}`), cùng bộ mã lỗi, nhưng không đòi ai bật Python. Chỉ dùng **thư viện chuẩn** (`urllib`, `concurrent.futures`) — không `requirements.txt`, không SDK — gọi thẳng `https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent` với key đặt trong header `x-goog-api-key` (query string `?key=` bị ghi vào log của mọi thiết bị trung gian). `handler(event, context)` một cửa cho hai đường dẫn: `GET` → health, `POST` → câu hỏi, `OPTIONS` → 204 kèm CORS (để ô `cysim-ai-endpoint` trỏ từ máy khác tới được — đúng cái lỗi CORS mà proxy đã trả giá một buổi). Phần dễ hỏng nhất của một bản sao là **ghép payload**, nên `SYSTEM_INSTRUCTION` (4.023 ký tự), `TEN_NGU_TRONG_APP`, `CHAT_ROLES`, `ANH_CHO_PHEP` và 13 con số trần được `--check` của proxy đối chiếu **từng ký tự bằng `ast`** (đọc nguồn, không import — import là để `.env` của máy này quyết định "hai bản có khớp không"). Tự kiểm tra không cần mạng + không cần key: `python netlify/functions/gemini.py` → sáu khối ĐẠT (chỉ dẫn, lịch sử + khuôn contents, ảnh, ép ngôn ngữ, độ sâu, health). |
+| `netlify/functions/gemini.py` | 833 | Bản **serverless** của `server/gemini_proxy.py`: cùng hợp đồng (`POST /api/gemini` → `{ok,text,model}`, `GET /api/health` → `{ok,model,keyConfigured,depths,images}`), cùng bộ mã lỗi, nhưng không đòi ai bật Python. **NHƯNG NÓ KHÔNG CHẠY TRÊN NETLIFY** — kiểm chứng 29-10-2026: trang "Get started with functions" bản 2026 chỉ nhận TypeScript / JavaScript / Go, và nhân viên Netlify trên diễn đàn host (thread "Python Functions Not Found", 2025) nói đúng một câu: "Currently, you can deploy functions built with TypeScript, JavaScript, and Go." Kéo thả file `.py` vào `netlify/functions/` vì thế không sinh ra hàm nào, `/.netlify/functions/gemini` trả 404, và khung chat báo `remote` — đó chính là bệnh mà mục 5.5 đã chốt bằng máy chủ Python trên Render. File vẫn được GIỮ: nó là bản tham chiếu không-Flask mà `--check` của proxy đối chiếu từng ký tự (18 mục), là khuôn cho host chạy Python thật, và cả đường Netlify cũng chưa từng cứu nổi bản web vì trần 60 s đồng bộ của host nhỏ hơn 202,7 s mà Google mất với key hiện tại. Chỉ dùng **thư viện chuẩn** (`urllib`, `concurrent.futures`) — không `requirements.txt`, không SDK — gọi thẳng `https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent` với key đặt trong header `x-goog-api-key` (query string `?key=` bị ghi vào log của mọi thiết bị trung gian). `handler(event, context)` một cửa cho hai đường dẫn: `GET` → health, `POST` → câu hỏi, `OPTIONS` → 204 kèm CORS (để ô `cysim-ai-endpoint` trỏ từ máy khác tới được — đúng cái lỗi CORS mà proxy đã trả giá một buổi). Phần dễ hỏng nhất của một bản sao là **ghép payload**, nên `SYSTEM_INSTRUCTION` (4.023 ký tự), `TEN_NGU_TRONG_APP`, `CHAT_ROLES`, `ANH_CHO_PHEP` và 13 con số trần được `--check` của proxy đối chiếu **từng ký tự bằng `ast`** (đọc nguồn, không import — import là để `.env` của máy này quyết định "hai bản có khớp không"). Tự kiểm tra không cần mạng + không cần key: `python netlify/functions/gemini.py` → sáu khối ĐẠT (chỉ dẫn, lịch sử + khuôn contents, ảnh, ép ngôn ngữ, độ sâu, health). |
 
 **Ba chỗ đi mượn từ proxy và một chỗ không đi mượn.** Đi mượn: toàn bộ khối làm
 sạch (`clean_profile` / `clean_images` / `sanitize_history` — chặn dung lượng bằng
@@ -441,9 +441,13 @@ mọi lượt sẽ trả `overloaded` chứ không trả lời. Đây là chuy�
 (đã đo và ghi ở mục `server/`), không phải của code: cùng khuôn gọi đó, một key nhanh
 đã đo 1,3–2,6 s thì nằm gọn trong 55 giây.
 
-**Chưa kiểm chứng:** một lần deploy thật. File mới chỉ nằm trong thư mục này;
-`cysim.netlify.app` vẫn chạy bản cũ cho tới khi bạn deploy lại. Các bước và điều phải
-đổi trong dashboard ghi ở mục 5.5.
+**Đã kiểm chứng, và kết luận ngược với ý lúc đầu (29-10-2026):** chưa từng có một lần
+deploy thật nào của file này, nhưng câu hỏi "Netlify có chạy nó không" thì tài liệu của
+host trả lời rõ: **không**. Nên `cysim.netlify.app` có thêm `.py` trong
+`netlify/functions/` vẫn chỉ là file tĩnh, và bản web công khai lấy AI từ máy chủ Python
+trên Render (mục 5.5, đường 2). Toàn bộ phần trên vẫn hữu ích theo cách khác: nó là bản
+tham chiếu không-Flask để `--check` đối chiếu, và là hồ sơ về những gì một hàm serverless
+phải tự lo (buffer, deadline, cold start, endpoint công khai) mà đường Render không có.
 
 ### _legacy/ — code chết, giữ lại để không mất lịch sử
 
@@ -953,50 +957,52 @@ hay `.env.example`. Host tĩnh phát **mọi** file cho **mọi** người: cùn
 kẻ quét GitHub/AI-URLs sẽ tiêu hết hạn mức, còn hóa đơn và trách nhiệm thuộc về chủ
 key. Môi trường của Netlify (`Site settings → Environment variables`) cũng không
 phải lối tắt cho file tĩnh: biến đó chỉ tới được code chạy **trên server** — tức
-`netlify/functions/gemini.py` bên dưới — chứ không rơi vào file gửi cho trình
+máy chủ Python của đường 2 bên dưới — chứ không rơi vào file gửi cho trình
 duyệt. Đây là cùng một bài học mà `js/labs/` dạy người học,
 nên app không được phép làm khác để "cho nó chạy".
 
 **Muốn AI chạy thật trên domain công khai** thì cần một máy chủ AI. Ngày 29-10-2026
-làm **cả hai đường**: đường 1 thêm đúng hai file (`netlify.toml` +
-`netlify/functions/gemini.py`) nên trần 50 file của mục 7 được nâng lên **52** — số
-file mới là 2, không phải 3, vì hàm chỉ dùng thư viện chuẩn của Python; đường 2
-**không thêm file nào**, chỉ đổi cách cấu hình `server/gemini_proxy.py` và một dòng
-trong `js/ai.js`. Hai đường thay thế nhau bằng một biến: `MAI_CONG_KHAI` trống thì
-đi đường 1, có URL thì đi đường 2.
+dự định làm **cả hai đường**, rồi đo và kiểm chứng lại: đường 1 (`netlify.toml` +
+`netlify/functions/gemini.py`, hai file, nâng trần 50 của mục 7 lên **52**) **không
+chạy được trên Netlify**, đường 2 **không thêm file nào**, chỉ đổi cách cấu hình
+`server/gemini_proxy.py` và một dòng trong `js/ai.js` — và đó là đường đang dùng.
+`MAI_CONG_KHAI` giờ chỉ còn hai trạng thái thật: **có URL** thì bản web gọi máy chủ
+Python ở host khác, **trống** thì bản web không có AI nào cả (khung chat báo `remote`
+một cách chính xác), vì host tĩnh không chạy giúp ai tiến trình nào.
 
-1. **Netlify Function — ĐÃ LÀM.** Hai file mới: `netlify.toml` (redirect
-   `/api/gemini` + `/api/health` → `/.netlify/functions/gemini`, che `/.env`,
-   `/server/`, `/tools/`, `/_legacy/`) và `netlify/functions/gemini.py` (gọi thẳng
-   `…/v1beta/models/<model>:generateContent` bằng `urllib`, không SDK, không
-   `requirements.txt`; key đọc từ biến môi trường của Netlify). Mô tả đầy đủ, kèm
-   số đo thật và các hạn giờ, ở mục `netlify/` trong phần 2. **Không phải sửa code
-   app lần nữa**: `js/ai.js` đã tự chọn `/api/gemini` cùng nguồn cho mọi origin
-   không phải loopback.
-
-   Ba bước trong dashboard, theo đúng thứ tự:
-
-   | # | Việc | Nơi bấm | Điều phải thấy |
-   | --- | --- | --- | --- |
-   | 1 | Khai key | Site configuration → Environment variables → `GEMINI_API_KEY` | cùng giá trị đang nằm trong `.env` của máy này; đánh dấu Secret nếu plan cho phép. Các biến khác (`GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`, `GEMINI_DEEP_MODEL`, `GEMINI_MAX_TOKENS`, `GEMINI_THINKING_BUDGET`, `GEMINI_FUNCTION_DEADLINE`, `CYSIM_RPM`, `CYSIM_ORIGINS`) **để trống cũng chạy**, vì mặc định đã nằm trong hàm. |
-   | 2 | Deploy | Kéo **repo** lên GitHub rồi Connect new site from Git, hoặc Netlify Drop | Nên đi đường Git: `git status` thấy `.env` bị ignore nên key không rời khỏi máy. Drop thì phải chắc rằng thư mục upload **không kèm `.env`** — host tĩnh mà nhận được nó là coi như đã dán key lên trang công khai (redirect 404 trong `netlify.toml` là khoá thứ hai, không phải khoá duy nhất). Kéo **file** lẻ tẻ thì không có hàm nào chạy: `netlify.toml` và thư mục `netlify/functions/` phải nằm trong bản deploy. |
-   | 3 | Xác nhận | `curl https://<site>/api/health` | JSON có `keyConfigured:true` và danh sách `depths`. `false` → hàm đã sống nhưng quên bước 1 (khung chat sẽ nói đúng chỗ thiếu, mã `no_key`). |
-
-   Cái được và cái mất, nói thẳng: **mất** hiệu ứng chữ dần (Lambda buffer, không
-   có `text/event-stream`) và thêm cold-start vài giây cho lượt đầu; **được** một
-   máy chủ AI không đòi ai bật Python, và `.ai-time` vẫn in số đo thật. CẢNH BÁO
-   thật nhất: với key hiện tại, câu trả lời đo được **170,5 s**, lớn hơn trần 60 s
-   của host lẫn 55 s hàm tự cắt, nên trên Netlify **mọi lượt sẽ báo `overloaded`**
-   cho tới khi đổi sang key nhanh (đã đo 1,3–2,6 s) — xem mục `server/`. Deploy
-   xong mà thấy chữ đỏ đó thì lỗi nằm ở tốc độ của Google với key này, không phải
-   ở hàm.
+1. **Netlify Function — ĐÃ VIẾT, nhưng host đó KHÔNG chạy: sai ở đâu và vì sao giữ file.**
+   Kiểm chứng 29-10-2026 bằng tài liệu của chính Netlify, không bằng suy đoán: trang
+   "Get started with functions" bản 2026 liệt kê đúng ba ngôn ngữ làm hàm —
+   **TypeScript, JavaScript, Go** — còn trang "Lambda compatibility" (dạng
+   `exports.handler` / `def handler(event, context)` mà file này viết theo) đã bị đánh
+   dấu **deprecated, hết nhận deploy từ 1-7-2027**. Trên diễn đàn host, nhân viên
+   Netlify trả lời một câu gọn cho đúng câu hỏi "vì sao file `.py` của tôi không được
+   phát hiện": *"Currently, you can deploy functions built with TypeScript, JavaScript,
+   and Go."* Nghĩa là `netlify/functions/gemini.py` được Netlify **bỏ qua**,
+   `/.netlify/functions/gemini` trả 404, hai rewrite trong `netlify.toml` chỉ tổ 404
+   theo, và khung chat vẽ đúng bệnh mà ảnh chụp hôm trước đã chụp: `remote`.
+   Nói thẳng chỗ tôi từng nói sai: khi viết hai file đó tôi đã tin (và ghi vào tài liệu)
+   rằng Netlify chạy hàm Python; kiểm chứng lại thì không.
+   Kể cả khi đổi sang hàm JavaScript thì cũng **không** cứu được bản web này: trần
+   đồng bộ của một lời gọi hàm Netlify là 60 giây và không cấu hình được, còn một câu
+   trả lời của key hiện tại đo qua chính `handler()` hôm 29-10 là **202,7 giây** (HTTP
+   200, 490 ký tự, model `gemini-flash-lite-latest`) — hàm sẽ chết hoặc tự cắt và báo
+   `overloaded` ở mọi lượt. Thêm một file `.js` còn phá trần 52 file của mục 7 (và
+   `require("@google/genai")` đòi thêm `package.json`), nên đổi lại là: **không viết
+   hàm Netlify**.
+   File `gemini.py` vẫn nằm lại repo vì hai việc thật: `--check` của proxy đối chiếu
+   18 mục của nó **từng ký tự** (xoá file là hỏng bộ kiểm tra), và nó là khuôn cho host
+   chạy Python thật. Ba biến môi trường (`GEMINI_API_KEY`, tuỳ chọn `GEMINI_MODEL` /
+   `CYSIM_RPM` / `CYSIM_ORIGINS` / `GEMINI_FUNCTION_DEADLINE`) và bài học "đừng kéo-thả
+   cả thư mục lên Drop vì `.env` sẽ bị upload cùng" vẫn đúng nguyên văn — chỉ là chúng
+   thuộc về **đường 2**, xem bên dưới.
 2. **Render Free chạy đúng `server/gemini_proxy.py` — ĐÃ LÀM CODE, CÒN THIẾP BẠN BẤM
    (29-10-2026).** Đường này sinh ra vì một con số: **Netlify giới hạn rewrite dạng
    proxy ở 26 giây**, trong khi một câu trả lời của key này đo qua `handler` hôm
    29-10 là **176,9 giây**. Để Netlify chuyển tiếp hộ `/api/gemini → Render` là cắt
-   đúng 26 giây, chết giữa chừng một cách đều đặn. Nên trình duyệt gọi **thẳng**
-   máy chủ Python, còn `netlify.toml` + hàm Netlify vẫn nguyên đó cho ai để
-   `MAI_CONG_KHAI` trống. **Zero file mới** (repo vẫn 52): `server/requirements.txt`
+   đúng 26 giây, chết giữa chừng một cách đều đặn. Nên **trình duyệt gọi thẳng** máy
+   chủ Python. Đường này cũng là đường ĐANG DÙNG, vì đường 1 không chạy được trên
+   Netlify (xem mục 1 ở trên). **Zero file mới** (repo vẫn 52): `server/requirements.txt`
    đã có sẵn `google-genai` + `Flask`, và proxy đã tự đọc `PORT` mà Render cấp.
 
    | # | Việc | Nơi điền | Điều phải thấy |
@@ -1098,7 +1104,10 @@ nguyên trên Netlify vì chúng chỉ cần file tĩnh.
   (không theo dõi, machine-local). Trần trước là 50; ngày 29-10-2026 bạn Đức đồng ý
   nâng lên 52 để lấy máy chủ AI trên Netlify (`netlify.toml` +
   `netlify/functions/gemini.py`, hai file — không file thứ ba vì hàm chỉ dùng thư
-  viện chuẩn, nên không có `requirements.txt`). Đã tính README, launcher
+  viện chuẩn, nên không có `requirements.txt`). Như mục 5.5 đã ghi lại, Netlify không
+  chạy hàm Python: hai file đó vẫn cần cho cấu hình host tĩnh và cho bộ đối chiếu
+  `--check`, nhưng AI của bản web thì đi đường Render, không đi đường này. Đã tính
+  README, launcher
   `chay-ai.bat`, `server/gemini_proxy.py` + `server/requirements.txt`, `js/ai.js`,
   `js/labs/exam.js`, `.env.example` + `.gitignore`, `_legacy/auth.legacy.js`; chưa
   tính `__pycache__` và file tạm. **Vì đã chạm trần, thêm file mới thì phải gộp

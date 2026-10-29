@@ -1,23 +1,40 @@
 """=========================================================
-   CySim — netlify/functions/gemini.py · cầu nối Google Gemini chạy trên host tĩnh
+   CySim — netlify/functions/gemini.py · bản serverless của cầu nối Google Gemini
 
    LÀ GÌ   : Bản serverless của server/gemini_proxy.py. Cùng một hợp đồng với giao
              diện (POST /api/gemini -> {ok, text, model}; GET /api/health ->
              {ok, model, keyConfigured, depths, images}), nhưng không đòi ai phải
              bật Python trên máy. Lý do phải có file THỨ HAI thay vì dùng lại proxy:
              proxy cần Flask + google-genai (server/requirements.txt) và một process
-             SỐNG LIÊN TỤC, còn Netlify chỉ phục vụ file tĩnh — mở app trên
+             SỐNG LIÊN TỤC, còn host tĩnh thì chỉ phục vụ file — mở app trên
              cysim.netlify.app thì trình duyệt của khách gọi vào 127.0.0.1:8000 tức
              là gọi vào chính máy khách, máy chủ AI vĩnh viễn không tồn tại ở đó.
              Ở đây chỉ dùng thư viện chuẩn của Python (urllib), gọi thẳng
              REST https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent
-             để Netlify không phải cài gì thêm, và key lấy từ môi trường của Netlify
+             để host không phải cài gì thêm, và key lấy từ môi trường của host
              chứ KHÔNG nằm trong file nào của repo.
 
-   CHẠY    : Không chạy bằng tay — Netlify gọi handler(event, context) mỗi lượt POST.
-             Ba bước bật nó trên host (chi tiết đầy đủ trong README mục 5.5):
-             1) Netlify -> Site configuration -> Environment variables: thêm
-                GEMINI_API_KEY (giá trị là key MỚI; đánh dấu Secret nếu plan cho phép).
+   TÌNH TRẠNG (đo và kiểm chứng 29-10-2026, đọc trước khi tin phần còn lại):
+             Netlify KHÔNG chạy file này. Trả lời chính thức của nhân viên Netlify
+             trên diễn đàn host (thread "Python Functions Not Found", 2025) và trang
+             "Get started with functions" bản 2026 đều nói chỉ deploy được hàm
+             TypeScript / JavaScript / Go. Hai khối redirect trong netlify.toml vì
+             thế hiện tổ 404, và máy chủ AI công khai của bản web đi đường khác:
+             server/gemini_proxy.py chạy trên Render Free, khai qua MAI_CONG_KHAI
+             trong js/ai.js (README mục 5.5, đường 2). File này được GIỮ LẠI vì hai
+             việc vẫn thật: nó là bản tham chiếu không-flask mà --check của proxy đối
+             chiếu từng ký tự (18 mục), và nó là khuôn cho bất kỳ host nào chạy Python
+             (Firebase Functions cần thẻ tín dụng, các host Python thuần thì không cần
+             sửa một dòng nào). Kể cả khi hàm chạy được thì cũng chưa cứu nổi bản web:
+             một câu hỏi đo thật mất 202,7 giây với key hiện tại, lớn hơn trần 60 giây
+             đồng bộ của Netlify — nên vẫn phải cần Render hoặc một key nhanh.
+
+   CHẠY    : Không ai gọi bằng tay — một host chạy Python sẽ gọi handler(event, context)
+             mỗi lượt POST. Trên Netlify thì KHÔNG có ai gọi (xem TÌNH TRẠNG ở trên),
+             nên ba bước dưới đây là cho host Python khác, còn bản web thật đang chạy
+             theo đường Render.
+             1) Khai GEMINI_API_KEY vào môi trường của host (giá trị là key MỚI; đánh
+                dấu Secret nếu plan cho phép) — không bao giờ vào file nào trong repo.
              2) Deploy repo từ Git, KHÔNG kéo-thả cả thư mục: .env của máy bạn nằm ở
                 gốc và sẽ bị upload cùng. netlify.toml đã trỏ publish = "." và
                 directory = "netlify/functions", redirect /api/gemini + /api/health.

@@ -3,25 +3,25 @@
 #
 # LÀ GÌ   : Ba việc, và chỉ ba việc. (1) Nói Netlify rằng thư mục gốc của repo
 #           CHÍNH LÀ thư mục web (app này không có bước build: index.html + js/ +
-#           style.css chạy nguyên văn). (2) Nói nơi cất hàm serverless giữ key
-#           Gemini: netlify/functions/gemini.py. (3) Đi kèm hai đường dẫn mà
-#           js/ai.js gọi tới — /api/gemini và /api/health — vì Netlify chỉ phục vụ
-#           file tĩnh, nếu không viết hai khối redirect dưới đây thì chúng trả về
-#           trang 404 và khung chat báo "máy chủ AI không chạy được ở đây"; và chặn
-#           bốn đường không bao giờ được phép trở thành file tải về được (./.env,
-#           /server/*, /tools/*, /_legacy/*).
+#           style.css chạy nguyên văn). (2) trỏ hàm vào netlify/functions/ — NHƯNG
+#           ĐỌC CÁI NÀY TRƯỚC KỲ VỌNG: tài liệu Netlify bản 2026 chỉ nhận hàm
+#           JavaScript / TypeScript / Go, vì vậy bản gemini.py của repo ĐÂY KHÔNG
+#           chạy trên Netlify; hai khối redirect dưới hiện chỉ tổ 404, còn máy chủ
+#           AI của bản web nằm ở Render (js/ai.js -> MAI_CONG_KHAI). (3) Chặn bốn
+#           đường không bao giờ được phép trở thành file tải về được (/.env,
+#           /server/*, /tools/*, /_legacy/*) — phần này vẫn đúng và vẫn đang có tác dụng.
 #   KHÔNG CHỨA KEY. Key đặt trong Netlify -> Site configuration -> Environment
 #   variables (GEMINI_API_KEY). File này là file công khai: ai mở repo cũng đọc
 #   được, nên nó chỉ được chứa đường dẫn và tên biến.
 #
 # CHẠY    : Netlify đọc file này lúc deploy (Git-based hoặc `netlify deploy`).
-#           Muốn thử trên máy: npm i -g netlify-cli rồi `netlify dev` — lệnh này
-#           phục vụ cả site lẫn hàm, vào http://localhost:8888/api/health để xem
-#           hàm trả gì mà không cần đẩy lên mạng.
+#           Trên host đó KHÔNG có hàm nào phục vụ /api/gemini — đó chính là lý do
+#           MAI_CONG_KHAI trong js/ai.js phải trỏ một máy chủ Python chạy ở nơi
+#           khác (README mục 5.5, đường 2: Render Free chạy server/gemini_proxy.py).
 #
-# CHẠM TỚI: js/ai.js (macDinh — mọi origin công khai đều gọi /api/gemini cùng
-#           origin), netlify/functions/gemini.py, server/gemini_proxy.py (máy chủ
-#           cục bộ, không đụng tới file này).
+# CHẠM TỚI: js/ai.js (macDinh — origin công khai gọi /api/gemini cùng nguồn KHI
+#           MAI_CONG_KHAI trống; có URL thì gọi thẳng máy chủ đã khai), sw.js (mọi
+#           đường /api/* đều bỏ qua, không cache).
 #
 # BẪY ĐÃ BIẾT: đừng kéo-thả (drag & drop) cả thư mục dự án lên Netlify. Publish
 #           ở đây là "." nên mọi file trong thư mục đều được upload, kể cả .env —

@@ -7,7 +7,7 @@
              khoản đang dùng, nên AI nhớ những gì vừa nói.
              MÁY CHỦ AI NẰM Ở ĐÂU phụ thuộc chỗ mở trang: trên chính máy này thì
              gọi http://127.0.0.1:8000; trên một domain công khai thì gọi
-             /api/gemini CÙNG NGUỒN (đường Netlify Function), hoặc gọi THẲNG
+             /api/gemini CÙNG NGUỒN (host đó phải tự chạy máy chủ AI), hoặc gọi THẲNG
              MAI_CONG_KHAI khi máy chủ Python chạy ở một host khác (Render / Railway
              / VPS). Host tĩnh không chạy Python, nên bản web công khai chỉ có AI
              khi ai đó deploy thêm một máy chủ. Không có chuyện "thiếu API key" trên
@@ -115,7 +115,7 @@
      duyệt của người lạ cũng không có đường gọi về máy của tác giả. Nên:
        - mở trên chính máy này (127.0.0.1 / localhost / [::1] / file://) -> proxy cục bộ;
        - mở từ một domain công khai -> "/api/gemini" CÙNG NGUỒN, tức là bản web đó
-         phải tự kèm một máy chủ AI (Netlify Function) thì khung chat mới sống;
+         phải tự kèm máy chủ AI; Netlify chỉ nhận hàm JS/TS/Go nên .py không chạy ở đó;
        - cũng từ domain công khai, nếu MAI_CONG_KHAI có giá trị -> gọi THẲNG máy chủ
          Python ở host khác, và đây là đường giữ được chữ về dần (SSE) vì một tiến
          trình thật không bị trần 60 giây của serverless cắt ngang.
@@ -126,7 +126,7 @@
   /* Máy chủ AI ở NƠI CÔNG KHAI, không cùng nguồn với trang (đường Render/Railway/
      VPS chạy chính server/gemini_proxy.py). Dán URL gốc vào đây MỘT lần, ví dụ
      "https://cysim-ai.onrender.com" — để trống nghĩa là gọi "/api/gemini" cùng
-     nguồn như cũ (đường Netlify Function).
+     nguồn như cũ (chỉ sống nếu chính host đó chạy được máy chủ AI).
      Vì sao phải gọi THẲNG mà không để Netlify chuyển tiếp hộ: rewrite làm proxy
      của Netlify cắt ở 26 giây (docs), trong khi một câu trả lời đo thật hôm
      29-10-2026 mất 176,9 giây — đi đường vòng là chắc chắn chết giữa chừng, dù
