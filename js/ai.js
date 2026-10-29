@@ -177,11 +177,12 @@
      bảo người ta bật chay-ai.bat) và "đang thử URL nào" (để in ra khi sai). Dùng
      cho bản deploy: tác giả trỏ endpoint sang một proxy ở nơi khác thì không được
      còn nhắc file .bat của máy mình nữa. */
-  const noiGoi = (duongDan) => {
+ const noiGoi = (duongDan) => {
     const e = duongDan || endpoint();
-    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(e) || e.startsWith("//")) return e;
-    return (/^file:/.test(location.protocol) ? "https://cysim-backend.onrender.com" : location.origin) + (e.startsWith("/") ? e : "/" + e);
-  };
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(e) || e.startsWith("//")) return e;
+    return "https://cysim-backend.onrender.com" + (e.startsWith("/") ? e : "/" + e);
+};
+
   const mayChuCuaToi = () =>
     /^https?:\/\/((127\.0\.0\.1|localhost|\[::1\])(:|$))/i.test(noiGoi());
   /* Máy chủ ở MỘT HOST KHÁC trang đang chạy (đường Render/Railway/VPS, hoặc ô
