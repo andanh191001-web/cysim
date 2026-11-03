@@ -49,11 +49,30 @@
                  có trong danh sách -> dùng UU_DAI_MAC_DINH, không báo lỗi, không
                  âm thầm đổi model của người dùng. Xem bảng đang chạy ở /api/health.
              11) chạy ở NƠI CÔNG KHAI (đường Render/Railway/VPS, thêm 29-10-2026):
-                 GEMINI_PROXY_HOST=0.0.0.0 + cổng lấy từ biến PORT của host. Khi đó
-                 hai lớp hãm mới có việc: CYSIM_ORIGINS chặn Origin lạ (mặc định
-                 TẮT, loopback luôn được tha) và CYSIM_RPM hãm số lượt/phút mỗi IP
-                 (mặc định 20). Cả hai là ĐỒ HÃM chứ không phải tường — xem khối
-                 "hai lớp hãm" ở phần code.
+                 host TỰ bind 0.0.0.0 khi môi trường có biến PORT (PaaS nào cũng đặt)
+                 và chỉ bind 127.0.0.1 khi chạy ở máy mình — không phải khai gì thêm;
+                 GEMINI_PROXY_HOST vẫn thắng nếu muốn ép. Cổng lấy từ PORT, mặc định
+                 8000. Bộ lọc nguồn luôn cho phép https://cysim.netlify.app và
+                 loopback; CYSIM_ORIGINS chỉ THÊM domain khác, không thay thế chúng.
+                 CYSIM_RPM hãm số lượt/phút mỗi IP (mặc định 20). Cả hai là ĐỒ HÃM
+                 chứ không phải tường — xem khối "hai lớp hãm" ở phần code. Nguồn
+                 lạ bị chặn ngay cả khi CYSIM_ORIGINS trống; domain bổ sung phải khai
+                 đủ, nhưng thiếu Netlify không còn làm chính trang này nhận 403.
+                 /api/health in ra "access" để nhìn thấy danh sách đang chạy.
+             12) phân biệt "CÓ CHUỖI" và "CHUỖI DÙNG ĐƯỢC": /api/health trả thêm
+                 keyValid | keyValidDetail | keyValidAge | keyShape, và ?probe=1 buộc
+                 hỏi lại Google thật thay vì ăn kết quả cache 5 phút (_KHOA_KIEM). Lý
+                 do: keyConfigured chỉ nhìn "có chữ hay không", nên một key đúng định
+                 dạng nhưng đã bị Google thu hồi/chặn (401) vẫn khiến khung chat
+                 báo "Đã nối được máy chủ AI" — người dùng gõ câu hỏi rồi mới nhận
+                 một bong bóng lỗi. keyShape (4 ký tự đầu + độ dài, không lộ key) tồn
+                 tại để trả lời đúng câu cãi "key này hợp lệ mà": nó cho thấy chuỗi
+                 app ĐANG ĐỌC là chuỗi nào, chứ không chỉ bảo chuỗi đó sai. Cùng ngày,
+                 dòng in lúc bật máy chủ nói luôn hình
+                 dạng key và kết luận kiểm thật (trên PaaS thì chỉ in hình dạng, vì
+                 gọi Google trước khi bind port là tự sát theo đúng nghĩa health check).
+                 .env được đọc lại bằng mtime (nap_lai_env_neu_da_sua), nên dán key
+                 mới vào file là dùng được ngay — không phải bật lại máy chủ.
    CHẠM TỚI : GEMINI_API_KEY / GEMINI_MODEL / GEMINI_FALLBACK_MODEL / GEMINI_DEEP_MODEL
              / GEMINI_PROXY_HOST / GEMINI_PROXY_PORT / PORT / CYSIM_ORIGINS / CYSIM_RPM
              / GEMINI_SYSTEM_PROMPT / GEMINI_MAX_TOKENS / GEMINI_THINKING_BUDGET
@@ -77,8 +96,7 @@ import sys
 import time
 from pathlib import Path
 from itertools import chain
-from flask_cors import CORS
-
+from urllib.parse import urlparse
 
 from flask import Flask, Response, jsonify, request, stream_with_context
 
@@ -116,6 +134,14 @@ DOTENV = Path(__file__).resolve().parent.parent / ".env"
 # tác dụng, dù chính file đó hứa "đổi ở đây mà không sửa code". Cấu hình khai báo
 # mà không dùng là lời nói dối, nên thứ tự nạp phải nằm trên cùng.
 load_dotenv(DOTENV)
+# Mốc thời gian của lần đọc vừa rồi — nap_lai_env_neu_da_sua() bên dưới so với cái
+# này để biết file .env VỪA được sửa hay chưa. Hai phía của cùng một cái bẫy: không
+# nạp lại thì người dùng dán key mới, bấm "Thử lại", vẫn chết như cũ; còn nạp lại
+# vô điều kiện bằng override=True thì đè lên biến mà host deploy khai ở dashboard.
+try:
+    _MOC_DOC_ENV = DOTENV.stat().st_mtime
+except OSError:
+    _MOC_DOC_ENV = None
 
 # ---------- cấu hình: mọi thứ đều đọc từ môi trường, không hardcode ----------
 # Mặc định là bản Lite nhanh nhất và ỔN ĐỊNH NHẤT đã đo được. Số đo ngày 28–29/10/2026
@@ -202,34 +228,44 @@ if _TB:
         THINKING = genai_types.ThinkingConfig(thinking_level=_TB, include_thoughts=False)
 # role mà SDK của Google chấp nhận cho một lượt hội thoại
 CHAT_ROLES = {"user", "model"}
-# Mặc định: MỌI cổng của chính máy này (127.0.0.1 / localhost / [::1]). Proxy chỉ
-# bind loopback nên "vòng quanh máy này" không có nghĩa là lộ ra ngoài mạng.
+# Mặc định: MỌI cổng của chính máy này (127.0.0.1 / localhost / [::1]). Ở máy mình
+# proxy bind loopback nên "vòng quanh máy này" không có nghĩa là lộ ra ngoài mạng;
+# ra tới Render thì bind 0.0.0.0, và danh sách loopback dưới đây vẫn chỉ là vòng
+# máy khách — nó không mở thêm đường nào cho người lạ.
 # Bản cũ hard-code đúng hai nguồn cổng 8137 -> chỉ cần mở app bằng Live Server
 # (cổng 5505) hay một cổng khác là trình duyệt âm thầm chặn request bằng CORS:
 # máy chủ không log đường nào, còn người dùng chỉ thấy "Máy chủ AI chưa chạy"
 # trong khi nó đang chạy bon bon.
 # CYSIM_ORIGINS vẫn dùng được, nhưng để THÊM nguồn khác (máy khác trong mạng),
 # không phải để thay thế danh sách loopback này.
-LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "[::1]"}
+# HOST KHÔNG NGOẶC: urlparse trả hostname của "http://[::1]:8000" về đúng "::1"
+# (đã cắt ngoặc vuông), nên danh sách này cũng phải viết "::1". Bản cũ giữ "[::1]"
+# trong khi code cắt chuỗi bằng partition(":") — thấy dưới đây.
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 
 def _cong_loopback(origin: str) -> bool:
-    """http(s)://127.0.0.1:<bất kỳ cổng> | localhost | [::1] -> True."""
-    if not origin:
+    """http(s)://127.0.0.1:<bất kỳ cổng> | localhost | [::1]:<cổng> -> True.
+
+    Vì sao phải là urlparse chứ không phải cắt chuỗi: bản cũ làm
+    `rest.partition(":")`, nên với origin IPv6 "http://[::1]:8000" nó lấy
+    host = "[" — không khớp phần tử "[::1]" nào trong LOOPBACK_HOSTS và
+    trình duyệt mở app trên http://[::1]:5505 bị từ chối CORS ngay khi máy
+    chủ có khai CYSIM_ORIGINS. urlparse còn tự viết hoa scheme/host về chữ
+    thường và cắt ngoặc vuông, nên "http://LOCALHOST:8000" cũng khớp; origin
+    dị dạng ("http://[::1") ném ValueError -> coi là không phải loopback."""
+    try:
+        p = urlparse(origin or "")
+    except ValueError:
         return False
-    scheme, _, rest = origin.partition("://")
-    if scheme not in ("http", "https") or not rest:
-        return False
-    host, _, _port = rest.partition(":")
-    host = host.partition("/")[0].lower()
-    return host in LOOPBACK_HOSTS
+    return p.scheme in ("http", "https") and (p.hostname or "") in LOOPBACK_HOSTS
 
 
-# Nguồn do người dùng khai thêm; rỗng là hợp lệ vì loopback đã tự được chấp nhận.
-ALLOWED_ORIGINS = {
-    o.strip()
+PUBLIC_ORIGIN = "https://cysim.netlify.app"
+ALLOWED_ORIGINS = {PUBLIC_ORIGIN} | {
+    o.strip().rstrip("/")
     for o in os.environ.get("CYSIM_ORIGINS", "").split(",")
-    if o.strip()
+    if o.strip().rstrip("/")
 }
 
 
@@ -237,17 +273,24 @@ ALLOWED_ORIGINS = {
 # Mặc định proxy bind 127.0.0.1 nên "khách" là chính máy này và hai lớp dưới đây
 # gần như không việc gì làm. Đặt GEMINI_PROXY_HOST=0.0.0.0 (Render / Railway / VPS)
 # thì nó thành máy chủ của thiên hạ, và khi đó:
-#   * CYSIM_ORIGINS — danh sách nguồn được phép. Loopback LUÔN được tha, vì
-#     chay-ai.bat + Live Server là đường dùng chính của dự án này.
+#   * CYSIM_ORIGINS — thêm nguồn được phép ngoài Netlify và loopback mặc định.
+#     chay-ai.bat + Live Server không cần khai riêng từng cổng.
 #   * CYSIM_RPM — trần lượt/phút cho một IP, mặc định 20.
-# Nói thẳng: cả hai là ĐỒ HÃM chứ không phải tường. Origin do trình duyệt gửi nên
-# curl giả được trong một dòng lệnh; bộ đếm chỉ sống trong một tiến trình. Cái thật
-# sự chặn hoá đơn là trần nội dung (prompt / lịch sử / ảnh) ở khối clean_* bên dưới.
+#   * CYSIM_REQUIRE_ORIGIN — mặc định 0. Đặt 1 thì request KHÔNG gửi Origin
+#     cũng bị đuổi, thay vì được tha như bên dưới.
+# Nói thẳng: cả ba là ĐỒ HÃM chứ không phải tường. Origin do trình duyệt gửi nên
+# curl giả được trong một dòng lệnh; bộ đếm chỉ sống trong một tiến trình; và
+# CYSIM_REQUIRE_ORIGIN chỉ chặn được kẻ lười (script không gửi Origin), không chặn
+# được kẻ chịu giả Origin. Cái thật sự chặn hoá đơn là trần nội dung (prompt /
+# lịch sử / ảnh) ở khối clean_* bên dưới. Mặc định để 0 vì chính tài liệu này
+# khuyến nghị chẩn đoán bằng `curl /api/health` — một lệnh không gửi Origin.
+REQUIRE_ORIGIN = os.environ.get("CYSIM_REQUIRE_ORIGIN", "0").strip().lower() in ("1", "true", "yes")
+
+
 def _ngu():
-    """Origin của request có được phép không. Lọc chỉ bật khi khai CYSIM_ORIGINS."""
     origin = (request.headers.get("Origin") or "").strip().rstrip("/")
-    if not ALLOWED_ORIGINS or not origin:
-        return True  # chưa khai báo gì, hoặc curl/script vốn không gửi Origin
+    if not origin:
+        return not REQUIRE_ORIGIN  # curl/script vốn không gửi Origin
     return origin in ALLOWED_ORIGINS or _cong_loopback(origin)
 
 
@@ -312,8 +355,8 @@ class LoiAnh(ValueError):
 #  (3) KHÔNG BỊA — cấm tự bịa tên cờ, đường dẫn, số liệu, trích dẫn; bắt nói "không
 #      chắc" và cách kiểm chứng. Với một app dạy bảo mật, một câu chắc-sai còn hại
 #      hơn một câu "tôi không biết".
-#  (4) BÁM CHƯƠNG TRÌNH CySim — bảng 13 phòng lab bên dưới để câu trả lời chỉ đúng
-#      vào chỗ người dùng thật sự được thực hành, thay vì nói chung chung.
+#  (4) BÁM CHƯƠNG TRÌNH CySim — bảng 12 phòng lab + màn chứng chỉ bên dưới để câu
+#      trả lời chỉ đúng vào chỗ người dùng thật sự được thực hành, không nói chung.
 SYSTEM_INSTRUCTION = """Bạn là trợ lý AI của CySim, một web app dạy thực hành an toàn thông tin cho học sinh Việt Nam.
 
 Danh tính (trả lời đúng y như vậy, không tự bịa):
@@ -357,7 +400,8 @@ Học lực: người dùng đang HỌC, không đi làm thuê. Giải thích b�
 thường trước khi dùng thuật ngữ, thuật ngữ nào cũng dịch một vế; kết bằng một gợi ý
 tự kiểm tra ("thử đổi X rồi xem Y có nhảy không").
 
-Chương trình của CySim — 13 phòng lab, mỗi lab một nhiệm vụ. Khi câu hỏi thuộc một
+Chương trình của CySim — 12 phòng lab và màn Chứng chỉ do kỳ thi tốt nghiệp cấp;
+mỗi cái một nhiệm vụ. Khi câu hỏi thuộc một
 chủ đề, chỉ đúng lab để họ vào làm thay vì chỉ nói suông:
 - `sqli` SQL Injection: câu chữ bị hiểu thành lệnh; thuốc là truy vấn tham số hoá.
 - `xss` XSS: script kẻ tấn công chạy trong trình duyệt nạn nhân; thuốc là escape + CSP.
@@ -518,7 +562,9 @@ def instruction_for(lang, ho_so=""):
 
 
 app = Flask(__name__)
-CORS(app)
+# CORS viết tay ở add_cors() dưới đây — không dùng flask-cors: thêm một dependency
+# thứ ba chỉ để đặt đúng bốn cái header, và hai cùng lúc thì rủi ro header trùng
+# giá trị (trình duyệt từ chối ngay).
 # Trần body: đủ cho prompt + lịch sử (vài chục KB) VÀ ảnh base64 đi kèm. Con số
 # lấy từ MAX_IMAGES_BYTES nhân độ phình của base64, xem khối ảnh ở trên.
 app.config["MAX_CONTENT_LENGTH"] = MAX_BODY_BYTES
@@ -541,6 +587,7 @@ def get_client():
     key cũ cho tới lúc restart.
     """
     global _client, _client_key
+    nap_lai_env_neu_da_sua()  # dán key mới vào .env là dùng được ngay, không phải bật lại máy chủ
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
         load_dotenv(DOTENV, override=True)
@@ -555,6 +602,146 @@ def get_client():
     _client = genai.Client(api_key=key)
     _client_key = key
     return _client
+
+
+def nap_lai_env_neu_da_sua():
+    """Đọc lại .env khi và chỉ khi file vừa được sửa. Trả về True nếu có nạp lại.
+
+    Vì sao phải so mtime mà không nạp lại mỗi lần: lời hứa ở đầu load_dotenv là
+    "biến đã có trong môi trường (lúc deploy) luôn thắng", và override=True phá lời
+    đó. Nhưng ở máy cá nhân thì ngược lại — key nằm trong .env, người dùng dán key
+    mới rồi bấm "Thử lại" mà vẫn nhận đúng lỗi cũ thì câu hướng dẫn của giao diện
+    thành một câu bịa. So mtime giải được cả hai: chỉ nạp lại khi chính tay ai đó
+    vừa sửa file.
+    """
+    global _MOC_DOC_ENV
+    if not DOTENV.is_file():
+        return False
+    try:
+        moc = DOTENV.stat().st_mtime
+    except OSError:
+        return False
+    if _MOC_DOC_ENV == moc:
+        return False
+    _MOC_DOC_ENV = moc
+    load_dotenv(DOTENV, override=True)
+    global _client, _client_key
+    _client = None  # key mới thì client cũ phải bị bỏ, nếu không SDK dùng lại key cũ
+    _client_key = None
+    return True
+
+
+# ---------- key có được Google chấp nhận thật không ----------
+# Bệnh đo ngày 01-11-2026: trong .env là một chuỗi credential mà Google KHÔNG nhận
+# ở chỗ API key (401 UNAUTHENTICATED, reason ACCESS_TOKEN_TYPE_UNSUPPORTED). Proxy
+# vẫn sống, /api/health vẫn trả keyConfigured:true vì nó chỉ nhìn "có chuỗi hay
+# không", và giao diện báo "Đã nối được máy chủ AI". Người dùng gõ câu hỏi, ngồi
+# chờ, rồi mới nhận một bong bóng lỗi — đúng cái kiểu nói dối mà khối chẩn đoán này
+# sinh ra để tránh ("người dùng thấy bệnh trước khi gõ").
+# Nên ở đây hỏi THẬT: một cú models.list không sinh chữ, chỉ kiểm auth.
+#
+# Hình dạng chuỗi KHÔNG nói được key sống hay chết — bản trước của khối này nói
+# "AQ. là credential của Gemini CLI, hãy lấy key AIza…", và câu đó SAI: AI Studio
+# hiện cấp key dạng "AQ." (key gắn tài khoản dịch vụ, gửi qua header
+# x-goog-api-key — đúng đường SDK google-genai đang dùng), còn "AIza…" là dạng cũ
+# đang bị thay dần. Người dùng đã cãi "api hợp lệ mà" và họ đúng về định dạng.
+# Đo lại 03-11-2026: key AQ. còn sống trả 200 ở models.list; key trong .env máy này
+# bị 401 ACCESS_TOKEN_TYPE_UNSUPPORTED ở MỌI đường (header, ?key=, v1, v1beta, cả
+# models.list không sinh chữ) trong 0,15 s — tức là Google không nhận chính chuỗi
+# đó nữa: key đã bị xoá/thu hồi, hoặc bị chặn vì lộ (Google tự chặn nhanh key bị
+# phát hiện công khai, và đúng chuỗi này nằm trong một commit public). Nên câu
+# chẩn đoán chỉ nói điều đo được: "định dạng đúng, Google từ chối → tạo key MỚI".
+# _dang_key() chỉ nhìn hình dạng, chỉ dùng để in console / keyValidDetail, không
+# bao giờ quyết định có gọi Google hay không.
+def _dang_key(key):
+    """Mô tả ngắn loại credential đang nằm ở GEMINI_API_KEY, hoặc 'trống'."""
+    if not key:
+        return "trống"
+    if key.startswith("AQ.") and len(key) >= 40:
+        return "AQ.… — đúng định dạng key hiện nay của AI Studio"
+    if key.startswith("AIza") and len(key) >= 30:
+        return "AIza… — định dạng key API kiểu cũ của Google"
+    return f"{key[:3]}… ({len(key)} ký tự) — không giống key Google (dạng AQ.… hoặc AIza…)"
+
+
+def _vi_sao_bi_tu_choi(key):
+    """Câu hướng dẫn khi Google trả 401/403 cho một key ĐÚNG định dạng.
+
+    Đúng định dạng mà vẫn bị đuổi thì không có gì trong app sửa được: chuỗi đó
+    đã bị xoá, bị thu hồi, hoặc bị Google chặn vì lộ công khai. Bấm "Thử lại" với
+    cùng chuỗi ấy sẽ nhận đúng kết quả cũ, nên câu này nói thẳng việc phải làm.
+    """
+    if key.startswith(("AQ.", "AIza")):
+        return (
+            "Google không nhận CHÍNH chuỗi này (đã bị xoá/thu hồi hoặc bị chặn vì lộ "
+            "công khai) — tạo key MỚI ở AI Studio > Get API key, chỉ dán vào .env, "
+            "không commit .env, rồi bấm Thử lại"
+        )
+    return "Chuỗi không phải key Google — dán lại key lấy từ AI Studio > Get API key vào .env"
+
+
+def _hinh_key(key):
+    """Bản NGẮN, không lời, của hình dạng chuỗi trong .env: "AQ.…(53)" / "AIza…(39)".
+
+    Lý do tồn tại: câu "GEMINI_API_KEY không hợp lệ" bị cãi lại ngay — người đọc
+    đang cầm một chuỗi HỢP LỆ ở chỗ khác (AI Studio, dashboard host) trong khi app
+    đọc một chuỗi khác từ file. In 4 ký tự đầu + độ dài thì so được tại chỗ rằng
+    "cái app này đang thấy gì", và vẫn an toàn: 4 ký tự đầu của một chuỗi 53 ký tự
+    không dùng lại được. Hai key khác nhau cùng dạng "AQ.…(53)" thì chip này không
+    phân biệt được — khi đó so ngày sửa file .env với lúc tạo key mới ở AI Studio.
+    """
+    return "—" if not key else f"{key[:4]}…({len(key)})"
+
+
+_KHOA_KIEM = {"ketLuan": None, "luc": 0.0, "chiTiet": ""}
+_KHOA_KIEM_TTL = 300.0  # 5 phút: một lần kiểm tra đắt hơn nhiều một lần đọc môi trường
+_KHOA_KIEM_MS = 4000  # 4 giây: hỏi-auth mà lâu hơn thế thì coi như không kết luận được
+
+
+def kiem_key_google(buoc = False):
+    """True = Google nhận key này | False = Google đuổi 401/403 | None = chưa kết luận được.
+
+    BA kết luận chứ không phải hai, vì nói "key hỏng" khi mạng đứt là đổ lỗi cho
+    người đang đọc nó — và cũng đúng theo nghĩa ngược lại: không có None thì một
+    lần Google chậm biến khung chat thành "Sẵn sàng" giả.
+    """
+    now = time.time()
+    if not buoc and _KHOA_KIEM["ketLuan"] is not None and (now - _KHOA_KIEM["luc"]) < _KHOA_KIEM_TTL:
+        return _KHOA_KIEM["ketLuan"]
+    if buoc:
+        nap_lai_env_neu_da_sua()  # "Thử lại" là lúc người dùng vừa dán key mới vào file
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    ketLuan, chiTiet = None, ""
+    if key:
+        try:
+            # Client RIÊNG với timeout RIÊNG: generateContent phải được phép chờ hàng
+            # chục giây (Google xếp hàng thật), còn một cú hỏi-auth thì phải trả lời
+            # nhanh hoặc biến — dùng chung client là để một lần health treo cả phút.
+            # PHẢI gán vào biến tạm, không được gọi chuỗi `genai.Client(...).models
+            # .list()`: đo thật hôm 01-11-2026, bản viết một dòng đó trả "RuntimeError:
+            # Cannot send a request, as the client has been closed" — .models là một
+            # property, và khi object Client không có tên nào giữ thì bộ gom rác đóng
+            # luôn kênh HTTP mà danh sách model sắp dùng.
+            client_kiem = genai.Client(
+                api_key=key,
+                http_options=genai_types.HttpOptions(timeout=_KHOA_KIEM_MS),
+            )
+            client_kiem.models.list()
+            ketLuan = True
+        except genai_errors.APIError as exc:
+            if getattr(exc, "code", None) in (401, 403):
+                ketLuan = False
+                # Google chỉ nói "API key not valid" — không nói vì sao, nên ta nói.
+                chiTiet = (_dang_key(key) + " | " + _vi_sao_bi_tu_choi(key) + " | "
+                           + str(getattr(exc, "message", exc))[:120])
+            else:
+                chiTiet = f"APIError {getattr(exc, 'code', '?')}"
+        except Exception as exc:  # mạng đứt, DNS lỗi, timeout của chính requests
+            chiTiet = type(exc).__name__ + ": " + str(exc)[:160]
+    else:
+        chiTiet = "chưa có key"
+    _KHOA_KIEM.update(ketLuan=ketLuan, luc=time.time(), chiTiet=chiTiet)
+    return ketLuan
 
 
 def sanitize_history(raw):
@@ -621,11 +808,27 @@ def build_contents(prompt, turns, images=()):
 
 
 def add_cors(response):
+    """CORS viết tay, một nguồn sự thật duy nhất (không dùng flask-cors: thêm
+    dependency thứ ba chỉ để đặt bốn cái header, và hai lớp cùng đặt thì rủi ro
+    header trùng giá trị — trình duyệt từ chối ngay).
+
+    QUY TẮC: có Origin thì LUÔN cấp header, kể cả với response 403 vì bị chặn
+    nguồn. Lý do: nếu chỉ cấp cho nguồn được phép, một trang bị loại khỏi
+    CYSIM_ORIGINS sẽ thấy đúng một lỗi mạng mù mịt ("không truy cập được máy
+    chủ") trong khi máy chủ đang nói rõ "Origin không nằm trong CYSIM_ORIGINS".
+    Danh sách nguồn là ĐỒ HÃM chống đốt key chứ không phải bức tường bí mật (curl
+    giả Origin trong một dòng), nên để lộ lý do từ chối không mất gì, còn che nó
+    thì người dùng thật bị dối. Đo thật 30-10-2026 trên Render: preflight từ
+    https://cysim.netlify.app về 200-không-Access-Control-Allow-Origin và POST về
+    403-không-header — nghĩa là bản web công khai không đọc nổi câu trả lời nào,
+    dù /api/health vẫn 200 trong 0,83 giây. Bệnh này đang sống, không phải lý thuyết.
+    """
     origin = request.headers.get("Origin", "")
-    if origin in ALLOWED_ORIGINS or _cong_loopback(origin):
+    if origin:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+        response.headers["Access-Control-Max-Age"] = "600"  # khỏi preflight lại trong 10 phút
         response.headers["Vary"] = "Origin"
     return response
 
@@ -635,17 +838,36 @@ app.after_request(add_cors)
 
 @app.get("/api/health")
 def health():
-    """Để giao diện biết proxy có sống và đã có key chưa — không bao giờ in key ra.
+    """Để giao diện biết proxy có sống, đã có key chưa, và key đó Google có chịu
+    không — không bao giờ in key ra.
 
     Trần ảnh cũng được báo ở đây vì js/ai.js cần nói đúng con số mà máy chủ THỰC
     SỰ áp dụng; giao diện tự bịa "2 MB" rồi máy chủ chặn ở 1 MB là kiểu hứa dối mà
-    một app dạy bảo mật không được phép có."""
+    một app dạy bảo mật không được phép có.
+
+    "keyValid" là ô mới vì chính cái bệnh hôm 01-11-2026: keyConfigured chỉ trả lời
+    "trong file có chuỗi gì sau dấu bằng hay không", nên một key đã bị Google thu hồi
+    (đúng định dạng AQ.…, nhưng chính chuỗi đó đã bị xoá/chặn) vẫn được báo là
+    sẵn sàng. Ba giá trị: true / false / null (null = chưa kiểm được, ví dụ mạng đứt),
+    để giao diện không được phép suy ra "key hỏng" từ "chưa biết".
+    ?probe=1 buộc kiểm tra lại ngay — nút "Thử lại" dùng nó, vì đúng lúc người dùng
+    vừa dán key mới thì câu trả lời cũ trong cache là câu trả lời sai."""
+    buoc = (request.args.get("probe") or "").strip() in ("1", "true", "yes")
+    valid = kiem_key_google(buoc)
     return jsonify(
         {
             "ok": True,
             "model": MODEL,
             "fallback": FALLBACK_MODEL,
             "keyConfigured": bool(os.environ.get("GEMINI_API_KEY")),
+            "keyValid": valid,
+            # Chỉ chi tiết kỹ thuật, không chứa key: đủ để mở console ra đọc "401
+            # API key not valid" thay vì phải đoán.
+            "keyValidDetail": _KHOA_KIEM["chiTiet"] if valid is not True else "",
+            # Bản ngắn để giao diện in NGAY CẠNH câu lỗi: người dùng cãi "key này hợp
+            # lệ mà" thì câu trả lời là "đây là 4 ký tự đầu của chuỗi mà app đang đọc".
+            "keyShape": _hinh_key(os.environ.get("GEMINI_API_KEY", "").strip()),
+            "keyValidAge": round(time.time() - _KHOA_KIEM["luc"], 1) if _KHOA_KIEM["luc"] else None,
             "sdk": getattr(genai, "__version__", "google-genai"),
             # Ba mức độ sâu mà giao diện vẽ được, kèm model thật của từng mức, để
             # người dùng (và người sửa code) thấy "Kỹ" đổi cái gì chứ không phải
@@ -659,6 +881,15 @@ def health():
                 "maxBytesPerImage": MAX_IMAGE_BYTES,
                 "maxBytesTotal": MAX_IMAGES_BYTES,
                 "mimes": sorted(ANH_CHO_PHEP),
+            },
+            # Hai đồ hãm ĐANG CHẠY THẬT, in ra để một câu curl trả lời được câu
+            # "máy chủ này có chặn trang của tôi không" thay vì phải đoán. Việc
+            # công khai chết hôm 30-10-2026 đúng là vì không có gì để nhìn: trên
+            # Render CYSIM_ORIGINS được khai mà không chứa https://cysim.netlify.app,
+            # nên mỗi lượt là một cú 403 vô hình với người dùng.
+            "access": {
+                "origins": sorted(ALLOWED_ORIGINS),
+                "rpm": int(os.environ.get("CYSIM_RPM", "20") or 0),
             },
         }
     )
@@ -743,6 +974,17 @@ def mo_stream(client, contents, config, model, fallback):
             )
             time.sleep(doi)
             continue
+        if ten != model:
+            # Log lúc model đỡ đạn BẮT ĐẦU trả lời, không chỉ lúc thử lại: người
+            # duyệt (nhược điểm #9) đúng ở chỗ proxy đổi model mà máy chủ không hề
+            # nói. Dòng "Gemini quá tải... thử lại sau" ở trên chỉ kể các lần thử
+            # cùng model, còn đây mới là bằng chứng "câu trả lời này không tới từ
+            # model mà /api/health vừa quảng cáo".
+            app.logger.warning(
+                "Đã dùng model dự phòng '%s' thay model yêu cầu '%s' (Google báo quá tải)",
+                ten,
+                model,
+            )
         if manh_dau is None:
             return iter(()), ten
         return chain((manh_dau,), gen), ten
@@ -963,7 +1205,7 @@ def config():
 def local_check():
     """Kiểm tra không cần mạng: lịch sử có bị nhận bừa không, contents có đúng
     khuôn không. Chạy: python server/gemini_proxy.py --check"""
-    global ALLOWED_ORIGINS  # khối "hai lớp hãm" dưới phải đổi được danh sách đang bật
+    global ALLOWED_ORIGINS, REQUIRE_ORIGIN  # khối "hai lớp hãm" dưới phải đổi được danh sách đang bật
     messy = [
         {"role": "user", "text": "Giới thiệu CSRF"},
         {"role": "model", "text": "CSRF là ..."},
@@ -1091,13 +1333,16 @@ def local_check():
     ok_ham = lan_luot == [True, True, True, False] and ip_khac_song and rpm_0_tat_han
     with app.test_request_context(headers={"X-Forwarded-For": "198.51.100.7, 10.0.0.1"}):
         ok_ham = ok_ham and _ip_khach() == "198.51.100.7"  # IP khách, không phải IP Render
-    gia_tri_cu = ALLOWED_ORIGINS
+    gia_tri_cu = (ALLOWED_ORIGINS, REQUIRE_ORIGIN)
+    khop_cau_hinh = PUBLIC_ORIGIN in ALLOWED_ORIGINS
     try:
-        ALLOWED_ORIGINS = set()  # chưa khai báo gì = lọc TẮT
+        ALLOWED_ORIGINS, REQUIRE_ORIGIN = {PUBLIC_ORIGIN}, False
+        with app.test_request_context(headers={"Origin": PUBLIC_ORIGIN}):
+            khop_mac_dinh = _ngu()
         with app.test_request_context(headers={"Origin": "https://ke-la.example"}):
-            mac_dinh_tat = _ngu()
-        ALLOWED_ORIGINS = {"https://cysim.netlify.app", "https://lan.example"}
-        with app.test_request_context(headers={"Origin": "https://cysim.netlify.app"}):
+            mac_dinh_chan = not _ngu()
+        ALLOWED_ORIGINS |= {"https://lan.example"}
+        with app.test_request_context(headers={"Origin": PUBLIC_ORIGIN}):
             khop = _ngu()
         with app.test_request_context(headers={"Origin": "https://lan.example/"}):
             duong_dan_chuan_hoa = _ngu()  # dấu / thừa ở cuối không được làm lệch khớp
@@ -1105,24 +1350,73 @@ def local_check():
             bi_chan = not _ngu()
         with app.test_request_context(headers={"Origin": "http://127.0.0.1:5505"}):
             loopback_van_song = _ngu()  # chay-ai.bat + Live Server không chết theo
+        # Cùng một luật phải áp cho vòng IPv6 của chính máy này. Đây đúng là chỗ
+        # bản cắt-string-by-partition fail âm thầm: host nhận ra là "[" nên
+        # http://[::1]:5505 bị từ chối — và người mở app bằng IPv6 chỉ thấy
+        # "Máy chủ AI chưa chạy" dù nó đang chạy.
+        with app.test_request_context(headers={"Origin": "http://[::1]:5505"}):
+            loopback_v6 = _ngu()
+        with app.test_request_context(headers={"Origin": "http://LOCALHOST:8000"}):
+            loopback_hoa = _ngu()  # hostname không phân biệt hoa thường
+        # Ba nguồn giả-dạng-loopback phải bị đuổi, không được lợi dụng urlparse:
+        # hậu tố tên, một IPv6 khác, và một origin dị dạng.
+        with app.test_request_context(headers={"Origin": "http://127.0.0.1.evil.example"}):
+            gia_dang_loopback = not _ngu()
+        with app.test_request_context(headers={"Origin": "http://[::2]:8000"}):
+            ipv6_khac_may = not _ngu()
+        with app.test_request_context(headers={"Origin": "http://[::1"}):
+            origin_di_dang = not _ngu()
         with app.test_request_context():
-            khong_gui_origin = _ngu()  # curl/script: không có Origin thì không chặn
+            khong_gui_origin = _ngu()  # mặc định: curl/script không gửi Origin thì được qua
+        # Chiều ngược lại của núm CYSIM_REQUIRE_ORIGIN: bật lên là chính cái request
+        # không Origin đó phải bị đuổi — nhưng khách thật đã khớp danh sách thì vẫn
+        # vào được, không được để cờ này chặn nhầm người dùng.
+        REQUIRE_ORIGIN = True
+        with app.test_request_context():
+            buoc_gui_origin = not _ngu()
+        with app.test_request_context(headers={"Origin": "https://cysim.netlify.app"}):
+            khop_khi_buoc = _ngu()
+        # CORS phải đo bằng CHÍNH cái header, không phải bằng _ngu(): hôm 30-10
+        # máy chủ trả 200/403 đúng luật mà trình duyệt vẫn quay về với "không đọc
+        # được", vì add_cors chỉ cấp header cho nguồn nằm trong danh sách. Khách
+        # BỊ từ chối cũng phải đọc được lý do từ chối.
+        _aco = {}
+        for nguon in ("https://cysim.netlify.app", "http://127.0.0.1:8000", "https://ke-la.example"):
+            with app.test_request_context(headers={"Origin": nguon}):
+                _aco[nguon] = (
+                    add_cors(Response("{}", mimetype="application/json")).headers.get(
+                        "Access-Control-Allow-Origin"
+                    )
+                    == nguon
+                )
     finally:
-        ALLOWED_ORIGINS = gia_tri_cu
+        ALLOWED_ORIGINS, REQUIRE_ORIGIN = gia_tri_cu
     ok_ham = ok_ham and (
-        mac_dinh_tat and khop and duong_dan_chuan_hoa and bi_chan
-        and loopback_van_song and khong_gui_origin
+        khop_cau_hinh and khop_mac_dinh and mac_dinh_chan
+        and khop and duong_dan_chuan_hoa and bi_chan
+        and loopback_van_song and loopback_v6 and loopback_hoa
+        and gia_dang_loopback and ipv6_khac_may and origin_di_dang
+        and khong_gui_origin and all(_aco.values())
+        and buoc_gui_origin and khop_khi_buoc
     )
     ok = ok and ok_ham
     print(
         "hai lớp hãm công khai:", "ĐẠT" if ok_ham else "HỎI",
         "| RPM=3 chặn lượt thứ 4:", not lan_luot[3],
-        "| Origin lạ bị chặn khi đã khai CYSIM_ORIGINS:", bi_chan,
-        "| loopback vẫn được tha:", loopback_van_song,
+        "| Netlify mặc định + khi thêm nguồn:", khop_cau_hinh and khop_mac_dinh and khop,
+        "| Origin lạ bị chặn kể cả khi không khai CYSIM_ORIGINS:", mac_dinh_chan and bi_chan,
+        "| loopback vẫn được tha (127.0.0.1, [::1], localhost HOA, mọi cổng):",
+        loopback_van_song and loopback_v6 and loopback_hoa,
+        "| giả dạng loopback / IPv6 máy khác / origin dị dạng bị đuổi:",
+        gia_dang_loopback and ipv6_khac_may and origin_di_dang,
+        "| không gửi Origin: mặc định qua, bật CYSIM_REQUIRE_ORIGIN thì bị đuổi:",
+        khong_gui_origin and buoc_gui_origin and khop_khi_buoc,
+        "| CORS header cho mọi nguồn (kể cả nguồn bị chặn):", all(_aco.values()),
     )
     # ------ CHỈ DẪN: ba phần làm AI thông minh hơn phải còn đủ mặt ------
     # Trả lời trước giải thích sau + toán từng bước + thành thật về độ chắc chắn +
-    # bám đúng chương trình 13 lab của CySim. Thiếu một trong bốn là chỉ dẫn đã bị
+    # bám đúng chương trình 13 chủ đề (12 phòng lab + chứng chỉ) của CySim. Thiếu một
+    # trong bốn là chỉ dẫn đã bị
     # sửa trượt, và người dùng sẽ lại nhận đoạn văn vòng vo trước khi vào ý.
     chu_de = ("sqli", "xss", "csrf", "idor", "phish", "ddos", "firewall",
               "password", "realip", "antivirus", "siem", "acct", "cert")
@@ -1183,17 +1477,50 @@ if __name__ == "__main__":
         raise SystemExit(local_check())
     if "--selftest" in sys.argv:
         raise SystemExit(selftest())
-    host = os.environ.get("GEMINI_PROXY_HOST", "0.0.0.0")
+    host = os.environ.get("GEMINI_PROXY_HOST") or ("0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
     # Render (và phần lớn host Python) chỉ định cổng qua biến PORT — cổng 8000 cứng
     # là dịch vụ chết ngay ở bước "health check". GEMINI_PROXY_PORT vẫn thắng để
     # máy này giữ nguyên hành vi cũ.
     port = int(os.environ.get("GEMINI_PROXY_PORT") or os.environ.get("PORT") or 8000)
     # debug=False là chủ đích: chế độ debug cho phép chạy code tuỳ ý qua trình
     # duyệt debugger, biến một proxy giữ key thành cửa sau.
-    print(f"Gemini proxy -> http://{host}:{port}  (model: {MODEL}, key: {bool(os.environ.get('GEMINI_API_KEY'))})")
-    # host lấy từ GEMINI_PROXY_HOST, KHÔNG hardcode 0.0.0.0: đặt như vậy là mở proxy
-    # giữ key ra mọi cổng của máy (ở quán cà phê thì cả mạng WiFi cùng chỗ gõ được
-    # /api/gemini và đốt key), và dòng print ngay trên sẽ nói một đằng — chạy một nẻo.
-    # Render không cần tới nó: Render tự đặt GEMINI_PROXY_HOST=0.0.0.0 trong môi trường.
+    # Vì sao HOST dựa vào PORT mà không hardcode "0.0.0.0" cũng không hardcode
+    # "127.0.0.1": PORT chỉ tồn tại khi host PaaS (Render/Railway/VPS container)
+    # chạy app —bind 0.0.0.0 là điều kiện sống còn của dịch vụ ở đó, họ đọc được
+    # từ biến môi trường chứ không tự đặt GEMINI_PROXY_HOST. Ở máy mình thì không
+    # có PORT, nên proxy bind loopback: mở ở quán cà phê không đồng nghĩa với việc
+    # cả mạng WiFi cùng chỗ gõ được /api/gemini để đốt key. Muốn tự mở cho máy khác
+    # trong mạng LAN thì khai rõ GEMINI_PROXY_HOST=0.0.0.0 — và khi đó nhớ rằng
+    # CYSIM_ORIGINS/CYSIM_RPM chỉ là đồ hãm (xem khối "hai lớp hãm").
+    # Dòng print dưới in đúng host thật, không nói một đằng chạy một nẻo.
+    print(f"Gemini proxy -> http://{host}:{port}  (model: {MODEL})")
+    # Số phận của cái key được in NGAY khi bật, thay vì chỉ "key: True" như bản cũ.
+    # "key: True" là một lời nói dối kiểu nửa vời: nó đúng theo nghĩa "có chuỗi trong
+    # biến môi trường" và khiến người đọc chắc rằng phần còn lại là lỗi của app,
+    # trong khi bệnh thật nằm ở chính chuỗi đó (đúng định dạng nhưng đã bị thu hồi). Hai dòng
+    # dưới trả lời đúng câu họ đang hỏi: "máy chủ này đã chat được chưa".
+    print("Key trong .env:", _dang_key(os.environ.get("GEMINI_API_KEY", "").strip()))
+    # Chỉ GỌI Google ở đây khi chạy ở máy mình. Trên host PaaS (có PORT) thì chưa
+    # bind port mà đã đi hỏi mạng là đúng cái bẫy mà khối HOST/PORT ở trên cảnh báo:
+    # dịch vụ chậm bind thì đúng là "chết ngay ở bước health check". Render/Railway
+    # muốn kết luận cứ bấm "Thử lại" trong khung chat hoặc gọi /api/health?probe=1 —
+    # hai đường đó chạy sau khi port đã sống, và cùng dùng một hàm kiểm.
+    if os.environ.get("PORT"):
+        print("Chưa kiểm key với Google ở bước khởi động (đang chạy trên PaaS) — "
+              "bấm 'Thử lại' trong khung chat hoặc gọi /api/health?probe=1.")
+    else:
+        # kiem_key_google(True) gọi Google thật (~1,7 s đo hôm 01-11-2026, trần 4 s)
+        # và chỉ IN kết luận, không chặn việc bật máy chủ: mất mạng thì nhận None,
+        # dòng đó nói "chưa kết luận được" và /api/gemini vẫn phục vụ như cũ. Probe
+        # này ghi sẵn _KHOA_KIEM nên cú health đầu tiên của khung chat trả lời tức thì.
+        ket = kiem_key_google(True)
+        print(
+            "Kiểm với Google:",
+            "ĐẠT — chat được." if ket is True
+            else "BỊ TỪ CHỐI — khung chat sẽ báo 'key không hợp lệ'; sửa .env rồi bấm Thử lại." if ket is False
+            else "chưa kết luận được (mạng/DNS/chậm) — máy chủ vẫn chạy bình thường.",
+        )
+        if ket is False and _KHOA_KIEM["chiTiet"]:
+            print("  Chi tiết:", _KHOA_KIEM["chiTiet"])
     app.run(host=host, port=port, debug=False)
 

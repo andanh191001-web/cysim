@@ -1,12 +1,15 @@
 /* =========================================================
    CySim — style.css  ·  toàn bộ giao diện
 
-   LÀ GÌ   : Bảng màu "màn hình SOC" (biến CSS trong :root), layout
-             sidebar + lưới card, và style riêng cho từng phòng lab:
+   LÀ GÌ   : Bảng màu "màn hình SOC" (biến CSS trong :root), hai chủ đề
+             tối/sáng + cỡ chữ + tương phản cao, layout sidebar + lưới card,
+             và style riêng cho từng phòng lab:
              lưới IP DDoS, cổng tường lửa, mailbox OTP, dock tài khoản
              góc phải, biển "không có internet" giữa đỉnh màn hình, khung
              chat AI nổi góc trái dưới (kèm khay ảnh + chế độ phóng to),
-             thanh trượt mã độc, chế độ báo lỗi bản dịch.
+             thanh trượt mã độc, trang Cài đặt/Quản trị, màn hình đăng nhập
+             (kèm khối gấp "mã quản trị"), thẻ "Bắt đầu ở đây",
+             chế độ báo lỗi bản dịch, palette tìm kiếm toàn văn Ctrl+K.
    CHẠY     : index.html nạp bằng một thẻ <link> ở <head>; không có build,
              không có CSS framework, không @import. Muốn nhận ra style của
              lab nào, tìm khối chú thích "=====" gần cuối file — mỗi khối
@@ -14,17 +17,127 @@
    TOÀN CẦU : chỉ dùng selector theo id/class có thật trong index.html.
              Mã màu luôn lấy từ biến --bg/--panel/--cyan/--red/--ok để
              đổi ngôn ngữ hay theme không làm lệch giao diện.
+             Đổi giao diện = JS ghi bốn thuộc tính data-theme / data-fs /
+             data-motion / data-contrast lên <html> (Settings.apply() trong
+             app.js, và một script nhỏ trong <head> áp sớm để không nháy nền).
+             Mọi màu nền MỜ dùng dạng rgba(var(--x),.9) với biến bộ ba màu
+             --panelTone/--sunkTone/--fillTone — chính ba biến đó đảo ngược
+             khi sang nền sáng, nên không còn màu tối viết tay nào sót.
              Responsive: breakpoint 860px khớp với điều kiện
              window.innerWidth <= 860 trong app.js.
    ========================================================= */
 
 :root{
-  --bg:#070b14; --panel:#0d1424; --raise:#141e38; --line:#222f4d;
-  --text:#e4ebf7; --mute:#8593b0; --cyan:#4de1ff; --red:#ff5c7a;
-  --amber:#ffb454; --ok:#6ee7a8;
-  --sans:"Space Grotesk","Segoe UI",system-ui,sans-serif;
-  --mono:"JetBrains Mono",Consolas,Monaco,monospace;
+  /* Nền và các lớp nổi — mọi khối trong file này lấy màu từ đây, không còn
+     mã màu cứng ở bên dưới (72 chỗ đã được đổi thành biến ngày 30-10-2026,
+     vì một "theme sáng" mà còn 72 màu tối viết tay thì chỉ là một màn hình
+     tối bị vá lỗ chỗ). */
+  --bg:#070b14; --panel:#0d1424; --raise:#141e38;
+  --deep:#060a12; --ink:#04121a; --void:#02060a;
+  --line:#222f4d; --line2:#2d3d63;
+  --text:#e4ebf7; --text2:#a9b6cf; --mute:#8593b0;
+  --cyan:#4de1ff;
+  --red:#ff5c7a; --redText:#ffb3c1; --redLine:#c22f4d; --redBg:#5a2233;
+  --amber:#ffb454; --amberText:#ffd9a0;
+  --ok:#6ee7a8; --okText:#9be8bb; --okLine:#1d3b2f; --okStrong:#157a56;
+  /* Ba 'tone' RGB dung cho rgba(): nen kinh (dock/toast/fab/panel chat), mat
+     ham (log, status, khay anh) va phu nhat (chip, vung sang nhe). Theme sang
+     dao nguoc ca ba, neu khong thi chu var(--text) mau xanh den ngam tren nen
+     trang van la mau trang -> mat chu. */
+  --panelTone:13,20,36; --sunkTone:6,10,18; --fillTone:255,255,255;
+  --danger:#c22f4d; --onDanger:#fff;
+  --injFg:#fff; --injBg:rgba(255,92,122,.3);
+  /* Chữ lấy từ MÁY, không tải qua mạng (30-10-2026 — lý do đầy đủ và đường
+     font cũ nằm trong comment ở <head> của index.html). Hai chỗ dựa:
+       --sans : system-ui là chữ mặc định mà Windows/Android/macOS đã chọn đẹp
+                cho UI; "Segoe UI" viết tường minh vì một số trình duyệt trên
+                Windows 10 trả system-ui = Arial chứ không phải Segoe.
+       --mono : ui-monospace là chữ mono hệ thống, nhưng Windows 10 (19045) chỉ
+                trả Cascadia từ Windows 11, nên Consolas phải đứng tên tường
+                minh — thiếu nó ô log terminal rơi xuống Courier, xấu và rộng
+                hơn hẳn.
+     Bỏ font web là bỏ 7 request + 94,6 KB CHẶN VẼ, và không còn một bên thứ ba
+     nào biết bạn vừa mở app. */
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Menlo, Consolas, Monaco, monospace;
 }
+
+/* =========================================================
+   ĐỔI GIAO DIỆN  ·  html[data-theme|data-fs|data-motion|data-contrast]
+   ---------------------------------------------------------
+   LÀ GÌ   : Bốn núm vặn nhìn thấy được ở trang Cài đặt (id="settings").
+             Giá trị do js/app.js ghi lên <html> lúc khởi động và mỗi lần
+             người dùng bấm — CSS không đọc localStorage, nên muốn thêm núm
+             mới thì phải sửa cả hai phía.
+   SYSTEM  : Mặc định là nền TỐI ("dem") vì app mô phỏng màn hình SOC, nhưng
+             người không chuyên thường đọc nền sáng dễ hơn — đó là lý do núm
+             này tồn tại chứ không phải để cho đẹp.
+   BẪY     : --redLine/--okLine/--redBg là MÀU VIỀN/NỀN nhạt trên nền tối và
+             đậm trên nền sáng, hai chiều ngược nhau, nên theme sáng phải đổi
+             cả nhóm đó chứ không chỉ --bg/--text.
+   ========================================================= */
+html[data-theme="sang"]{
+  --bg:#eef2f8; --panel:#ffffff; --raise:#e6ecf6;
+  --deep:#f7f9fc; --ink:#e9eff8; --void:#dfe7f3;
+  --line:#c3cfe0; --line2:#a9b8cf;
+  --text:#0e1a2e; --text2:#3c4c66; --mute:#5d6b84;
+  --cyan:#0a6f93;
+  --red:#c02044; --redText:#9c1636; --redLine:#f0b9c4; --redBg:#fbe4ea;
+  --amber:#8a5200; --amberText:#6b3f00;
+  --ok:#0d7a49; --okText:#0b5f3a; --okLine:#bfe6d2; --okStrong:#0d7a49;
+  --panelTone:255,255,255; --sunkTone:238,243,250; --fillTone:14,26,46;
+  --danger:#c02044; --onDanger:#fff;
+  --injFg:#7a1230; --injBg:rgba(192,32,68,.14);
+}
+/* Vệt scanline CRT và lưới nền là thứ trang trí của màn hình tối; trên nền
+   sáng chúng chỉ khiến chữ bẩn đi. */
+html[data-theme="sang"] body::after{display:none}
+html[data-theme="sang"] body::before{opacity:.22}
+
+/* Cỡ chữ: cả file dùng px (46 chỗ), nên "1.1em ở body" sẽ không đi đâu cả.
+   Cách duy nhất không phá layout là đánh thẳng vào phần chữ dài — đoạn văn
+   và danh sách — đúng chỗ người đọc cần to lên. */
+html[data-fs="lon"] .view p,html[data-fs="lon"] .view li,html[data-fs="lon"] .view .muted{font-size:17px}
+html[data-fs="rong"] .view p,html[data-fs="rong"] .view li,html[data-fs="rong"] .view .muted{font-size:19px}
+
+/* Tương phản cao: thêm viền đậm cho mọi khối và bỏ chữ xám nhạt. */
+html[data-contrast="cao"]{--mute:var(--text);--text2:var(--text);--line:var(--text2)}
+html[data-contrast="cao"] .card,html[data-contrast="cao"] .panel{border-width:2px}
+
+/* Giảm chuyển động — cùng điều khiển với prefers-reduced-motion của hệ điều
+   hành, nhưng người dùng vẫn có thể bật/tắt thủ công (một số người thấy chữ
+   gõ từng ký gây chóng mặt dù hệ thống không báo gì).
+   BẪY: đặt mỗi duration thì KHÔNG đủ — transition-property vẫn là "all" theo
+   mặc định, nên mọi lần đổi màu bị coi là một transition đang chạy. Ở tab bị
+   ẩn (đổi khung cửa sổ, điện thoại background), transition không có frame để
+   chạy tới đích và màn hình ở lại MÀU CŨ: người bật "Tắt chuyển động" bấm Đổi
+   nền sáng rồi quay lại thấy vẫn tối. Chặn luôn property = không có gì để chạy. */
+html[data-motion="tat"] *,html[data-motion="tat"] *::before,html[data-motion="tat"] *::after{
+  animation-duration:.001s!important;animation-iteration-count:1!important;
+  transition-property:none!important;
+  transition-duration:.001s!important;scroll-behavior:auto!important;
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-property:none!important;transition-duration:.001s!important}
+}
+
+/* Điều khiển của trang Cài đặt / Quản trị. select và input[type=number] không
+   nằm trong khối input[type=text|password] ở trên, nên phải khai báo ở đây —
+   thiếu một dòng là trình duyệt vẽ lại bằng màu trắng mặc định giữa màn hình
+   tối. */
+select,input[type="number"]{
+  width:100%;min-width:0;color:var(--text);background:var(--deep);
+  border:1px solid var(--line2);border-radius:10px;padding:11px 13px;
+  font:14px var(--sans);margin-top:6px;
+}
+select:focus,input[type="number"]:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,255,.12)}
+.seg{margin-top:8px}
+.seg .btn[aria-pressed="true"]{background:var(--cyan);color:var(--ink);border-color:var(--cyan)}
+.opt{display:flex;align-items:center;gap:10px;margin:10px 0 0;color:var(--text2);font-size:14px}
+.opt input[type="checkbox"]{width:18px;height:18px;accent-color:var(--cyan)}
+#adminFlags .opt{padding:8px 0;border-bottom:1px solid var(--line)}
+#adminFlags .off{color:var(--mute)}
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -58,13 +171,45 @@ aside{
 .brand{display:flex;align-items:center;gap:12px;padding:0 8px}
 .brand b{font-size:21px;letter-spacing:.5px}
 .brand small{display:block;color:var(--mute);font-size:11px;line-height:1.2}
-nav{display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+/* nav là hàng duy nhất được co giãn trong cột aside: không có flex:1 +
+   min-height:0 thì danh sách dài chiếm hết chiều cao và đẩy thẻ cấp (.rank,
+   margin-top:auto) tràn ra ngoài 100vh — đó chính là cái "chật" người dùng
+   phàn nàn, không phải do chữ nhỏ. */
+nav{display:flex;flex-direction:column;gap:4px;flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:6px;}
 .nav-btn{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:10px;color:var(--mute);background:none;cursor:pointer;text-align:left;transition:background .15s,color .15s,box-shadow .15s;}
 .nav-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .nav-btn:hover{color:var(--text);background:var(--raise)}
 .nav-btn.active{color:var(--cyan);background:rgba(77,225,255,.10);box-shadow:inset 3px 0 0 var(--cyan),0 0 12px rgba(77,225,255,0.4);}
 .nav-btn .tick{margin-left:auto;color:var(--ok);font-size:13px;opacity:0;transition:opacity .3s,transform .3s;transform:scale(.6)}
 .nav-btn.done .tick{opacity:1;transform:scale(1)}
+
+/* ---- Nhóm điều hướng + nút gập "Phòng lab" ----
+   LÀ GÌ   : Nhãn nhóm (.nav-cap) và cái nút gập 11 phòng lab lại thành một
+            dòng. Sidebar từng một lúc 20 hàng chữ nhỏ — người mới mở lên
+            không biết hôm nay mình cần gì, và đó là lý do thật sự khiến họ
+            đóng tab, không phải vì bài học khó.
+   CHẠY    : nav.labs-open là TRẠNG THÁI DUY NHẤT của khối này, do js/app.js
+            bật/tắt và nhớ trong cysim-nav-labs. Gập bằng display:none chứ
+            không xoá nút: js/search.js vẫn đọc được .nav-btn[data-view] nên
+            Ctrl+K tìm thấy cả 11 lab khi chúng đang bị giấu, renderProgress
+            vẫn gắn dấu ✓, và tab của bàn phím không còn nhảy vào nút vô hình.
+   SỞ THÍCH: [data-lab] thụt vào 12px + mép trái mờ để mắt hiểu "đám này thuộc
+            nhóm phía trên" mà không cần kẻ khung quanh từng nhóm. */
+.nav-cap{margin:12px 0 2px;padding:0 12px;color:var(--mute);font:700 10.5px var(--mono);
+  letter-spacing:.9px;text-transform:uppercase;opacity:.75}
+.nav-cap:first-child{margin-top:0}
+.nav-fold-btn{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+  border:0;border-radius:10px;color:var(--text2);background:none;cursor:pointer;text-align:left;
+  font:inherit;transition:background .15s,color .15s}
+.nav-fold-btn:hover{color:var(--text);background:var(--raise)}
+.nav-fold-btn[aria-expanded="true"]{color:var(--cyan)}
+.nav-fold-arrow{flex:none;width:7px;height:7px;margin-left:5px;border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .2s}
+.nav-fold-btn[aria-expanded="true"] .nav-fold-arrow{transform:rotate(45deg)}
+.nav-count{margin-left:auto;font:700 11px var(--mono);color:var(--mute);
+  border:1px solid var(--line);border-radius:99px;padding:1px 7px}
+nav:not(.labs-open) [data-lab]{display:none}
+[data-lab]{padding-left:24px;box-shadow:inset 2px 0 0 rgba(77,225,255,.12)}
 
 .rank{margin-top:auto;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,rgba(77,225,255,.05),var(--panel));}
 .rank .lv{font-weight:700;font-size:16px}
@@ -82,25 +227,36 @@ main{padding:68px 36px 20px;max-width:1180px;width:100%}
 .s12{grid-column:span 12}.s8{grid-column:span 8}.s7{grid-column:span 7}
 .s6{grid-column:span 6}.s5{grid-column:span 5}.s4{grid-column:span 4}.s3{grid-column:span 3}
 
-.card{background:linear-gradient(180deg,rgba(255,255,255,.015),transparent 40%),var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .25s,box-shadow .25s;}
-.card:hover{border-color:#2d3d63}
+.card{background:linear-gradient(180deg,rgba(var(--fillTone),.015),transparent 40%),var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .25s,box-shadow .25s;}
+.card:hover{border-color:var(--line2)}
 h1{margin:0 0 12px;font-size:clamp(26px,4vw,42px);line-height:1.1;letter-spacing:-.5px}
 h2{margin:0 0 6px;font-size:24px;letter-spacing:-.2px}
 h3{margin:0 0 6px;font-size:16px}
 h4{margin:0}
-p{margin:0 0 14px;color:#a9b6cf;max-width:62ch}
+p{margin:0 0 14px;color:var(--text2);max-width:62ch}
 .mute{color:var(--mute)}
 .pagehead{margin-bottom:20px}
 .pagehead p{margin:0}
 code{font:13px var(--mono);color:var(--cyan);background:rgba(77,225,255,.08);padding:2px 6px;border-radius:4px}
 
-.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;overflow:hidden;background:linear-gradient(135deg,#0f1930,var(--panel) 60%);}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;overflow:hidden;background:linear-gradient(135deg,var(--raise),var(--panel) 60%);}
 .radar{flex:none;width:220px;aspect-ratio:1;border-radius:50%;position:relative;border:1px solid var(--line);background:radial-gradient(circle,rgba(77,225,255,.12) 0 2px,transparent 3px),repeating-radial-gradient(circle,transparent 0 30px,var(--line) 30px 31px);}
-.radar::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 75%,rgba(77,225,255,.38));animation:spin 5s linear infinite;}
+/* Người dùng thật nói vòng quét quay quá nhanh (30-10-2026, nói HAI lần): nó là
+   hình nền trang chủ, không phải đồng hồ. 5s/vòng làm rối mắt và át mất chữ
+   đang đọc; hạ xuống 12s rồi mà người dùng vẫn thấy nhanh, vì trình duyệt của
+   họ vẫn đang dùng bản style.css cũ trong bộ nhớ đệm (lý do thật nằm ở sw.js,
+   mục "cache: reload"). Lần này hạ hẳn xuống 24s/vòng — chậm hơn nữa thì mắt
+   không còn thấy nó quay, chỉ còn một vệt sáng đứng. .blip đi cùng số giây vì
+   hai thứ phải cùng nhịp: chấm đỏ sáng lên rồi nhạt dần đúng một vòng quét. */
+.radar::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 75%,rgba(77,225,255,.38));animation:spin 24s linear infinite;}
 .radar::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
-.blip{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blip 5s infinite;z-index:1}
+.blip{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blip 24s infinite;z-index:1}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes blip{0%,12%{opacity:1;transform:scale(1.5)}30%{background:var(--ok);box-shadow:0 0 12px var(--ok);opacity:.9;transform:scale(1)}100%{background:var(--ok);opacity:.25}}
+/* Chấm sáng lên TỪ TỪ, không bật phắt. Bản cũ nhảy thẳng từ opacity .25 ở
+   cuối vòng lên opacity 1 ở đầu vòng nên mắt thấy một cái " nhấp" — chính là
+   cái người dùng bảo là nhanh quá. Nay 0% đã mờ, 9% (≈2,2 giây) mới tới đỉnh,
+   26% lắng xuống màu an toàn, phần còn lại của vòng chỉ nhạt dần. */
+@keyframes blip{0%{opacity:.22;transform:scale(1);background:var(--red);box-shadow:0 0 6px rgba(255,92,122,.2)}9%{opacity:1;transform:scale(1.5);background:var(--red);box-shadow:0 0 12px var(--red)}26%{opacity:.9;transform:scale(1);background:var(--ok);box-shadow:0 0 12px var(--ok)}100%{opacity:.22;transform:scale(1);background:var(--ok);box-shadow:0 0 6px rgba(122,255,199,.18)}}
 
 .mission{cursor:pointer;text-align:left;color:inherit;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;}
 .mission:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 24px -12px rgba(77,225,255,.35)}
@@ -108,32 +264,82 @@ code{font:13px var(--mono);color:var(--cyan);background:rgba(77,225,255,.08);pad
 .mission.done .chip{color:var(--ok);border-color:rgba(110,231,168,.4);background:rgba(110,231,168,.08)}
 .mission .goal{color:var(--mute);font-size:13px;margin-bottom:16px}
 
+/* Thẻ "Bắt đầu ở đây" trên dashboard: số bước to, chữ dài, không icon — người
+   chưa biết gì về bảo mật cần một hàng chữ rõ ràng hơn là một khối mỹ lệ. */
+.batdau ol{margin:6px 0 0;padding-left:26px}
+.batdau li{margin:9px 0;line-height:1.65}
+.batdau li::marker{color:var(--cyan);font:700 15px var(--mono)}
+.batdau p{margin:14px 0 0}
+.batdau .linkbtn{font:inherit;color:var(--cyan)}
+
 .row{display:flex;gap:10px;flex-wrap:wrap}
-input[type="text"],input[type="password"]{width:100%;min-width:0;color:var(--text);background:#060a12;border:1px solid #2b3a5c;border-radius:10px;padding:12px 14px;font:14px var(--mono);transition:border-color .2s,box-shadow .2s;}
+input[type="text"],input[type="password"]{width:100%;min-width:0;color:var(--text);background:var(--deep);border:1px solid var(--line2);border-radius:10px;padding:12px 14px;font:14px var(--mono);transition:border-color .2s,box-shadow .2s;}
 input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,255,.12)}
-.btn{cursor:pointer;border:1px solid var(--cyan);border-radius:10px;padding:11px 18px;font-weight:700;white-space:nowrap;color:#04121a;background:var(--cyan);transition:filter .15s,transform .15s,box-shadow .15s;}
+.btn{cursor:pointer;border:1px solid var(--cyan);border-radius:10px;padding:11px 18px;font-weight:700;white-space:nowrap;color:var(--ink);background:var(--cyan);transition:filter .15s,transform .15s,box-shadow .15s;}
 .btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 0 12px rgba(77,225,255,0.4);}
 .btn:active{transform:translateY(0)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
 .btn.ghost{color:var(--cyan);background:none}
-.btn.danger{color:#fff;background:#c22f4d;border-color:var(--red)}
+.btn.danger{color:var(--onDanger);background:var(--danger);border-color:var(--red)}
 .btn.danger:hover{box-shadow:0 0 12px rgba(255,92,122,0.4)}
-.btn.success{color:#04121a;background:var(--ok);border-color:var(--ok)}
+.btn.success{color:var(--ink);background:var(--ok);border-color:var(--ok)}
 .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px}
 
-.notice{margin-top:16px;padding:11px 14px;border-left:3px solid var(--amber);background:rgba(255,180,84,.07);color:#cdc3ae;font-size:13px;border-radius:0 8px 8px 0;}
-.query{margin-top:18px;padding:16px;border-radius:12px;background:#060a12;border:1px solid var(--line);font:13px/1.8 var(--mono);color:#9fb0d0;overflow-wrap:anywhere;}
-.query .inj{color:#fff;background:rgba(255,92,122,.3);border-radius:4px;padding:1px 3px;box-shadow:0 0 0 1px var(--red)}
+/* ---- Vùng chạm tối thiểu  ·  WCAG 2.5.5 (target size) ----
+   LÀ GÌ   : Ở máy chạm, mọi thứ người dùng bấm được phải cao ≥ 44px. Chuột
+            nhắm trúng một ô 30px, ngón tay thì không — và người dùng điện thoại
+            không biết vì sao nút "không bấm được", họ chỉ thoát app.
+   CHẠY    : --touch = 0px trên desktop nên cả khối này là chữ ký vô hình với
+            màn hình rộng; nó chỉ thành 44px trong (max-width:860px) HOẶC
+            (pointer:coarse) — tablet ngang hơn 860px vẫn phải có, vì không có
+            chuột thì không có lý do gì được phép nhỏ hơn.
+   ĐO      : 30-10-2026, getBoundingClientRect trong iframe 390×740 (trước/sau):
+            nút payload lab 33→44, nút trong thẻ IP 30→44, select 36→44,
+            checkbox 18→24 (vùng chạm cả dòng 18→44), công tắc 30→44 vùng chạm.
+   LƯU Ý   : .switch và checkbox KHÔNG tăng chiều cao thật — kéo cái công tắc
+            lên 44px là méo hình viên thuốc, người dùng không nhận ra nó là gì.
+            Mở vùng ăn chạm bằng lớp ::before vô hình thay vào đó: input đã
+            appearance:none thì pseudo vẫn vẽ và vẫn nhận click (chính núm tròn
+            của công tắc là một ::after). .opt là <label> bọc lấy ô vuông nên
+            chiều cao tối thiểu đặt trên label, không đặt trên ô vuông. */
+:root{--touch:0px}
+@media (max-width:860px),(pointer:coarse){:root{--touch:44px}}
+button,input,select,textarea{min-height:var(--touch)}
+input[type="checkbox"],input[type="radio"],.switch{min-height:0}
+@media (max-width:860px),(pointer:coarse){
+  /* <label> bọc ô nhập: người dùng chạm vào DÒNG CHỮ "Bật xác minh hai bước",
+     không nhắm được ô vuông nhỏ. Cho nhãn lấy chiều cao tối thiểu thì cả dòng
+     thành vùng bấm, và :has(input) chặn nhầm mấy nhãn chú thích nhỏ kiểu
+     .lang-switch label (chúng chỉ trỏ bằng for=, không bọc ô nào). */
+  label:has(input),label:has(select),label:has(textarea){min-height:var(--touch);align-items:center}
+  input[type="checkbox"]:not(.switch){width:22px;height:22px}
+  /* .switch đã position:relative ở khối định nghĩa nó (dùng cho núm ::after). */
+  .switch::before{content:"";position:absolute;left:0;right:0;top:50%;
+    height:var(--touch);margin-top:calc(var(--touch) / -2)}
+  /* Hai thứ bấm được mà KHÔNG phải <button>, nên luật button{} ở trên không
+     chạm tới: thanh URL trong lab lừa đảo (đo 27,2px ở khung 360px) và các ô
+     .spot-target "chấm vào chi tiết đáng ngờ". Cùng chuẩn 44px với nút. */
+  .url-bar.clickable,.spot-target{min-height:var(--touch)}
+  /* .linkbtn là một LINK NẰM GIỮA CÂU ("…bạn mở trang Cài đặt") — WCAG 2.5.5 có
+     ngoại lệ inline cho đúng trường hợp này. Ép nó cao 44px (hay bù bằng padding
+     dọc) thì cả dòng chữ giãn thành một khoảng trắng vô duyên giữa paragraph,
+     nên ở đây miễn luật và GIỮ nguyên bản chữ 24px. */
+  button.linkbtn{min-height:0}
+}
+
+.notice{margin-top:16px;padding:11px 14px;border-left:3px solid var(--amber);background:rgba(255,180,84,.07);color:var(--amberText);font-size:13px;border-radius:0 8px 8px 0;}
+.query{margin-top:18px;padding:16px;border-radius:12px;background:var(--deep);border:1px solid var(--line);font:13px/1.8 var(--mono);color:var(--text2);overflow-wrap:anywhere;}
+.query .inj{color:var(--injFg);background:var(--injBg);border-radius:4px;padding:1px 3px;box-shadow:0 0 0 1px var(--red)}
 .query .val{color:var(--cyan)}
 
-.term{position:relative;margin-top:14px;border:1px solid #1d3b2f;border-radius:12px;background:#02060a;overflow:hidden;box-shadow:0 0 34px rgba(110,231,168,.08);}
-.term-bar{display:flex;align-items:center;gap:7px;padding:9px 12px;background:#0a1118;border-bottom:1px solid #16261f;font:12px var(--mono);color:var(--mute);}
-.term-bar i{width:10px;height:10px;border-radius:50%;background:#ff5c7a}
-.term-bar i:nth-child(2){background:#ffb454}
-.term-bar i:nth-child(3){background:#6ee7a8}
-.term-body{position:relative;height:310px;overflow:auto;padding:14px;font:12.5px/1.65 var(--mono);color:#9be8bb;text-shadow:0 0 6px rgba(110,255,176,.3);white-space:pre-wrap;}
+.term{position:relative;margin-top:14px;border:1px solid var(--okLine);border-radius:12px;background:var(--void);overflow:hidden;box-shadow:0 0 34px rgba(110,231,168,.08);}
+.term-bar{display:flex;align-items:center;gap:7px;padding:9px 12px;background:var(--deep);border-bottom:1px solid var(--okLine);font:12px var(--mono);color:var(--mute);}
+.term-bar i{width:10px;height:10px;border-radius:50%;background:var(--red)}
+.term-bar i:nth-child(2){background:var(--amber)}
+.term-bar i:nth-child(3){background:var(--ok)}
+.term-body{position:relative;height:310px;overflow:auto;padding:14px;font:12.5px/1.65 var(--mono);color:var(--okText);text-shadow:0 0 6px rgba(110,255,176,.3);white-space:pre-wrap;overflow-wrap:anywhere;}
 .term-body::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(110,231,168,.025) 2px,rgba(110,231,168,.025) 3px);}
-.term-body .t-ok{color:#7dffb0}
+.term-body .t-ok{color:var(--okText)}
 .term-body .t-info{color:var(--cyan)}
 .term-body .t-warn{color:var(--amber)}
 .term-body .t-err{color:var(--red)}
@@ -144,37 +350,37 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
 .verdict{margin-top:14px;padding:14px 16px;border-radius:12px;font-weight:700;display:none;text-align:center;font-family:var(--mono);}
 .verdict.show{display:block;animation:pop .3s ease}
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
-.verdict.bad{background:rgba(255,92,122,.1);border:1px solid var(--red);color:#ffb3c1;animation:shake .4s}
+.verdict.bad{background:rgba(255,92,122,.1);border:1px solid var(--red);color:var(--redText);animation:shake .4s}
 .verdict.good{background:rgba(110,231,168,.08);border:1px solid rgba(110,231,168,.5);color:var(--ok)}
-.verdict.warn{background:rgba(255,180,84,.1);border:1px solid var(--amber);color:#ffd9a0}
+.verdict.warn{background:rgba(255,180,84,.1);border:1px solid var(--amber);color:var(--amberText)}
 @keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
 
 .db-leak-container{width:100%;overflow-x:auto;margin-top:15px;border:1px solid var(--line);border-radius:10px}
 .db-table{width:100%;border-collapse:collapse;font:13px var(--mono);min-width:480px}
 .db-table th,.db-table td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
 .db-table th{background:rgba(255,92,122,.15);color:var(--red);border-bottom:2px solid var(--red)}
-.db-table td{color:#a9b6cf}
-.db-table tr:hover td{background:rgba(255,255,255,.02)}
+.db-table td{color:var(--text2)}
+.db-table tr:hover td{background:rgba(var(--fillTone),.02)}
 
 .phish-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.browser-mock{border:1px solid var(--line);border-radius:12px;background:#0a0f1d;overflow:hidden;display:flex;flex-direction:column}
-.browser-bar{background:#141e38;padding:8px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
-.url-bar{flex:1;background:#060a12;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font:12px var(--mono);color:var(--mute);display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.browser-mock{border:1px solid var(--line);border-radius:12px;background:var(--deep);overflow:hidden;display:flex;flex-direction:column}
+.browser-bar{background:var(--raise);padding:8px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.url-bar{flex:1;background:var(--deep);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font:12px var(--mono);color:var(--mute);display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .url-bar.clickable{cursor:pointer}
 .url-bar.clickable:hover{border-color:var(--cyan)}
-.phish-body{padding:20px;flex:1;display:flex;align-items:center;justify-content:center;background:#0b1326}
-.phish-card{background:#141e38;border:1px solid var(--line);padding:20px;border-radius:12px;width:100%;max-width:280px;text-align:center;}
+.phish-body{padding:20px;flex:1;display:flex;align-items:center;justify-content:center;background:var(--panel)}
+.phish-card{background:var(--raise);border:1px solid var(--line);padding:20px;border-radius:12px;width:100%;max-width:280px;text-align:center;}
 .spot-target{border:2px dashed rgba(255,180,84,.4);padding:4px;border-radius:6px;cursor:pointer;transition:all .2s}
 .spot-target:hover{border-color:var(--amber);background:rgba(255,180,84,.1)}
 .spot-target.found{border-color:var(--ok)!important;background:rgba(110,231,168,.15)!important;border-style:solid!important}
 
-.ddos-monitor{background:#04070d;border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.ddos-monitor{background:var(--void);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden}
 .metric-bar{height:16px;border-radius:8px;background:var(--raise);overflow:hidden;margin-top:6px}
 .metric-bar i{display:block;height:100%;width:0;background:var(--cyan);transition:width .3s,background .3s}
 .metric-bar.danger i{background:var(--red);animation:pulse-red 1s infinite}
 @keyframes pulse-red{0%,100%{opacity:1}50%{opacity:.55}}
-.ip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px;min-height:180px;max-height:240px;overflow-y:auto;padding:6px;border:1px solid var(--line);border-radius:10px;background:#02050b;}
-.ip-card{background:rgba(255,92,122,.15);border:1px solid var(--red);border-radius:8px;padding:8px;font:12px var(--mono);color:#ffb3c1;text-align:center;cursor:pointer;transition:transform .1s,background .2s;display:flex;flex-direction:column;align-items:center;gap:4px;animation:pop-in .25s ease;}
+.ip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:16px;min-height:180px;max-height:240px;overflow-y:auto;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--void);}
+.ip-card{background:rgba(255,92,122,.15);border:1px solid var(--red);border-radius:8px;padding:8px;font:12px var(--mono);color:var(--redText);text-align:center;cursor:pointer;transition:transform .1s,background .2s;display:flex;flex-direction:column;align-items:center;gap:4px;animation:pop-in .25s ease;}
 @keyframes pop-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
 .ip-card:hover{transform:scale(1.05);background:rgba(255,92,122,.25)}
 .ip-card button{border:0;background:var(--red);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;font-weight:700;}
@@ -188,12 +394,12 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
 .check li.pass::before{content:"✓";color:var(--ok)}
 
 .fwline{display:flex;align-items:center;gap:14px;margin:6px 0 20px}
-.switch{appearance:none;flex:none;width:54px;height:30px;border-radius:99px;background:#5a2233;position:relative;cursor:pointer;transition:background .2s;}
+.switch{appearance:none;flex:none;width:54px;height:30px;border-radius:99px;background:var(--redBg);position:relative;cursor:pointer;transition:background .2s;}
 .switch::after{content:"";position:absolute;width:22px;height:22px;left:4px;top:4px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 2px 6px rgba(0,0,0,.4);}
-.switch:checked{background:#157a56}
+.switch:checked{background:var(--okStrong)}
 .switch:checked::after{transform:translateX(24px)}
 .ports{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.port{padding:12px;border-radius:12px;background:#060a12;border:1px solid var(--line);transition:all .25s}
+.port{padding:12px;border-radius:12px;background:var(--deep);border:1px solid var(--line);transition:all .25s}
 .port b{display:block;font:600 18px var(--mono)}
 .port span{font-size:12px;color:var(--mute)}
 .port em{display:block;margin-top:6px;font:12px var(--mono);color:var(--mute);font-style:normal}
@@ -204,24 +410,30 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
 .port.open em{color:var(--amber)}
 .port.exposed{border-color:var(--red);background:rgba(255,92,122,.12)}
 .port.exposed em{color:var(--red)}
-.legend{margin-top:14px;min-height:48px;color:#a9b6cf;font-size:14px}
+.legend{margin-top:14px;min-height:48px;color:var(--text2);font-size:14px}
 
-.balance-box{font-family:var(--mono);font-size:24px;color:var(--cyan);background:#060a12;padding:20px;border-radius:12px;border:1px solid var(--line);text-align:center;margin:16px 0;}
-.attacker-site{background:#141e38;padding:20px;border-radius:12px;border:1px dashed var(--red);text-align:center;}
+.balance-box{font-family:var(--mono);font-size:24px;color:var(--cyan);background:var(--deep);padding:20px;border-radius:12px;border:1px solid var(--line);text-align:center;margin:16px 0;}
+.attacker-site{background:var(--raise);padding:20px;border-radius:12px;border:1px dashed var(--red);text-align:center;}
 
 #idorInput{outline:none;border-bottom:1px solid var(--cyan)!important;}
 
-.siem-log{height:400px;overflow-y:auto;background:#02060a;border:1px solid #1d3b2f;border-radius:12px;padding:12px;font:12.5px/1.6 var(--mono);}
-.siem-line{padding:4px 8px;border-radius:4px;cursor:pointer;color:#9be8bb;transition:background .15s;user-select:none;}
+.siem-log{height:400px;overflow-y:auto;background:var(--void);border:1px solid var(--okLine);border-radius:12px;padding:12px;font:12.5px/1.6 var(--mono);}
+/* overflow-wrap:anywhere KHÔNG phải trang trí. Đo ở khung 360px: 10/20 dòng log
+   rộng tới 312px trong hộp 246px, vì một dòng như
+   "GET /login?user=admin%27+OR+%271%27%3D%271&pass=x" là MỘT chuỗi không có chỗ
+   trống — không có gì để ngắt, nên hộp log (overflow-y:auto kéo theo overflow-x
+   auto) hiện thanh cuộn ngang dọc theo dòng chữ, và trên điện thoại thì người
+   đọc phải kéo ngang từng dòng một. Cho phép ngắt giữa chuỗi là hết cuộn. */
+.siem-line{padding:4px 8px;border-radius:4px;cursor:pointer;color:var(--okText);transition:background .15s;user-select:none;overflow-wrap:anywhere;}
 .siem-line:hover{background:rgba(77,225,255,.08);}
-.siem-line.flagged{background:rgba(255,180,84,.18);border-left:3px solid var(--amber);color:#ffd9a0;}
+.siem-line.flagged{background:rgba(255,180,84,.18);border-left:3px solid var(--amber);color:var(--amberText);}
 .siem-line.flagged::before{content:"⚑ ";color:var(--amber);}
 .siem-line .ts{color:var(--mute);margin-right:8px;}
-.siem-line .lvl-info{color:#7fb0e0;font-weight:600;margin-right:6px;}
+.siem-line .lvl-info{color:var(--text2);font-weight:600;margin-right:6px;}
 .siem-line .lvl-warn{color:var(--amber);font-weight:600;margin-right:6px;}
 .siem-line .lvl-crit{color:var(--red);font-weight:600;margin-right:6px;}
 
-.cert-frame{background:linear-gradient(135deg,#0d1424 0%,#0a1929 50%,#0d1424 100%);border:3px solid var(--cyan);border-radius:16px;padding:4px;box-shadow:0 0 40px rgba(77,225,255,0.25);}
+.cert-frame{background:linear-gradient(135deg,var(--panel) 0%,var(--ink) 50%,var(--panel) 100%);border:3px solid var(--cyan);border-radius:16px;padding:4px;box-shadow:0 0 40px rgba(77,225,255,0.25);}
 .cert-inner{border:1px solid rgba(77,225,255,0.35);border-radius:10px;padding:38px 30px;text-align:center;position:relative;overflow:hidden;}
 .cert-inner::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(77,225,255,0.03) 20px,rgba(77,225,255,0.03) 21px);pointer-events:none;}
 .cert-brand{font-size:20px;color:var(--cyan);letter-spacing:4px;font-weight:700;margin-bottom:6px;}
@@ -242,7 +454,7 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
 
 /* ============== Kỳ thi tốt nghiệp (màn hình Chứng chỉ) ============== */
 .exam-part{margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line);color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
-.exam-q{margin:0 0 18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.015);}
+.exam-q{margin:0 0 18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(var(--fillTone),.015);}
 .exam-h{margin:0 0 10px;font-weight:600;}
 .exam-opt{display:flex;gap:9px;align-items:flex-start;margin:0 0 7px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .15s;}
 .exam-opt:hover{background:rgba(77,225,255,.06)}
@@ -250,7 +462,7 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
 .exam-dung{color:var(--ok);font-weight:700}
 .exam-sai{color:var(--red);font-weight:700}
 .exam-note{margin:8px 0 0;font:12px var(--mono);color:var(--mute)}
-.exam-ta{width:100%;min-width:0;color:var(--text);background:#060a12;border:1px solid #2b3a5c;border-radius:10px;padding:11px 13px;font:14px/1.55 var(--sans);resize:vertical;transition:border-color .2s,box-shadow .2s;}
+.exam-ta{width:100%;min-width:0;color:var(--text);background:var(--deep);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;font:14px/1.55 var(--sans);resize:vertical;transition:border-color .2s,box-shadow .2s;}
 .exam-ta:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
 .exam-ta:disabled{opacity:.6}
 .exam-y{margin:10px 0 0;padding-left:4px;list-style:none;}
@@ -276,7 +488,7 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
    bài làm bị xoá. Đứng riêng chứ không gộp vào .exam-lock (hổ phách) vì đây là
    hậu quả đã xảy ra, không phải nội quy. */
 .exam-huy{margin:10px 0 0;padding:10px 14px;border:1px solid var(--red);border-radius:10px;
-  background:rgba(255,92,122,.08);color:#ffb3c1;font-size:13px}
+  background:rgba(255,92,122,.08);color:var(--redText);font-size:13px}
 /* Hàng chọn lượt: thi THẬT (tính điểm, cấp bằng) và thi THỬ (không tính điểm).
    Nút đang chọn tô viền cyan để phân biệt mà không phải nghĩ thêm màu mới. */
 .exam-che{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
@@ -290,19 +502,46 @@ input:focus{border-color:var(--cyan);outline:0;box-shadow:0 0 0 3px rgba(77,225,
    màu xanh "đỗ" hay hổ phách "khoá": một lượt không tính điểm thì không được
    trông giống kết quả thật, cũng không được trông như lỗi. */
 .exam-thu{margin:10px 0 0;padding:10px 14px;border:1px solid var(--line);border-left:3px solid var(--cyan);
-  border-radius:10px;background:rgba(255,255,255,.03);color:var(--mute);font-size:13px}
+  border-radius:10px;background:rgba(var(--fillTone),.03);color:var(--mute);font-size:13px}
 
 .lb-table{width:100%;border-collapse:collapse;margin-top:10px;font:13px var(--mono)}
 .lb-table th,.lb-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
 .lb-table th{color:var(--cyan);background:rgba(77,225,255,.05)}
-.lb-table tr:hover td{background:rgba(255,255,255,.02)}
+.lb-table tr:hover td{background:rgba(var(--fillTone),.02)}
 .lb-table tr.me td{background:rgba(77,225,255,.08);font-weight:700}
 /* Dòng nói thẳng: mấy hạng kia là chữ do app tự đặt, không phải người thật. */
 .lb-note{margin:10px 2px 0;font:12px var(--sans);line-height:1.5}
 
+/* Bảng xếp hạng trên điện thoại. Số đo thật ở khung 360px: bảng cần 320px
+   trong khi hộp chứa chỉ có 311px, và bốn cột chen trong 311px nghĩa là mỗi ô
+   rộng ~78px — tên học viên vỡ thành ba dòng, "Chuyên viên phân tích" thành một
+   cột chữ dựng đứng. Chuyển sang THẺ: một hàng = một thẻ hai dòng, hạng nằm
+   cột trái, tên + XP trên dòng đầu, cấp bậc dồn xuống dòng hai. thead ẩn được
+   vì từng ô tự giải thích: "#3" là hạng, "300 XP" là điểm, dòng dưới là cấp.
+   Chỉ áp cho #lbTable (bảng xếp hạng): bảng "Tài khoản trên máy này" trong
+   trang Quản trị dùng cùng lớp .lb-table nhưng ô cuối là NÚT (đổi role, xoá) —
+   xếp nó thành thẻ sẽ làm các cột lệch nhau theo từng hàng, nên bảng đó giữ
+   nguyên và cuộn ngang trong .table-scroll. */
+@media (max-width:480px){
+  #lbTable, #lbTable tbody{display:block}
+  #lbTable thead{display:none}
+  #lbTable tr{display:grid;grid-template-columns:auto 1fr auto;
+    grid-template-areas:"hang ten xp" ". cap cap";gap:3px 10px;
+    padding:10px 6px;border-bottom:1px solid var(--line);align-items:baseline}
+  #lbTable td{display:block;padding:0;border:0;text-align:left;background:none}
+  #lbTable td:nth-child(1){grid-area:hang;color:var(--cyan);font-weight:700;font-size:15px}
+  #lbTable td:nth-child(2){grid-area:ten;font-weight:700;overflow-wrap:anywhere}
+  #lbTable td:nth-child(3){grid-area:cap;color:var(--mute);font-size:12px}
+  #lbTable td:nth-child(4){grid-area:xp;white-space:nowrap}
+  /* Nền của hàng, không của ô: kẻ giữa các ô là khoảng trống của lưới, tô màu
+     từng ô sẽ thành mấy vệt đứt quãng giữa thẻ. */
+  #lbTable tr:hover{background:rgba(var(--fillTone),.02)}
+  #lbTable tr.me{background:rgba(77,225,255,.08)}
+}
+
 footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 
-.toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:#123a32;border:1px solid var(--ok);color:#d8ffec;font-weight:700;transform:translateY(120px);opacity:0;transition:.4s cubic-bezier(.2,.9,.3,1.3);z-index:9999;box-shadow:0 12px 40px -12px rgba(110,231,168,.5);}
+.toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;border-radius:14px;background:var(--okLine);border:1px solid var(--ok);color:var(--okText);font-weight:700;transform:translateY(120px);opacity:0;transition:.4s cubic-bezier(.2,.9,.3,1.3);z-index:9999;box-shadow:0 12px 40px -12px rgba(110,231,168,.5);}
 .toast.show{transform:none;opacity:1}
 
 .mobile-menu-btn{display:none;position:fixed;top:15px;left:15px;z-index:1002;background:var(--panel);border:1px solid var(--line);color:var(--cyan);font-size:24px;padding:6px 12px;border-radius:8px;cursor:pointer;}
@@ -333,15 +572,31 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
   h2{font-size:20px}
   .row{flex-direction:column}
   .row .btn{width:100%}
+  /* .btn viết nowrap (đúng trên desktop: nút ngắn, không cho gãy chữ). Ở 360px
+     với mấy nhãn dài thì nowrap biến chính cái nút thành nguồn tràn ngang — đo
+     30-10-2026: #xssSafeBtn ("Chế độ An toàn (textContent + encode)") cần
+     313px trong ô 262px, #setWipe ("Xoá toàn bộ dữ liệu của tài khoản này trên
+     máy") tràn 15px khỏi thẻ; cả trang vì thế cuộn ngang 10px. Cho phép ngắt
+     dòng: nút cao thêm một dòng, đổi lại không mất chữ và hết cuộn ngang. */
+  .btn{white-space:normal}
   .ports{grid-template-columns:1fr 1fr}
   .term-body{height:240px}
+  /* Lưới thẻ IP của lab DDoS. Đo 30-10-2026 trong iframe 390×740, khung lưới
+     chỉ rộng 239px: quy cũ auto-fill minmax(110px,1fr) xếp được đúng MỘT cột
+     227px — một danh sách dài dằng dặc phải cuộn, không phải lưới. Viết non
+     tay grid-template-columns:1fr 1fr thì thành 2 cột nhưng TRÀN 49px: sàn của
+     1fr là min-content, và "192.168.7.24" là một chuỗi liền 106px không breaking
+     được. minmax(0,1fr) bỏ sàn đó, kèm chữ nhỏ bớt + cho phép đứt sau dấu chấm
+     — đo lại: 2 cột 109.6px, không tràn, IP đi hết một dòng. */
+  .ip-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ip-card{padding:12px 6px;font-size:13px}
+  .ip-card span{overflow-wrap:anywhere}
 }
 
 /* ============== Language switcher ============== */
-.lang-switch{display:flex;flex-direction:column;gap:5px;padding:0 8px;margin-top:-8px}
-.lang-switch label{font-size:11px;color:var(--mute);letter-spacing:.5px;text-transform:uppercase}
-.lang-switch select{background:#060a12;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
-.lang-switch select:hover{border-color:#2d3d63}
+.lang-switch{display:flex;flex-direction:column;gap:5px;padding:0 8px}
+.lang-switch select{background:var(--deep);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.lang-switch select:hover{border-color:var(--line2)}
 .lang-switch select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
 
 /* ============== Antivirus lab ============== */
@@ -349,7 +604,7 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .av-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .25s}
 .av-stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font:13px var(--mono);color:var(--mute)}
 .av-stats b{font-size:16px;margin-left:4px}
-.av-results{max-height:360px;overflow-y:auto;margin-top:12px;border:1px solid var(--line);border-radius:10px;background:#04070d}
+.av-results{max-height:360px;overflow-y:auto;margin-top:12px;border:1px solid var(--line);border-radius:10px;background:var(--void)}
 .av-row{display:grid;grid-template-columns:26px 1.4fr 90px 2.2fr;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font:13px var(--mono);align-items:center}
 .av-row:last-child{border-bottom:0}
 .av-row .av-icon{text-align:center}
@@ -369,8 +624,8 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 }
 /* Nút SQLMap và Deep Scan */
 #runSqlmap, #avDeepScan {
-  background: linear-gradient(135deg, #ff5c7a, #c22f4d);
-  border-color: #ff5c7a;
+  background: linear-gradient(135deg, var(--red), #c22f4d);
+  border-color: var(--red);
   color: #fff;
   animation: pulse-red 2s infinite;
 }
@@ -391,6 +646,24 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .auth-form .row .btn{margin-top:0}
 .auth-form .auth-switch{margin:14px 0 0;font-size:13px}
 .linkbtn{background:none;border:0;padding:0;color:var(--cyan);cursor:pointer;text-decoration:underline}
+/* Ô "Mã quản trị (nếu bạn có)" để gấp trong form đăng nhập/đăng ký. Gấp vì nó
+   không phải thứ học viên cần nhìn; mở ra thì có đủ giải thích để không ai gõ
+   bừa. summary tự vẽ dấu ▶ bằng ::before, không dùng marker của trình duyệt —
+   marker đổi hình theo system và on/off không đồng nhất giữa hai theme. */
+.auth-more{margin-top:12px;padding:9px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--deep)}
+.auth-more summary{cursor:pointer;font-size:12.5px;color:var(--mute);list-style:none}
+.auth-more summary::-webkit-details-marker{display:none}
+.auth-more summary::before{content:"▸ ";color:var(--cyan)}
+.auth-more[open] summary::before{content:"▾ "}
+.auth-more[open] summary{color:var(--text2)}
+.auth-more label{display:block;margin-top:10px;font-size:13px;color:var(--mute)}
+.auth-more p{margin:8px 0 0;font-size:12px;line-height:1.55;color:var(--mute)}
+.auth-why{margin:12px 0 0;font-size:12.5px;line-height:1.6;color:var(--mute)}
+/* .auth-note: câu nói thẳng giới hạn tài khoản, đặt xen giữa các ô nhập chứ
+   chỉ nằm trên cùng. Lý do: người ta nhìn ô mật khẩu chứ không nhìn tiêu đề,
+   nên cảnh báo "đừng dùng mật khẩu thật / không có máy chủ" phải ở ngay tay
+   họ gõ. Viền hổ phách = cùng họ màu với .auth-notice.demo. */
+.auth-note{margin:8px 0 0;padding:7px 10px;border-left:2px solid var(--amber);background:rgba(255,180,84,.07);border-radius:0 8px 8px 0;font-size:12px;line-height:1.55;color:var(--mute)}
 .auth-msg{min-height:20px;margin-top:12px;font-size:13px}
 .auth-msg.err{color:var(--red)}
 .auth-msg.ok{color:var(--ok)}
@@ -401,7 +674,7 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .mailbox-body strong{font:700 22px var(--mono);letter-spacing:6px;color:var(--text)}
 .mailbox-body small{display:block;margin-top:6px;color:var(--mute)}
 .userbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
-.userbox .avatar{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#04121a;background:var(--cyan)}
+.userbox .avatar{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--ink);background:var(--cyan)}
 .userbox .uinfo{min-width:0;flex:1}
 .userbox .uinfo b,.userbox .uinfo small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .userbox .uinfo small{color:var(--mute);font-size:11px}
@@ -413,7 +686,7 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .acct-dock{position:fixed;top:14px;right:16px;z-index:998;display:flex;justify-content:flex-end}
 .auth-locked .acct-dock{display:none}
 .acct-dock .userbox{flex-wrap:nowrap;align-items:center;gap:8px;padding:6px 8px;border-radius:999px;
-  background:rgba(13,20,36,.9);backdrop-filter:blur(10px);box-shadow:0 12px 32px -18px rgba(0,0,0,.95)}
+  background:rgba(var(--panelTone),.9);backdrop-filter:blur(10px);box-shadow:0 12px 32px -18px rgba(0,0,0,.95)}
 .acct-dock .userbox .avatar{width:28px;height:28px;font-size:13px}
 .acct-dock .userbox .uinfo{flex:0 1 200px;min-width:0}
 .acct-dock .userbox .btn{width:auto;padding:6px 12px;font-size:12px;border-radius:999px}
@@ -434,7 +707,7 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
    nhập — mất mạng thì EmailJS cũng không gửi được mã, người dùng phải biết. */
 .net-flag{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:998;
   max-width:min(620px,calc(100vw - 48px));margin:0;padding:8px 16px;border-radius:999px;
-  border:1px solid rgba(255,180,84,.5);background:rgba(13,20,36,.94);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,180,84,.5);background:rgba(var(--panelTone),.94);backdrop-filter:blur(10px);
   color:var(--amber);font:12px/1.45 var(--sans);text-align:center;
   box-shadow:0 12px 32px -18px rgba(0,0,0,.95)}
 .net-flag[hidden]{display:none}
@@ -447,7 +720,7 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .guide-steps{margin:0;padding:0;list-style:none;counter-reset:g;display:grid;gap:14px}
 .guide-steps li{counter-increment:g;display:grid;grid-template-columns:34px 1fr;column-gap:12px}
 .guide-steps li::before{content:counter(g);grid-row:span 2;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:700 14px var(--mono);color:var(--cyan);border:1px solid var(--cyan)}
-.guide-steps span{color:#a9b6cf;font-size:14px}
+.guide-steps span{color:var(--text2);font-size:14px}
 .guide-ranks{list-style:none;margin:8px 0 0;padding:0}
 .guide-ranks li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
 .guide-ranks li:last-child{border-bottom:0}
@@ -457,18 +730,25 @@ footer{padding:26px 0 6px;color:var(--mute);font-size:12px}
 .guide-table th,.guide-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
 .guide-table th{color:var(--mute);font-weight:500}
 .guide-table td:first-child{white-space:nowrap;font-weight:700}
+/* Ở khung 360px, nowrap biến cột "Nhiệm vụ" thành xi-lanh: bảng cần 313px
+   trong hộp 263px nên phải kéo ngang mới đọc hết. Cho tên nhiệm vụ xuống dòng
+   và bớt viền trong là bảng nằm gọn trong hộp — nội dung chữ vẫn nguyên. */
+@media (max-width:480px){
+  .guide-table td:first-child{white-space:normal}
+  .guide-table th,.guide-table td{padding:8px}
+}
 details{border-bottom:1px solid var(--line);padding:10px 0}
 details:last-child{border-bottom:0}
 details summary{cursor:pointer;font-weight:700}
-details p{margin:8px 0 0;color:#a9b6cf}
+details p{margin:8px 0 0;color:var(--text2)}
 
 /* ===== Thông báo chế độ đăng nhập (demo / email thật) ===== */
 .auth-notice{display:flex;gap:10px;align-items:flex-start;margin:0 0 16px;padding:11px 13px;border-radius:10px;font-size:12.5px;line-height:1.55}
 .auth-notice[hidden]{display:none}
 .auth-notice p{margin:0!important}
 .auth-notice-icon{flex:none;font-size:15px;line-height:1.2}
-.auth-notice.demo{border:1px solid rgba(255,180,84,.5);background:rgba(255,180,84,.08);color:#ffd9a0}
-.auth-notice.real{border:1px solid rgba(110,231,168,.45);background:rgba(110,231,168,.07);color:#c8f7dd}
+.auth-notice.demo{border:1px solid rgba(255,180,84,.5);background:rgba(255,180,84,.08);color:var(--amberText)}
+.auth-notice.real{border:1px solid rgba(110,231,168,.45);background:rgba(110,231,168,.07);color:var(--okText)}
 .auth-remember{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--mute);margin-top:12px;cursor:pointer}
 .auth-remember input{width:16px;height:16px;flex:none}
 /* Danh sách tài khoản đang nằm trong localStorage — trả lời câu hỏi
@@ -487,12 +767,12 @@ details p{margin:8px 0 0;color:#a9b6cf}
 
 /* ===== Toast ===== */
 .toast{display:flex;align-items:center;gap:10px;max-width:min(78vw,420px)}
-.toast .toast-xp{flex:none;font:700 12px var(--mono);padding:3px 9px;border-radius:99px;background:var(--ok);color:#04121a}
+.toast .toast-xp{flex:none;font:700 12px var(--mono);padding:3px 9px;border-radius:99px;background:var(--ok);color:var(--ink)}
 .toast .toast-xp[hidden]{display:none}
 .toast #toastMsg{font-weight:600;font-size:14px;text-align:left}
 
 /* ===== Bẫy phishing: nhắc khi đã bấm nộp mật khẩu ===== */
-.caught{margin-top:14px;padding:11px 14px;border-radius:10px;border:1px solid var(--red);background:rgba(255,92,122,.12);color:#ffb3c1;font-size:13px;text-align:center;animation:pop .3s ease}
+.caught{margin-top:14px;padding:11px 14px;border-radius:10px;border:1px solid var(--red);background:rgba(255,92,122,.12);color:var(--redText);font-size:13px;text-align:center;animation:pop .3s ease}
 .caught[hidden]{display:none}
 
 /* ===== Bảng cấu hình ở trang Hướng dẫn ===== */
@@ -520,7 +800,7 @@ details p{margin:8px 0 0;color:#a9b6cf}
    "bấm vào đây để sửa" mà không cần thêm lớp phủ nào chặn tương tác. */
 body.report-mode{cursor:crosshair}
 body.report-mode :not(#i18nReportMode):not(#i18nReportMode *):not(.fix-box):not(.fix-box *):hover{text-decoration:underline dashed var(--amber);text-underline-offset:3px;cursor:pointer}
-#i18nReportMode.active{color:#04121a;background:var(--amber);border-color:var(--amber)}
+#i18nReportMode.active{color:var(--ink);background:var(--amber);border-color:var(--amber)}
 #i18nReportMode.active:hover{filter:brightness(1.08)}
 
 /* ===== Ô sửa bản dịch ===== */
@@ -529,7 +809,7 @@ body.report-mode :not(#i18nReportMode):not(#i18nReportMode *):not(.fix-box):not(
    bấm, đóng bằng Esc/Huỷ, Enter để lưu. */
 .fix-box{position:absolute;z-index:9998;width:min(360px,calc(100vw - 24px));display:grid;gap:9px;padding:13px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--amber);box-shadow:0 18px 44px -18px rgba(0,0,0,.85);}
 .fix-box p{margin:0;font:12px/1.6 var(--mono);color:var(--mute);white-space:pre-wrap;overflow-wrap:anywhere}
-.fix-box input{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:#060a12;color:var(--text);font:13px var(--sans);}
+.fix-box input{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--deep);color:var(--text);font:13px var(--sans);}
 .fix-box input:focus{outline:0;border-color:var(--amber);box-shadow:0 0 0 3px rgba(255,180,84,.14)}
 .fix-box-actions{display:flex;gap:8px;justify-content:flex-end}
 
@@ -541,7 +821,7 @@ body.report-mode :not(#i18nReportMode):not(#i18nReportMode *):not(.fix-box):not(
 /* ===== Các lớp text động trong lab ===== */
 .term-body .t-muted{color:var(--mute)}
 .siem-line .siem-ip{color:var(--cyan)}
-.sqlmap{margin:0;font:12px/1.6 var(--mono);color:#9be8bb;white-space:pre-wrap;overflow-wrap:anywhere}
+.sqlmap{margin:0;font:12px/1.6 var(--mono);color:var(--okText);white-space:pre-wrap;overflow-wrap:anywhere}
 .av-busy,.av-demo-note{padding:12px;font:12px var(--mono);color:var(--mute)}
 .av-demo-note{color:var(--amber)}
 
@@ -550,8 +830,8 @@ body.report-mode :not(#i18nReportMode):not(#i18nReportMode *):not(.fix-box):not(
 .userbox:not(.signed-in) .avatar{background:var(--raise);color:var(--mute)}
 
 /* select ở mọi nơi theo đúng chủ đề tối (trước đây chỉ .lang-switch được style) */
-select{appearance:none;-webkit-appearance:none;background:#060a12 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%234de1ff'/></svg>") no-repeat right 10px center;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 30px 9px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
-select:hover{border-color:#2d3d63}
+select{appearance:none;-webkit-appearance:none;background:var(--deep) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%234de1ff'/></svg>") no-repeat right 10px center;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 30px 9px 10px;font:13px var(--sans);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+select:hover{border-color:var(--line2)}
 select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
 
 /* ===== Trợ lý AI: nút nổi + khung chat (js/ai.js) =====
@@ -560,9 +840,20 @@ select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225
    viewport, phần hội thoại tự cuộn; [hidden] phải thắng display:flex.
    Ba khối phụ trong cùng một mục: khay ảnh đính kèm (#aiImages), ô độ sâu câu
    trả lời (#aiDepth), nút phóng to (.ai-wide + resize) và dòng trạng thái "mất
-   internet" (data-state="no_net"). */
+   internet" (data-state="no_net").
+   Hai màu hổ phách còn lại: "external" (máy chủ công khai được khai nhưng chưa
+   trả lời — host free đang thức dậy, không phải đã chết) và "bad_key" (01-11-2026:
+   proxy sống, chuỗi có thật, nhưng Google đuổi — bệnh của .env, không phải của mạng,
+   nên không được sơn đỏ như "offline").
+   VÀ MỘT CÁ BẪY ĐÃ LÀM MẤT NÚT ✕ (01-11-2026): resize:both bắt overflow khác
+   visible, nên panel mang overflow:hidden — mà overflow:hidden VẪN là một hộp cuộn,
+   chỉ không có thanh cuộn để kéo lại. focus() ô hỏi khi nội dung tràn làm panel tự
+   cuộn ~221px, đẩy .ai-head (chứa ✕) ra khỏi khung nhìn, và người dùng chỉ còn cách
+   tải lại trang. Sửa bằng .ai-head sticky-top + .ai-form sticky-bottom + .ai-log
+   flex:1 1 <basis>/min-height:0 (min-height CỨNG trong flex column chính là lý do
+   hộp log không co được, nên nội dung luôn tràn). Xem README mục 5.7. */
 .ai-fab{position:fixed;left:272px;bottom:22px;z-index:997;display:flex;align-items:center;gap:8px;
-  padding:10px 16px;border-radius:999px;border:1px solid rgba(77,225,255,.55);background:rgba(13,20,36,.92);
+  padding:10px 16px;border-radius:999px;border:1px solid rgba(77,225,255,.55);background:rgba(var(--panelTone),.92);
   color:var(--cyan);font:700 13px var(--sans);cursor:pointer;backdrop-filter:blur(8px);
   box-shadow:0 12px 32px -14px rgba(77,225,255,.6);transition:transform .18s,filter .18s}
 .ai-fab:hover{transform:translateY(-2px);filter:brightness(1.08)}
@@ -571,22 +862,44 @@ body.ai-open .ai-fab{display:none}
 body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
 .ai-panel{position:fixed;left:272px;bottom:22px;z-index:998;display:flex;flex-direction:column;gap:10px;
   width:min(430px,calc(100vw - 300px));max-height:min(640px,72vh);padding:14px;
-  border:1px solid var(--line);border-radius:16px;background:rgba(13,20,36,.97);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:16px;background:rgba(var(--panelTone),.97);backdrop-filter:blur(10px);
   box-shadow:0 26px 64px -24px rgba(0,0,0,.85)}
 .ai-panel[hidden]{display:none}
-.ai-head{display:flex;align-items:flex-start;gap:8px}
-.ai-head-text{flex:1;min-width:0}
+/* ---- thanh trên / thanh dưới của khung chat: LUON LUON NHIN THAY ----
+   Vi sao phai sticky: .ai-panel la hop overflow:hidden (can cho bo goc va cho
+   resize:both), ma hop overflow:hidden van CUON DUOC BANG CODE. setOpen() goi
+   $("aiInput").focus() — ô nhập nằm cuối khung, nên trình duyệt cuộn cả khung
+   lên để lộ nó (đo thật: scrollTop = 221px). Header — nơi có đúng một nút ✕ —
+   bị đẩy lên trên mép khung và bị cắt sạch: không cuộn lại bằng chuột được vì
+   overflow:hidden không có thanh cuộn, thế là hết đường đóng, chỉ còn tải lại
+   trang. flex:none giữ nguyên chiều cao header; background cùng tông với khung
+   để chữ cuộn underneath không hiện xuyên qua; margin âm kéo hai dải phủ kín
+   lớp padding 14px để không hở chữ ở mép. */
+.ai-head{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;flex:none;
+  position:sticky;top:0;z-index:3;margin:-14px -14px 0;padding:14px 14px 8px;
+  background:rgba(var(--panelTone),.97);border-radius:16px 16px 0 0}
+/* flex:1 1 150px (chứ không phải flex:1 + min-width:0): ba nút "Phóng to khung
+   chat" / "Xoá lịch sử" / "✕" không co được (flex:none), nên bản cũ nén khối
+   chữ xuống 79px — đo thật — và dòng mô tả dồn thành một cột chữ cao 117px
+   ngay trong ảnh người duyệt gửi. Cho phép mọc thêm hàng: chữ đủ đọc, nút nào
+   không vừa thì xuống dòng dưới, vẫn bấm được. */
+.ai-head-text{flex:1 1 150px;min-width:0}
 .ai-head h3{margin:0;font-size:15px;line-height:1.25}
 .ai-head small{display:block;margin-top:2px;font-size:11.5px;line-height:1.35}
 .ai-head .btn{flex:none}
 /* Trạng thái máy chủ: vẽ bằng textContent trong js/ai.js, màu đổi theo
-   data-state để biết bệnh trước khi gõ câu hỏi. */
-.ai-status{display:flex;align-items:center;gap:7px;margin:0;padding:7px 10px;border-radius:10px;
-  border:1px solid var(--line);background:rgba(6,10,18,.7);font:12px var(--sans);line-height:1.4}
+   data-state để biết bệnh trước khi gõ câu hỏi. flex-wrap:wrap là bắt buộc:
+   hàng này gồm chấm màu + câu chữ + chip kỹ thuật + nút "Thử lại" giành nhau
+   một dòng, và bản cũ không cho xuống dòng nên khi câu chữ dài, con chip
+   `.env` bị nén đúng 1 ký tự một dòng — ảnh người dùng gửi 01-11 cho thấy
+   ".e/n/v" đứng dọc ngay mép phải. code{flex:none} giữ chip nguyên vẹn,
+   max-width:100% để một URL dài vẫn tự gãy trong phạm vi của nó. */
+.ai-status{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0;padding:7px 10px;border-radius:10px;
+  border:1px solid var(--line);background:rgba(var(--sunkTone),.7);font:12px var(--sans);line-height:1.4}
 .ai-status[hidden]{display:none}
 .ai-status i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--mute)}
-.ai-status code{font:11.5px var(--mono);color:var(--text);background:rgba(255,255,255,.06);
-  padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
+.ai-status code{font:11.5px var(--mono);color:var(--text);background:rgba(var(--fillTone),.06);
+  padding:1px 5px;border-radius:5px;flex:none;max-width:100%;overflow-wrap:anywhere}
 .ai-status[data-state="ready"]{border-color:rgba(110,231,168,.45)}
 .ai-status[data-state="ready"] i{background:var(--ok)}
 .ai-status[data-state="no_key"]{border-color:rgba(255,180,84,.45)}
@@ -598,6 +911,12 @@ body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
    là hướng dẫn sai. */
 .ai-status[data-state="no_net"]{border-color:rgba(255,180,84,.45)}
 .ai-status[data-state="no_net"] i{background:var(--amber)}
+/* "bad_key": máy chủ sống, key có trong .env, nhưng CHÍNH GOOGLE đuổi 401/403.
+   Hổ phách như no_key — cả hai là "chưa cấu hình đúng key", sửa tại chỗ được,
+   khác đỏ của offline ("chưa bật gì cả"). Sơn đỏ một bệnh sửa được trong 30 giây
+   là hướng dẫn sai, cùng lý do no_net không dùng màu đỏ. */
+.ai-status[data-state="bad_key"]{border-color:rgba(255,180,84,.45)}
+.ai-status[data-state="bad_key"] i{background:var(--amber)}
 /* "external": máy chủ công khai được KHAI nhưng không trả lời. Hổ phách chứ không
    đỏ: host miễn phí thường ngủ, bấm Thử lại là đủ — sơn đỏ một thứ đang thức dậy
    là hướng dẫn sai, giống đúng lý do no_net không dùng màu của offline. */
@@ -608,23 +927,28 @@ body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
 /* Ô hồ sơ tự chọn trong khung chat: gập lại theo mặc định để không chiếm chỗ,
    mở ra mới thấy ô nhập. Nét viền giống #aiStatus vì cùng một loại khối. */
 .ai-profile{margin:0;padding:0;border:1px solid var(--line);border-radius:10px;
-  background:rgba(6,10,18,.7);font:12px var(--sans)}
+  background:rgba(var(--sunkTone),.7);font:12px var(--sans)}
 .ai-profile>summary{padding:7px 10px;cursor:pointer;list-style:none;color:var(--mute)}
 .ai-profile>summary::-webkit-details-marker{display:none}
 .ai-profile>summary::before{content:"▸ ";color:var(--accent)}
 .ai-profile[open]>summary::before{content:"▾ "}
 .ai-profile textarea{display:block;width:calc(100% - 20px);margin:0 10px 6px;padding:7px 8px;
-  border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);
+  border:1px solid var(--line);border-radius:8px;background:rgba(var(--fillTone),.04);
   color:var(--text);font:12px var(--sans);resize:vertical;min-height:64px}
 .ai-profile textarea:focus{outline:none;border-color:var(--accent)}
 .ai-profile-state{margin:0;padding:0 10px 8px;color:var(--mute);line-height:1.45}
 /* Nút "Thử lại" ngay trong dòng trạng thái: bật chay-ai.bat xong bấm là biết kết quả,
    không phải đóng/mở panel. flex:none để dòng chữ dài không bẹp nút. */
 .ai-retry{flex:none;margin-left:auto;padding:3px 10px;border:1px solid var(--line);border-radius:999px;
-  background:rgba(255,255,255,.06);color:var(--text);font:11.5px var(--sans);cursor:pointer}
+  background:rgba(var(--fillTone),.06);color:var(--text);font:11.5px var(--sans);cursor:pointer}
 .ai-retry:hover{border-color:var(--accent);color:var(--accent)}
-.ai-log{flex:1;min-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px;
-  border:1px solid var(--line);border-radius:12px;background:rgba(6,10,18,.7)}
+/* flex-basis 150px + min-height:0 thay cho min-height:150px: ô hội thoại vẫn
+   chiếm 150px khi còn chỗ, nhưng ĐƯỢC PHÉP co về 0 khi không còn — phần còn
+   lại của khung (header, dòng trạng thái, ghi chú, ô nhập) là chữ cố định
+   không co được. Bản cũ khoá 150px nên tổng nội dung luôn cao hơn khung (đo:
+   634px trong khung 413px), và chính chỗ thừa đó mới bị cuộn đi, cắt mất nút ✕. */
+.ai-log{flex:1 1 150px;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px;
+  border:1px solid var(--line);border-radius:12px;background:rgba(var(--sunkTone),.7)}
 .ai-empty{margin:0;padding:10px 6px;text-align:center;font-size:12.5px}
 .ai-msg{max-width:92%;display:flex;flex-direction:column;gap:3px}
 .ai-msg b{font:600 10.5px var(--mono);letter-spacing:.4px;color:var(--mute)}
@@ -635,15 +959,20 @@ body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
 /* Dòng của chính app (lỗi mạng, đang chờ) — nét đứt, chữ nhỏ, không có nhãn
    "CySim AI" để người đọc không nhầm đây là câu trả lời của mô hình. */
 .ai-msg.system{max-width:100%;align-self:stretch}
-.ai-msg.system p{border-style:dashed;border-color:#3a4a70;background:rgba(255,92,122,.07);
-  color:#f3cdd6;font-size:12.5px}
+.ai-msg.system p{border-style:dashed;border-color:var(--line2);background:rgba(255,92,122,.07);
+  color:var(--redText);font-size:12.5px}
 /* .ai-msg.ai-pending: phải hai class mới thắng .ai-msg.system phía trên,
    nếu không dòng "đang soạn" sẽ đỏ lòm như một lỗi. */
 .ai-msg.ai-pending p{background:transparent;border-color:var(--line);color:var(--mute);font-style:italic}
 .ai-note{margin:0;font-size:11.5px;line-height:1.45}
-.ai-form{display:flex;gap:8px}
+/* Dải dưới cũng sticky như dải trên: khi khung phải cuộn (viewport thấp, cỡ
+   chữ to, đang đính kèm ảnh) thì thứ người dùng cần nhìn thấy là ô nhập + nút
+   Gửi, còn dòng ghi chú dài phía trên mới là thứ được phép cuộn mất. */
+.ai-form{display:flex;gap:8px;flex:none;position:sticky;bottom:0;z-index:3;
+  margin:0 -14px -14px;padding:10px 14px 14px;background:rgba(var(--panelTone),.97);
+  border-radius:0 0 16px 16px}
 .ai-form input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line);
-  background:#060a12;color:var(--text);font:14px var(--sans)}
+  background:var(--deep);color:var(--text);font:14px var(--sans)}
 .ai-form input:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.12)}
 .ai-form .btn{flex:none}
 /* Nút "Đính ảnh": .btn mặc định không phải flex nên icon + chữ phải tự xếp. */
@@ -653,20 +982,20 @@ body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
    Khay do veAnhKem() vẽ, mỗi tấm có nút ✕ để bỏ. Ảnh hiện trong bong bóng thì
    chỉ là bản xem nhỏ: dữ liệu thật nằm trong RAM của đúng lượt hỏi vừa rồi. */
 .ai-images{display:flex;flex-wrap:wrap;gap:8px;padding:9px 10px;border:1px solid var(--line);
-  border-radius:12px;background:rgba(6,10,18,.7)}
+  border-radius:12px;background:rgba(var(--sunkTone),.7)}
 .ai-images[hidden]{display:none}
 .ai-img{position:relative;width:86px}
 .ai-img img{display:block;width:86px;height:86px;object-fit:cover;border-radius:9px;
-  border:1px solid var(--line);background:#060a12}
+  border:1px solid var(--line);background:var(--deep)}
 .ai-img span{display:block;max-width:86px;margin-top:3px;font:10.5px var(--mono);color:var(--mute);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ai-img-bo{position:absolute;top:4px;right:4px;width:20px;height:20px;padding:0;border-radius:6px;
-  border:1px solid var(--line);background:rgba(6,10,18,.9);color:var(--text);font:11px/1 var(--sans);cursor:pointer}
+  border:1px solid var(--line);background:rgba(var(--sunkTone),.9);color:var(--text);font:11px/1 var(--sans);cursor:pointer}
 .ai-img-bo:hover{border-color:var(--red);color:var(--red)}
 .ai-image-state{margin:0;font-size:11.5px;line-height:1.45}
 .ai-thumbs{display:flex;flex-wrap:wrap;gap:6px}
 .ai-thumb{max-width:170px;max-height:170px;border-radius:10px;border:1px solid rgba(77,225,255,.4);
-  background:#060a12;object-fit:contain}
+  background:var(--deep);object-fit:contain}
 /* Lượt hỏi cũ nạp từ localStorage: ảnh KHÔNG được lưu (xem js/ai.js), bong bóng
    chỉ còn dòng ghi chú số ảnh — vẽ nghiêng, chữ nhỏ để không giống câu trả lời. */
 .ai-img-note{font-size:11.5px;font-style:italic;color:var(--mute)}
@@ -691,13 +1020,87 @@ body.auth-locked .ai-fab,body.auth-locked .ai-panel{display:none}
    #aiLog co giãn theo vì nó là flex:1 trong cột. */
 .ai-panel{resize:both;overflow:hidden}
 .ai-panel.ai-wide{width:min(1000px,calc(100vw - 300px));max-height:min(920px,92vh)}
-.ai-panel.ai-wide .ai-log{min-height:280px}
+.ai-panel.ai-wide .ai-log{flex-basis:280px}
 @media (max-width:860px){
   .ai-fab{left:16px;bottom:16px}
   .ai-panel{left:16px;right:16px;width:auto;bottom:16px;max-height:74vh;
     /* Trên điện thoại không có chuột để kéo góc; màn hình đã hẹp nên resize
        chỉ tổ cho phép kéo khung bé xíu rồi mất nút Gửi. */
     resize:none}
-  .ai-panel.ai-wide{left:8px;right:8px;bottom:8px;width:auto;max-height:92vh}
+  /* Chế độ toàn màn hình cho máy chạm. .ai-wide trên desktop chỉ RỘNG (vẫn
+     chừa sidebar 272px); trên điện thoại thì không có sidebar để chừa, nên
+     kẹp thêm top:8px — fixed + top + bottom + height:auto = cao đúng bằng
+     khung nhìn. Không dùng 100vh: trên iOS 100vh còn tính cả thanh địa chỉ đã
+     cuộn ẩn, khung cao hơn màn hình thật và nút Gửi tụt xuống dưới. */
+  .ai-panel.ai-wide{top:8px;left:8px;right:8px;bottom:8px;width:auto;
+    height:auto;max-height:none}
   .ai-thumb{max-width:120px;max-height:120px}
+}
+
+/* =========================================================
+   TÌM KIẾM TOÀN VĂN  ·  js/search.js
+   ---------------------------------------------------------
+   LÀ GÌ   : Nút "Tìm kiếm" trên sidebar (#searchOpen) và palette Ctrl+K
+             (#searchPalette). Palette vẽ đè lên mọi thứ: z-index 9990, dưới
+             .toast (9999) để thông báo "+XP" vẫn thấy khi đóng tìm kiếm.
+   CHẠY     : danh sách kết quả do JS thêm <li> vào #searchResults, nên kích
+             thước khối phải do CSS khoá lại — không có max-height thì 12 dòng
+             dài sẽ đẩy ô nhập ra khỏi màn hình.
+   BẪY     : `.palette` đặt display:flex, vì vậy [hidden] của trình duyệt bị
+             thắng. Phải khai báo .palette[hidden]{display:none} riêng, nếu
+             không palette hiện ra ngay từ lúc mở app và chặn hết cú bấm.
+   CHẠM   : chiều cao bấm tối thiểu 44px cho cả nút kết quả lẫn nút mở —
+             chuẩn WCAG 2.5.5 mà ngón tay cái trên điện thoại cần.
+   ========================================================= */
+.search-open{display:flex;align-items:center;gap:9px;width:100%;min-height:44px;
+  padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+  background:var(--deep);color:var(--text2);font:13px var(--sans);
+  cursor:pointer;transition:border-color .2s,color .2s,box-shadow .2s}
+.search-open:hover{border-color:var(--cyan);color:var(--text)}
+.search-open:focus-visible{outline:0;box-shadow:0 0 0 3px rgba(77,225,255,.14)}
+.search-open svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.search-open kbd{margin-left:auto}
+kbd{font:11px var(--mono);color:var(--mute);background:var(--raise);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px}
+
+.palette{position:fixed;inset:0;z-index:9990;display:flex;justify-content:center;
+  align-items:flex-start;padding:12vh 16px 16px;background:rgba(var(--sunkTone),.72);
+  backdrop-filter:blur(3px)}
+.palette[hidden]{display:none}
+.palette-box{width:min(620px,100%);display:flex;flex-direction:column;gap:9px;
+  padding:14px;border:1px solid var(--line2);border-radius:14px;
+  background:var(--panel);box-shadow:0 30px 70px -25px rgba(0,0,0,.85)}
+.palette-title{margin:0;font:700 11.5px var(--mono);letter-spacing:.6px;
+  text-transform:uppercase;color:var(--mute)}
+.palette-box input{width:100%;margin:0;font-size:16px}
+.palette-count{margin:0;font:11.5px var(--mono);color:var(--mute)}
+.palette-count:empty{display:none}
+.palette-list{list-style:none;margin:0;padding:0;max-height:min(46vh,420px);overflow-y:auto}
+.search-item{display:grid;grid-template-columns:88px 1fr;align-items:baseline;gap:4px 10px;
+  width:100%;min-height:44px;padding:8px 10px;border:0;border-radius:9px;
+  background:none;color:var(--text);text-align:left;cursor:pointer;font:inherit}
+.search-item:hover,.search-item.sel{background:rgba(77,225,255,.10)}
+.search-item.sel{box-shadow:inset 2px 0 0 var(--cyan)}
+.search-item:focus-visible{outline:0;box-shadow:0 0 0 2px var(--cyan)}
+.s-kind{font:700 10.5px var(--mono);letter-spacing:.4px;text-transform:uppercase;color:var(--cyan)}
+.s-title{font-weight:600}
+.s-desc{grid-column:2;font-size:12px;color:var(--mute);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.search-empty{padding:14px 10px;font-size:13px;color:var(--mute);list-style:none}
+.palette-hint{display:flex;align-items:center;gap:6px;margin:2px 0 0;color:var(--mute);font-size:11px}
+
+/* Palette cao 12vh tính từ đỉnh không còn là "không gian" khi bàn phím ảo hiện,
+   nên trên máy chạm hộp được hạ thấp hơn và cho danh sách co lại; ô nhập thì
+   js/app.js cuộn lên giữa màn hình nếu nó bị che (một handler cho mọi ô nhập). */
+@media (max-width:860px){
+  /* Cột, không phải hàng: để justify-content vô nghĩa với chiều dọc và hộp
+     chiếm hết bề ngang còn lại thay vì co theo nội dung (306px trên cửa sổ
+     514px là lỗi thật, đo bằng getBoundingClientRect ngày 30-10-2026). */
+  .palette{padding:8vh 10px 10px;flex-direction:column;align-items:stretch}
+  .palette-box{width:auto;max-height:84vh}
+  .palette-list{max-height:40vh}
+}
+@media (max-width:480px){
+  .search-item{grid-template-columns:1fr;gap:2px}
+  .s-desc{grid-column:1}
 }

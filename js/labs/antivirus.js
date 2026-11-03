@@ -87,13 +87,13 @@
     verdictKind = "counts";
     if (counts.mal > 0) {
       verdict.className = "verdict show bad";
-      verdict.textContent = `${t("PHÁT HIỆN")} ${counts.mal} ${t("MÃ ĐỘC — Hãy xóa ngay và không mở các file này!")}`;
+      verdict.textContent = `${t("PHÁT HIỆN")} ${counts.mal} ${tdem(counts.mal, "MÃ ĐỘC — Hãy xóa ngay và không mở các file này!")}`;
     } else if (counts.sus > 0) {
       verdict.className = "verdict show bad";
-      verdict.textContent = `${counts.sus} ${t("file nghi vấn — Kiểm tra kỹ trước khi mở.")}`;
+      verdict.textContent = `${counts.sus} ${tdem(counts.sus, "file nghi vấn — Kiểm tra kỹ trước khi mở.")}`;
     } else {
       verdict.className = "verdict show good";
-      verdict.textContent = `${t("Hoàn tất! Đã quét")} ${counts.scanned} ${t("file — không phát hiện mã độc.")}`;
+      verdict.textContent = `${t("Hoàn tất! Đã quét")} ${counts.scanned} ${tdem(counts.scanned, "file — không phát hiện mã độc.")}`;
     }
   }
 
@@ -102,6 +102,7 @@
     $("avStats").style.display = "flex";
     $("avProgress").style.width = "0%";
     $("avVerdict").className = "verdict";
+    $("avVerdict").textContent = "";
     verdictKind = "";
     const results = $("avResults");
     results.replaceChildren();

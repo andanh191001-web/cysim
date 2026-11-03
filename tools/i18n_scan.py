@@ -34,13 +34,19 @@ ANY_LETTER = re.compile(r"[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]")
 # Nội dung của những thẻ này không bao giờ là chữ hiển thị trên màn hình.
 # "head" cố tình không nằm trong danh sách: nó chỉ chứa meta/link/style/script
 # và <title>, mà tiêu đề tab thì ĐƯỢC hiển thị, nên phải giữ lại.
-DROP_TAGS = {"script", "style", "noscript", "svg"}
+# "kbd" là nhãn phím (Ctrl, K, Esc, Enter, ↑): js/i18n.js cũng bỏ qua thẻ này
+# trong SKIP_TAGS — hai bên phải khớp nhau, nếu một bên coi nó là chuỗi thì
+# check_i18n sẽ đòi dịch "Enter" sang "Entrée" và báo thiếu vĩnh viễn.
+DROP_TAGS = {"script", "style", "noscript", "svg", "kbd"}
 
 # Thuộc tính mà trình duyệt hiển thị dưới dạng chữ (tooltip, ô gợi ý).
 ATTR_TEXT_KEYS = ("placeholder", "title", "aria-label")
 
 # Nguyên hàm dịch chuỗi động. Chuỗi nằm trong tham số của chúng luôn an toàn.
-TRANSLATE_FNS = ("t", "tr")
+# tdem(số, "chuỗi") là dạng đếm: đối số THỨ HAI mới là chuỗi nguồn, nên bộ đếm
+# vẫn lấy đúng — và nếu quên không đăng ký tdem, mọi chuỗi chỉ dùng qua nó sẽ bị
+# coi là "đứng ngoài t()" rồi bị purge_cache() xoá như chuỗi chết.
+TRANSLATE_FNS = ("t", "tr", "tdem")
 
 
 def keep(s: str) -> bool:
@@ -294,16 +300,105 @@ def _enclosed(src: str, start: int, end: int) -> bool:
     return any(a <= start and end <= b for a, b in _t_call_spans(src))
 
 
+# Tham số nào của một lời gọi mới là KHOÁ từ điển: t("…") và tr("…") lấy tham số
+# đầu, còn tdem(số, "…") lấy tham số thứ hai.
+KEY_ARG = {"t": 0, "tr": 0, "tdem": 1}
+
+
+def _split_args(inner: str) -> list[str]:
+    """Tách tham số mức ngoài cùng theo dấu phẩy, không cắt vào trong chuỗi
+    hay vào lời gọi lồng nhau."""
+    out, buf, depth = [], [], 0
+    quote = ""
+    i = 0
+    while i < len(inner):
+        c = inner[i]
+        if quote:
+            buf.append(c)
+            if c == "\\":
+                buf.append(inner[i + 1 : i + 2])
+                i += 2
+                continue
+            if c == quote:
+                quote = ""
+        elif c in "\"'`":
+            quote = c
+            buf.append(c)
+        elif c in "([{":
+            depth += 1
+            buf.append(c)
+        elif c in ")]}":
+            depth -= 1
+            buf.append(c)
+        elif c == "," and not depth:
+            out.append("".join(buf))
+            buf = []
+        else:
+            buf.append(c)
+        i += 1
+    out.append("".join(buf))
+    return out
+
+
+def key_literals(src: str) -> set[str]:
+    """Chuỗi viết thẳng trong đối số khoá của t()/tr()/tdem().
+
+    Đây là mắt còn thiếu: bộ lọc VI_LETTER bên dưới chỉ nhận chữ CÓ dấu thanh,
+    nên "Sai", "trang", "BLOCK" — những từ tiếng Việt gõ không dấu hoặc nhãn
+    in hoa — lọt qua mọi báo cáo "thiếu dịch" rồi bị âm thầm đẩy vào hàng đợi
+    dịch máy trên trình duyệt. Nhà phát triển đã tự tay bọc t() quanh nó thì
+    phải coi đó là lời hứa "chuỗi này lên màn hình"."""
+    found: set[str] = set()
+    for m in re.finditer(r"\b(%s)\s*\(" % "|".join(TRANSLATE_FNS), src):
+        depth = 1
+        j = m.end()
+        while j < len(src) and depth:
+            if src[j] == "(":
+                depth += 1
+            elif src[j] == ")":
+                depth -= 1
+            j += 1
+        args = _split_args(src[m.end() : max(m.end(), j - 1)])
+        slot = KEY_ARG.get(m.group(1), 0)
+        if slot >= len(args):
+            continue
+        a = args[slot].strip()
+        if len(a) >= 2 and a[0] in "\"'" and a[-1] == a[0]:
+            text = normalize(decode_escapes(a[1:-1]))
+            if keep(text):
+                found.add(text)
+    return found
+
+
 def from_js(path: Path) -> tuple[list[str], list[str]]:
     """Trả về (mọi chuỗi tiếng Việt, những chuỗi KHÔNG nằm trong t/tr())."""
     src = path.read_text(encoding="utf-8")
     # Dòng đánh dấu "// i18n-skip" chứa chữ Việt nhưng không bao giờ lên màn
     # hình (nhật ký file, mô tả trong JSON export...). Cho nó ra khỏi danh sách
     # để từ điển chỉ chứa thứ người dùng thật sự nhìn thấy.
-    skip_lines = {i for i, line in enumerate(src.split("\n")) if "i18n-skip" in line}
+    lines = src.split("\n")
+    skip_lines = {i for i, line in enumerate(lines) if "i18n-skip" in line}
+    # Khối "// i18n-skip-begin" ... "// i18n-skip-end" bị bỏ CẢ VÙNG. Cần cho
+    # bảng chia số nhiều do người viết: KHÓA là tiếng Việt nhưng GIÁ TRỊ là bản
+    # dịch tiếng Pháp/Tây Ban Nha, và dấu thanh Latin-1 (é, í, ó) làm VI_LETTER
+    # tưởng đó là chuỗi Việt chưa dịch — nó sẽ bị đòi đưa vào từ điển, và bộ máy
+    # dựng từ điển sẽ tự nhân bản chính kết quả của mình.
+    mo = None
+    for i, line in enumerate(lines):
+        if "i18n-skip-begin" in line:
+            if mo is not None:
+                raise ValueError("%s:%d: i18n-skip-begin mo ma chua dong" % (path.name, mo + 1))
+            mo = i
+        elif "i18n-skip-end" in line:
+            if mo is None:
+                raise ValueError("%s:%d: i18n-skip-end khong co vung mo" % (path.name, i + 1))
+            skip_lines.update(range(mo, i + 1))
+            mo = None
+    if mo is not None:
+        raise ValueError("%s:%d: i18n-skip-begin de mo se an ca cuoi file" % (path.name, mo + 1))
     line_starts = []
     pos = 0
-    for line in src.split("\n"):
+    for line in lines:
         line_starts.append(pos)
         pos += len(line) + 1
 
@@ -319,12 +414,13 @@ def from_js(path: Path) -> tuple[list[str], list[str]]:
 
     all_vi: list[str] = []
     unwrapped: list[str] = []
+    keys = key_literals(src)
     for start, end, text in _string_literals(src):
         s = normalize(text)
-        if not keep(s) or not VI_LETTER.search(s):
-            continue  # không phải tiếng Việt -> không cần dịch
-        if line_of(start) in skip_lines:
+        if not keep(s) or line_of(start) in skip_lines:
             continue
+        if not VI_LETTER.search(s) and s not in keys:
+            continue  # không phải tiếng Việt và không ai bọc t() -> không cần dịch
         in_t = _enclosed(src, start, end)
         if not in_t:
             # Log dành cho lập trình viên (console.*): không hiển thị cho người

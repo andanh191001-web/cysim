@@ -192,11 +192,11 @@
 
     const verdict = $("crackVerdict");
     if (found) {
-      CyUtil.logLine(term, "t-ok", `[+] ${t("ĐÃ DÒ RA")}: "${found}" — ${attempts} ${t("lần thử")}`);
+      CyUtil.logLine(term, "t-ok", `[+] ${t("ĐÃ DÒ RA")}: "${found}" — ${attempts} ${tdem(attempts, "lần thử")}`);
       verdict.className = "verdict show bad";
       verdict.textContent = t("ĐÃ DÒ RA MẬT KHẨU KHÔNG BẢO VỆ!");
     } else {
-      CyUtil.logLine(term, "t-ok", `[+] ${attempts} ${t("lần thử")} — ${t("không tìm ra. Mật khẩu này nằm ngoài từ điển và ngoài không gian dò thử.")}`);
+      CyUtil.logLine(term, "t-ok", `[+] ${attempts} ${tdem(attempts, "lần thử")} — ${t("không tìm ra. Mật khẩu này nằm ngoài từ điển và ngoài không gian dò thử.")}`);
       verdict.className = "verdict show good";
       verdict.textContent = t("TẠM ỔN — Mật khẩu vượt qua được từ điển và vòng brute-force giới hạn.");
     }

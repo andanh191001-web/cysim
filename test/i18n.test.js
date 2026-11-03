@@ -184,6 +184,9 @@ function makeContext(seed) {
        isReviewed: (lang, source) => isReviewedSource(lang, source),
        normalize: (text) => normalize(text),
        t: (text) => t(text),
+       tdem: (n, text) => tdem(n, text),
+       dangDem: () => DANG_DEM,
+       setLang: (lang) => { currentLang = lang; },
        lang: () => currentLang,
        curated: () => CURATED,
        bundled: () => BUNDLED,
@@ -334,7 +337,63 @@ function check(name, condition, detail) {
   check("t() ở tiếng Việt trả nguyên văn", api.t(unknown) === unknown);
   check("t() ở tiếng Việt không tạo hàng đợi dịch máy", api.queueLength() === 0, String(api.queueLength()));
 
-  /* 11) OFFLINE: fetch chỉ được chạm tới file của dự án. */
+  /* 11) DANH TỪ SAU MỘT CON SỐ. "1 entrées de données" là lỗi người đọc thấy
+        được bằng mắt thường, và nó sinh ra từ đúng cái cách ghép mảnh mà cả bộ
+        máy i18n dựa vào — nên nó phải có chốt, không chỉ có ghi chú ở README. */
+  {
+    const DEM = api.dangDem();
+    const MA = "mục dữ liệu trên máy này";
+    const NGHI = "file nghi vấn — Kiểm tra kỹ trước khi mở.";
+    check("mọi mã ngôn ngữ trong bảng đếm đều là mã hệ thống thật",
+      Object.keys(DEM).length > 0 &&
+        Object.values(DEM).every((e) =>
+          Object.keys(e).every((l) => ["en", "zh", "fr", "es", "ja"].includes(l))),
+      JSON.stringify(Object.values(DEM).flatMap((e) => Object.keys(e)).filter((l) => !["en", "zh", "fr", "es", "ja"].includes(l))));
+    api.setLang("fr");
+    check("fr: số nhiều vẫn do từ điển quyết, tdem không tự bịa",
+      api.tdem(3, MA) === api.t(MA) && api.tdem(3, MA).includes("entrées"), api.tdem(3, MA));
+    check("fr: số ít không còn là '1 entrées'",
+      api.tdem(1, MA) === "entrée de données", api.tdem(1, MA));
+    api.setLang("en");
+    /* Chiều ngược cũng từng sai thật: js/lang/en.json mang sẵn dạng SỐ ÍT
+       ("suspicious file"), nên "2 suspicious file" hiện ra trên màn hình. */
+    check("en: từ điển chứa số ít thì số nhiều phải có dạng riêng",
+      api.tdem(2, NGHI) === "suspicious files — Inspect them carefully before opening.", api.tdem(2, NGHI));
+    check("en: số ít vẫn lấy đúng bản của từ điển", api.tdem(1, NGHI) === api.t(NGHI), api.tdem(1, NGHI));
+    api.setLang("zh");
+    check("zh: ngôn ngữ không chia số nhiều tự động rơi về t()",
+      api.tdem(1, MA) === api.t(MA), api.tdem(1, MA));
+    api.setLang("vi");
+    check("vi: tdem trả nguyên văn như t()", api.tdem(1, MA) === MA);
+    check("ngôn ngữ test đã được trả về vi sau khối tdem", api.lang() === "vi", api.lang());
+  }
+
+  /* 12) CHUỖI CỦA Ô TÌM KIẾM, KỂ CẢ CHUỖI KHÔNG DẤU THANH. "Sai" và "Trang" là
+         tiếng Việt gõ mất dấu: bộ quét chỉ tin chuỗi có dấu thanh nên hai chuỗi
+         đó lọt qua MỌI báo cáo "thiếu dịch", rồi trên màn hình tiếng Pháp bị âm
+         thầm đẩy vào hàng đợi máy. t("Sai") hiện ra "Faux" hay "Sai" không ai
+         kiểm được bằng mắt — nên phải kiểm bằng máy. */
+  {
+    const TU_DIEN = ["Sai", "Trang", "Tìm kiếm", "kết quả tìm được"];
+    const hangDoiTruoc = api.queueLength();
+    for (const lang of ["en", "zh", "fr", "es", "ja"]) {
+      api.setLang(lang);
+      for (const s of TU_DIEN) {
+        check(`${lang}: t(${JSON.stringify(s)}) có bản dịch trong từ điển`,
+          api.t(s) !== s, api.t(s));
+      }
+    }
+    check("khối chuỗi tìm kiếm không tạo hàng đợi dịch máy nào",
+      api.queueLength() === hangDoiTruoc, `${hangDoiTruoc} -> ${api.queueLength()}`);
+    api.setLang("fr");
+    check("fr: tdem(1) của dòng đếm kết quả là số ít",
+      api.tdem(1, "kết quả tìm được") === "résultat trouvé", api.tdem(1, "kết quả tìm được"));
+    check("fr: tdem(7) rơi về số nhiều của từ điển",
+      api.tdem(7, "kết quả tìm được") === "résultats trouvés", api.tdem(7, "kết quả tìm được"));
+    api.setLang("vi");
+  }
+
+  /* 13) OFFLINE: fetch chỉ được chạm tới file của dự án. */
   const external = fetched.filter((u) => /^https?:/.test(u) || !u.startsWith("js/"));
   check("test chạy offline hoàn toàn, không gọi API dịch", external.length === 0, external.join(", "));
 

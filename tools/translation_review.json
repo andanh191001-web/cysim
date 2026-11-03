@@ -44,6 +44,20 @@
       "es": "(gratis, ~200 correos/mes). Los tres valores siguientes se guardan en",
       "ja": "（無料で月約 200 通まで）。以下の 3 つの値は"
     },
+    "(tham số nằm ngay trên URL)": {
+      "en": "(the parameters sit right in the URL)",
+      "zh": "（参数直接写在 URL 里）",
+      "fr": "(les paramètres sont directement dans l'URL)",
+      "es": "(los parámetros van directamente en la URL)",
+      "ja": "(パラメーターはURLに直接書かれています)"
+    },
+    "(trình duyệt không đính)": {
+      "en": "(not attached by the browser)",
+      "zh": "（浏览器没有附上）",
+      "fr": "(non attaché par le navigateur)",
+      "es": "(el navegador no la adjuntó)",
+      "ja": "(ブラウザが同梱しませんでした)"
+    },
     "). Kiểm tra mạng hoặc thử IP khác.": {
       "en": "). Check network or try another IP.",
       "zh": "）。请检查网络或换用其他 IP。",
@@ -352,6 +366,13 @@
       "es": "Account → Email Services → Add New Service → seleccione Gmail → Connect Gmail (permitir que Google envíe) → guarde la línea",
       "ja": "Account → Email Services → Add New Service → Gmail を選択 → Connect Gmail（Google による送信を許可）→ 次の行を記録："
     },
+    "Ai có mã quản trị đều lên được quản trị. Đặt mã ở ô dưới — máy này chưa có ai giữ mã thì lần đặt đầu tiên là lần khai mã.": {
+      "en": "Anyone with the admin code becomes an administrator. Set the code in the box below — if nobody on this machine has claimed one yet, the first entry defines it.",
+      "zh": "只要有管理码就能升为管理员。请在下面的输入框设置管理码——如果这台电脑还没人设置过，第一次输入就会成为本机管理码。",
+      "fr": "Toute personne qui connaît le code d'administration devient administratrice. Définis-le dans le champ ci-dessous — si personne ne l'a encore fixé sur cet appareil, la première saisie le définit.",
+      "es": "Cualquiera con el código de administración pasa a ser administrador. Define el código en el campo de abajo — si nadie lo ha fijado aún en este equipo, la primera entrada lo establece.",
+      "ja": "管理コードさえあれば誰でも管理者になれます。下の欄でコードを設定してください。このパソコンでまだ誰も決めていなければ、最初に入力がそのまま管理コードになります。"
+    },
     "Antivirus là lớp phần mềm nhận ra mã độc. Cách cổ điển so dấu vết của file với cơ sở dữ liệu đã biết; cách hiện đại quan sát hành vi của chương trình đang chạy.": {
       "en": "Antivirus is a software layer that recognises malware. The classic way compares a file's signature with a database of known samples; the modern way watches what a running program actually does.",
       "zh": "杀毒软件是负责识别恶意软件的一层程序。传统做法是把文件特征与已知样本库比对；现代做法是观察正在运行的程序实际做了什么。",
@@ -365,6 +386,13 @@
       "fr": "Auto-Block 1 fois",
       "es": "Auto-Bloqueo 1 vez",
       "ja": "自動ブロック 1 回"
+    },
+    "BLOCK": {
+      "en": "BLOCK",
+      "zh": "拦截",
+      "fr": "BLOQUER",
+      "es": "BLOQUEAR",
+      "ja": "ブロック"
     },
     "Ba bước của TCP three-way handshake diễn ra theo thứ tự nào?": {
       "en": "In what order do the three steps of the TCP three-way handshake occur?",
@@ -506,6 +534,48 @@
       "es": "Debes completar las 12 misiones de laboratorio para desbloquear el examen de graduación. Actualmente:",
       "ja": "卒業試験を解放するには、12 個の実験室ミッションをすべて完了する必要があります。現在："
     },
+    "Bạn không có quyền xem hồ sơ này": {
+      "en": "You are not allowed to view this record",
+      "zh": "您没有权限查看此档案",
+      "fr": "Vous n'avez pas le droit de consulter ce dossier",
+      "es": "No tienes permiso para ver este registro",
+      "ja": "この記録を表示する権限がありません"
+    },
+    "Bạn không cần biết trước gì về an ninh mạng. Mỗi phòng lab bên dưới là một bài có hướng dẫn từng bước: bạn gây ra một cú tấn công thật sự — trong môi trường giả lập, an toàn — rồi tự tay chặn nó lại. Mỗi bài khoảng 10 phút, chạy ngay trong trình duyệt, không cần cài đặt gì.": {
+      "en": "You need no prior cybersecurity knowledge. Each lab below is a step-by-step exercise: you carry out a real attack — in a safe, simulated environment — and then block it with your own hands. Every lesson takes about 10 minutes, runs right in the browser, and needs no installation.",
+      "zh": "你不需要预先具备网络安全知识。下面的每个实验室都是一步一步的练习：你会在安全、模拟的环境里真正发动一次攻击，然后亲手把它挡住。每课大约 10 分钟，直接在浏览器里运行，不需要安装任何东西。",
+      "fr": "Aucune connaissance préalable en sécurité informatique n'est nécessaire. Chaque labo ci-dessous est un exercice pas à pas : tu déclenches une vraie attaque — dans un environnement simulé et sûr — puis tu la bloques toi-même. Chaque leçon dure environ 10 minutes, tourne dans le navigateur et ne nécessite aucune installation.",
+      "es": "No necesitas conocimientos previos de ciberseguridad. Cada laboratorio de abajo es un ejercicio paso a paso: provocas un ataque real —en un entorno simulado y seguro— y luego lo bloqueas tú mismo. Cada lección dura unos 10 minutos, se ejecuta en el navegador y no requiere instalar nada.",
+      "ja": "ネットワークセキュリティの予備知識は要りません。下の各ラボは手順つきの実習で、安全な模擬環境の中で実際に攻撃を仕掛け、それを自分の手で止めます。1課はおよそ10分、ブラウザの中でそのまま動き、インストールは不要です。"
+    },
+    "Bạn phụ trách máy này? Nhập mã quản trị": {
+      "en": "In charge of this machine? Enter the admin code",
+      "zh": "你在管理这台电脑？请输入管理码",
+      "fr": "Tu gères cet appareil ? Saisis le code d'administration",
+      "es": "¿Estás a cargo de este equipo? Introduce el código de administración",
+      "ja": "このパソコンを管理していますか？管理コードを入力してください"
+    },
+    "Bạn đang học dở ở chế độ khách? Tiến độ và hội thoại AI của lượt khách đó sẽ tự chuyển sang tài khoản mới này.": {
+      "en": "Learning as a guest right now? That guest progress and the AI chats move into this new account automatically.",
+      "zh": "你正在用访客模式学习吗？访客模式的进度和 AI 对话会自动转移到这个新账户。",
+      "fr": "Tu apprends en mode invité ? La progression et les conversations IA de cette session invité se déplacent automatiquement vers ce nouveau compte.",
+      "es": "¿Estás aprendiendo en modo invitado? El progreso y las conversaciones con la IA de esa sesión se transferirán automáticamente a esta cuenta nueva.",
+      "ja": "ゲストモードで学習中ですか？そのゲスト分の進捗と AI 会話は、この新規アカウントに自動的に移ります。"
+    },
+    "Bạn đang xem bằng phiên của nguyenvana, user_id 2. Hãy thử mở hồ sơ của người khác, rồi tìm chế độ mà cả sáu ID đều không lộ.": {
+      "en": "You are browsing with nguyenvana's session, user_id 2. Try opening someone else's record, then find the mode where none of the six IDs leak.",
+      "zh": "你正在以 nguyenvana 的会话（user_id 2）浏览。试着打开别人的档案，然后找出六个 ID 都不泄露的那种模式。",
+      "fr": "Vous naviguez avec la session de nguyenvana, user_id 2. Essayez d'ouvrir le dossier d'un autre, puis trouvez le mode où aucun des six ID ne fuit.",
+      "es": "Estás navegando con la sesión de nguyenvana, user_id 2. Intenta abrir el registro de otra persona y busca el modo en que ninguno de los seis IDs se filtre.",
+      "ja": "あなたは nguyenvana のセッション（user_id 2）で閲覧中です。まず他人の記録を開いてみてください。そのうえで、6つのIDのどれもう漏らさないモードを探してください。"
+    },
+    "Bạn đang đăng nhập bằng tài khoản này": {
+      "en": "You are signed in with this account",
+      "zh": "你正用此账户登录",
+      "fr": "Tu es connecté avec ce compte",
+      "es": "Has iniciado sesión con esta cuenta",
+      "ja": "このアカウントでログイン中です"
+    },
     "Bạn đang đăng nhập với tư cách user:": {
       "en": "You are logged in as user:",
       "zh": "您登录的身份为用户：",
@@ -548,6 +618,13 @@
       "es": "Traducción actual",
       "ja": "現在の翻訳"
     },
+    "Bản sao là file .json chứa tiến độ, điểm thi và lịch sử chat của riêng bạn. Có nó thì sang máy khác bạn vẫn còn công học.": {
+      "en": "The backup is a .json file containing your progress, your exam scores and your chat history. With it you can move to another machine and keep all your work.",
+      "zh": "备份是一个 .json 文件，包含你的进度、考试成绩和聊天记录。有了它，换到别的电脑也保得住你的学习成果。",
+      "fr": "La copie est un fichier .json qui contient ta progression, tes scores d'examen et ton historique de chat. Avec elle, tu peux changer de machine sans perdre ton travail.",
+      "es": "La copia es un archivo .json con tu progreso, tus puntajes de examen y tu historial de chat. Con él, si cambias de equipo conservas todo lo avanzado.",
+      "ja": "バックアップは .json ファイルで、進捗・試験の点数・チャット履歴が入ります。これがあれば別のパソコンに移っても学び直しになりません。"
+    },
     "Bản web này không kèm máy chủ AI nên khung chat không chạy được ở đây. Mọi phòng lab, bài thi và chứng chỉ vẫn dùng bình thường.": {
       "en": "This web build doesn't come with an AI server, so the chat can't run here. Every lab, exam and certificate still works normally.",
       "zh": "此网页版本没有附带 AI 服务器，因此聊天在这里无法运行。所有实验室、考试和证书仍可正常使用。",
@@ -555,12 +632,40 @@
       "es": "Esta versión web no incluye un servidor de IA, así que el chat no puede funcionar aquí. Todos los laboratorios, los exámenes y los certificados siguen funcionando con normalidad.",
       "ja": "このWeb版にはAIサーバーが付属していないため、ここではチャットを利用できません。すべてのラボ、試験、証明書は通常どおり使えます。"
     },
+    "Bảng dữ liệu bị rò rỉ (cuộn ngang để xem đủ cột)": {
+      "en": "Leaked data table (scroll sideways to see every column)",
+      "zh": "已泄露数据表（横向滚动可查看全部列）",
+      "fr": "Table des données divulguées (faites défiler horizontalement pour voir toutes les colonnes)",
+      "es": "Tabla de datos filtrados (desplázate en horizontal para ver todas las columnas)",
+      "ja": "漏洩したデータ表（横スクロールで全列を表示）"
+    },
     "Bảng hiện tại có 4 cột.": {
       "en": "The current table has 4 columns.",
       "zh": "当前数据表有 4 列。",
       "fr": "La table actuelle comporte 4 colonnes.",
       "es": "La tabla actual tiene 4 columnas.",
       "ja": "現在のテーブルには 4 列あります。"
+    },
+    "Bảng phân tích ba cửa": {
+      "en": "Three-vector analysis table",
+      "zh": "三种攻击途径分析表",
+      "fr": "Tableau d'analyse des trois vecteurs",
+      "es": "Tabla de análisis de los tres vectores",
+      "ja": "3つの経路の分析表"
+    },
+    "Bảng sáu ID, cùng một luật": {
+      "en": "Six IDs, one rule",
+      "zh": "六个 ID，同一套规则",
+      "fr": "Six ID, une seule règle",
+      "es": "Seis IDs, una misma regla",
+      "ja": "6つのID、同じルール"
+    },
+    "Bảng xếp hạng": {
+      "en": "Leaderboard",
+      "zh": "排行榜",
+      "fr": "Classement",
+      "es": "Clasificación",
+      "ja": "ランキング"
     },
     "Bảng xếp hạng SOC": {
       "en": "SOC leaderboard",
@@ -582,6 +687,20 @@
       "fr": "Cliquez sur le bouton « Réclamer le cadeau » sur le site web malveillant.",
       "es": "Haga clic en el botón «Recibir regalo ahora» en el sitio web malicioso.",
       "ja": "悪意のあるWebサイトにある「今すぐギフトを受け取る」をクリックします。"
+    },
+    "Bấm lần nữa để xác nhận xoá": {
+      "en": "Click again to confirm deletion",
+      "zh": "再点一次以确认删除",
+      "fr": "Clique encore pour confirmer la suppression",
+      "es": "Vuelve a hacer clic para confirmar el borrado",
+      "ja": "削除を確定するにはもう一度クリックしてください"
+    },
+    "Bấm một thẻ bài học bên dưới. Thẻ nào cũng mở ra một màn hình có sẵn hướng dẫn, bạn chỉ việc làm theo.": {
+      "en": "Click one of the lesson cards below. Every card opens a screen that already shows the instructions — just follow them.",
+      "zh": "点击下面的任意一课卡片。每张卡片打开的界面都自带说明，你照着做就行。",
+      "fr": "Clique sur une carte de leçon ci-dessous. Chaque carte ouvre un écran qui affiche déjà les consignes : il suffit de les suivre.",
+      "es": "Pulsa una tarjeta de lección de abajo. Cada tarjeta abre una pantalla que ya trae las instrucciones: solo síguelas.",
+      "ja": "下のレッスンカードを1枚押してください。どのカードにもはじめから手順が表示されているので、その通りに進めるだけです。"
     },
     "Bấm vào 3 điểm đáng ngờ trên trang giả mạo: tên miền, nút bấm và cảnh báo HTTP.": {
       "en": "Click the 3 suspicious spots on the fake page: the domain, the button and the HTTP warning.",
@@ -646,6 +765,13 @@
       "es": "Activar el modo de reporte",
       "ja": "報告モードをオン"
     },
+    "Bật hoặc tắt tính năng cho mọi tài khoản trên máy này và xem mọi người đã học tới đâu.": {
+      "en": "Turn features on or off for every account on this machine, and see how far each learner has got.",
+      "zh": "为这台电脑上的所有账户开启或关闭功能，并查看每个人学到哪里。",
+      "fr": "Active ou désactive les fonctions pour tous les comptes de cet appareil et vois où en est chaque apprenant.",
+      "es": "Activa o desactiva funciones para todas las cuentas de este equipo y mira cómo va cada alumno.",
+      "ja": "このパソコンの全アカウントについて機能を ON/OFF し、各自がどこまで学んだか確認できます。"
+    },
     "Bật hoặc tắt tường lửa, rồi xem một đợt quét cổng giả lập chạm vào máy chủ.": {
       "en": "Turn the firewall on or off, then watch a simulated port scan hit the server.",
       "zh": "开启或关闭防火墙，然后查看模拟端口扫描触及服务器的过程。",
@@ -702,12 +828,26 @@
       "es": "Iniciar ataque DDoS",
       "ja": "DDoS 攻撃を開始"
     },
+    "Bắt đầu ở đây — ba bước": {
+      "en": "Start here — three steps",
+      "zh": "从这里开始——三个步骤",
+      "fr": "Commencer ici — trois étapes",
+      "es": "Empieza aquí — tres pasos",
+      "ja": "ここから始める — 3ステップ"
+    },
     "Bằng tốt nghiệp": {
       "en": "Diploma",
       "zh": "毕业证书",
       "fr": "Diplôme",
       "es": "Título de graduación",
       "ja": "卒業認定"
+    },
+    "BỊ CHẶN": {
+      "en": "BLOCKED",
+      "zh": "已被拦截",
+      "fr": "BLOQUÉ",
+      "es": "BLOQUEADO",
+      "ja": "ブロックされました"
     },
     "Bị gỡ khỏi danh sách": {
       "en": "Removed from the list",
@@ -736,6 +876,13 @@
       "fr": "Supprimer cette image",
       "es": "Quitar esta imagen",
       "ja": "この画像を削除"
+    },
+    "Bốn công tắc dưới đây là cấu hình thật của máy chủ. Kết quả tấn công do chúng quyết định, không có kịch bản nào được gõ sẵn.": {
+      "en": "The four switches below are the server's real configuration. They decide the outcome of the attack; no script is written in advance.",
+      "zh": "下面的四个开关就是服务器的真实配置。攻击结果由它们决定，没有任何预先写好的剧本。",
+      "fr": "Les quatre interrupteurs ci-dessous sont la configuration réelle du serveur. Le résultat de l'attaque dépend d'eux, aucun scénario n'est écrit d'avance.",
+      "es": "Los cuatro interruptores de abajo son la configuración real del servidor. El resultado del ataque lo deciden ellos; no hay ningún guion preescrito.",
+      "ja": "以下の4つのスイッチがサーバーの実際の設定です。攻撃の結果はそれらが決めます。あらかじめ書き込んだ脚本はありません。"
     },
     "Bộ dấu hiệu nào sau đây là của email phishing?": {
       "en": "Which set of signs below belongs to a phishing email?",
@@ -772,6 +919,13 @@
       "es": "MODO DEMO: EmailJS no está configurado, así que el código se muestra directamente en pantalla. Todas las cuentas y contraseñas se guardan solo en tu propio navegador: pulsa F12 y las puedes leer todas. Esto es un ejercicio escolar, no un lugar para guardar contraseñas reales.",
       "ja": "デモモード：EmailJS が設定されていないため、認証コードはそのまま画面に表示されます。すべてのアカウントとパスワードはあなた自身のブラウザーにしか保存されず、F12 を押せばすべて読めます。これは学習用の演習であって、本物のパスワードを預ける場所ではありません。"
     },
+    "CHẾ ĐỘ KÍN — quét cả sáu ID không lộ hồ sơ của ai khác.": {
+      "en": "CLOSED MODE — scanning all six IDs leaks nobody else's record.",
+      "zh": "严密模式——扫描六个 ID 都不会泄露任何人的档案。",
+      "fr": "MODE ÉTANCHE — l'analyse des six ID ne fuit le dossier de personne d'autre.",
+      "es": "MODO ESTANCO: escanear los seis IDs no filtra el registro de nadie más.",
+      "ja": "閉じたモード — 6つのIDをスキャンしても他人の記録は漏れません。"
+    },
     "COLUMN ENUMERATED — Dò thành công cấu trúc bảng!": {
       "en": "COLUMN ENUMERATED — Successfully enumerated table structure!",
       "zh": "COLUMN ENUMERATED — 成功枚举出数据表结构！",
@@ -785,6 +939,13 @@
       "fr": "CSRF RÉUSSI — L'attaquant a piégé le navigateur pour qu'il transfère 9,000,000 VND !",
       "es": "CSRF EXITOSO — ¡El atacante engañó al navegador para transferir 9,000,000 VND!",
       "ja": "CSRF 成功 — 攻撃者がブラウザを騙して 9,000,000 VND を送金させました！"
+    },
+    "CSRF THẤT BẠI": {
+      "en": "CSRF FAILED",
+      "zh": "CSRF 失败",
+      "fr": "ÉCHEC DU CSRF",
+      "es": "CSRF FALLIDO",
+      "ja": "CSRF 失敗"
     },
     "CSRF là trang web khác mượn phiên đăng nhập còn hiệu lực của nạn nhân để gửi một hành động mà nạn nhân không hề chủ ý, ví dụ chuyển tiền hoặc đổi email.": {
       "en": "CSRF is another website borrowing the victim's still-valid session to trigger an action the victim never intended, such as transferring money or changing an email address.",
@@ -842,6 +1003,13 @@
       "es": "Cadena original",
       "ja": "元のテキスト"
     },
+    "Chính": {
+      "en": "Main",
+      "zh": "主要",
+      "fr": "Principal",
+      "es": "Principal",
+      "ja": "メイン"
+    },
     "Chúng tôi sẽ gửi mã 6 số đến email để xác minh.": {
       "en": "We will email you a 6-digit code to verify your address.",
       "zh": "我们将向您的邮箱发送 6 位验证码以完成验证。",
@@ -876,6 +1044,20 @@
       "fr": "Aucune conversation. Essayez : Qui êtes-vous ? Qui vous a écrit ?",
       "es": "Aún no hay conversación. Pruebe con: ¿Quién es usted? ¿Quién le escribió?",
       "ja": "会話がまだありません。まず次のように聞いてみてください：「あなたは誰ですか」「あなたは誰が作りましたか」。"
+    },
+    "Chưa có phiên đăng nhập hợp lệ": {
+      "en": "No valid login session",
+      "zh": "尚无有效登录会话",
+      "fr": "Aucune session de connexion valide",
+      "es": "No hay una sesión válida",
+      "ja": "有効なログインセッションがありません"
+    },
+    "Chưa có tài khoản nào trên máy này. Tạo một tài khoản trong bảng đăng nhập rồi mới tới đây.": {
+      "en": "No accounts on this machine yet. Create one in the sign-in box first, then come back here.",
+      "zh": "这台电脑上还没有任何账户。请先在登录框里注册一个账户，再回到这里。",
+      "fr": "Aucun compte sur cet appareil pour l'instant. Crée-en un dans le formulaire de connexion, puis reviens ici.",
+      "es": "Todavía no hay cuentas en este equipo. Crea una en el formulario de acceso y luego vuelve aquí.",
+      "ja": "このパソコンにはまだアカウントがありません。まずログイン画面で作成してから、ここに戻ってください。"
     },
     "Chưa có tài khoản nào được lưu tại địa chỉ này": {
       "en": "No account has been saved at this address",
@@ -947,6 +1129,13 @@
       "es": "Sin imagen adjunta: pregunta solo de texto.",
       "ja": "画像は添付されていません — テストみの質問です。"
     },
+    "Chưa đặt tên": {
+      "en": "No name yet",
+      "zh": "尚未命名",
+      "fr": "Pas encore de nom",
+      "es": "Sin nombre todavía",
+      "ja": "まだ名前なし"
+    },
     "Chưa đủ 12 nhiệm vụ để thi thật — nhưng bạn đã làm được lượt thi thử (không tính điểm). Xem khung thi ở cuối trang.": {
       "en": "You don’t have the 12 missions required for the real exam yet — but the practice run (not scored) is open to you. The exam frame is at the bottom of the page.",
       "zh": "还未完成正式考试所需的 12 个任务——但你可以参加模拟考（不计分）。考试框在页面底部。",
@@ -1010,12 +1199,40 @@
       "es": "Modo inseguro (innerHTML)",
       "ja": "安全でないモード（innerHTML）"
     },
+    "Chế độ khách trên máy này — chưa có tài khoản. Mọi thứ bạn làm lưu dưới tên guest, tạo tài khoản sẽ được chuyển sang cùng.": {
+      "en": "Guest mode on this machine — no account yet. Everything you do is stored under the name 'guest'; create an account and it all moves over with you.",
+      "zh": "此电脑上的访客模式——尚无账户。你的一切操作都保存在 guest 名下，创建账户后会自动转到账户里。",
+      "fr": "Mode invité sur cet appareil — aucun compte. Tout ce que tu fais est enregistré sous le nom « guest » ; crée un compte et tout suivra.",
+      "es": "Modo invitado en este equipo — sin cuenta. Todo lo que haces se guarda con el nombre «guest»; si creas una cuenta, se traslada contigo.",
+      "ja": "このパソコンはゲストモードです（アカウント未作成）。作業はすべて guest という名前で保存され、アカウントを作ればそのまま引っ越します。"
+    },
+    "Chế độ máy chủ": {
+      "en": "Server mode",
+      "zh": "服务器模式",
+      "fr": "Mode du serveur",
+      "es": "Modo del servidor",
+      "ja": "サーバーモード"
+    },
+    "Chế độ này kín chưa?": {
+      "en": "Is this mode airtight?",
+      "zh": "这个模式严密了吗？",
+      "fr": "Ce mode est-il hermétique ?",
+      "es": "¿Este modo ya es estanco?",
+      "ja": "このモードは漏れがありませんか？"
+    },
     "Chỉ dòng của bạn là tài khoản thật": {
       "en": "Only your row is a real account",
       "zh": "只有你那一行是真实账号",
       "fr": "Seule ta ligne est un vrai compte",
       "es": "Solo tu fila es una cuenta real",
       "ja": "あなたの行だけが本物のアカウント"
+    },
+    "Chỉ kiểm tra đã đăng nhập": {
+      "en": "Checks only that you are logged in",
+      "zh": "只检查是否已登录",
+      "fr": "Vérifie seulement la connexion",
+      "es": "Solo comprueba que hayas iniciado sesión",
+      "ja": "ログインしているかだけを確認"
     },
     "Chỉ nhận file ảnh (PNG, JPEG, WebP, GIF).": {
       "en": "Images only (PNG, JPEG, WebP, GIF).",
@@ -1030,6 +1247,13 @@
       "fr": "S'applique uniquement à la simulation",
       "es": "Solo se aplica a la simulación",
       "ja": "シミュレーションにのみ適用"
+    },
+    "Chỉnh cho màn hình vừa mắt bạn. Mọi thay đổi lưu ngay trên máy này và không gửi đi đâu cả.": {
+      "en": "Adjust the screen until it suits you. Every change is saved on this machine only and is never sent anywhere.",
+      "zh": "把界面调成你看着舒服的样子。所有改动只保存在这台电脑上，不会发送到任何地方。",
+      "fr": "Règle l'écran à ton goût. Chaque changement s'enregistre uniquement sur cet appareil et n'est envoyé nulle part.",
+      "es": "Ajusta la pantalla a tu gusto. Cada cambio se guarda solo en este equipo y no se envía a ningún sitio.",
+      "ja": "見やすい画面に調整できます。変更はこのパソコンにだけ保存され、外部には一切送信されません。"
     },
     "Chọn file hoặc thư mục thật từ máy tính của bạn để quét mã độc. Toàn bộ xử lý cục bộ trong trình duyệt — không tải file lên server.": {
       "en": "Select real files or folders from your computer to scan for malware. All processing is local in the browser — no files are uploaded to the server.",
@@ -1101,6 +1325,13 @@
       "es": "Espera…",
       "ja": "お待ちください…"
     },
+    "Chủ đề màu": {
+      "en": "Colour theme",
+      "zh": "配色主题",
+      "fr": "Thème de couleurs",
+      "es": "Tema de color",
+      "ja": "カラーテーマ"
+    },
     "Chứng chỉ": {
       "en": "Certificate",
       "zh": "证书",
@@ -1136,6 +1367,13 @@
       "es": "El certificado se emite automáticamente cuando complete",
       "ja": "を完了すると証明書が自動的に発行されます："
     },
+    "Chữ đậm hơn, viền rõ hơn": {
+      "en": "Bolder text, clearer outlines",
+      "zh": "更粗的文字、更清晰的边框",
+      "fr": "Texte plus gras, contours plus nets",
+      "es": "Texto más grueso, bordes más marcados",
+      "ja": "文字を太く、枠をはっきり"
+    },
     "Click vào các thẻ IP đỏ": {
       "en": "Click on the red IP tags",
       "zh": "单击红色的 IP 标签",
@@ -1149,6 +1387,20 @@
       "fr": "Cloudflare est ACTIVÉ 🛡️",
       "es": "Cloudflare está ACTIVADO 🛡️",
       "ja": "Cloudflare はON 🛡️"
+    },
+    "Content-Type application/json buộc trình duyệt gửi OPTIONS trước; nhà băng không mở CORS cho trang lạ nên gói thật không bao giờ đi.": {
+      "en": "The application/json Content-Type forces the browser to send OPTIONS first; the bank does not open CORS to a foreign site, so the real request never goes out.",
+      "zh": "application/json 这个 Content-Type 迫使浏览器先发 OPTIONS；银行没有为陌生网站开放 CORS，所以真正的请求根本发不出去。",
+      "fr": "Le Content-Type application/json oblige le navigateur à envoyer d'abord un OPTIONS ; la banque n'ouvre pas CORS au site étranger, la vraie requête ne part donc jamais.",
+      "es": "El Content-Type application/json obliga al navegador a enviar primero un OPTIONS; el banco no abre CORS al sitio ajeno, así que la petición real nunca llega a salir.",
+      "ja": "Content-Type が application/json のためブラウザは先に OPTIONS を送ります。銀行は外部サイトに CORS を開いていないので、実際のリクエストは送信されません。"
+    },
+    "Cookie có cờ Secure": {
+      "en": "Cookie has the Secure flag",
+      "zh": "Cookie 带有 Secure 标志",
+      "fr": "Cookie avec la marque Secure",
+      "es": "Cookie con la marca Secure",
+      "ja": "Cookie に Secure フラグを付ける"
     },
     "CySim dịch theo bốn lớp. Lớp một là bảng bản dịch đã qua mắt người, lớp hai là từ điển viết tay, lớp ba là file dịch sinh sẵn, lớp cuối mới gọi API dịch máy. Chuỗi chưa ai xem lại vẫn hiển thị được nhưng bị đánh dấu là bản dịch máy. Ba file quan trọng:": {
       "en": "CySim translates in four layers. Layer one is the table of translations a human has read, layer two the handwritten dictionary, layer three the generated dictionary files, and only then the machine API. A string nobody has reviewed still displays, but it is flagged as machine-translated. The three key files:",
@@ -1170,6 +1422,13 @@
       "fr": "CySim — Écosystème complet de formation à la cybersécurité",
       "es": "CySim — Ecosistema integral de formación en ciberseguridad",
       "ja": "CySim — 包括的なサイバーセキュリティ訓練エコシステム"
+    },
+    "Cài đặt": {
+      "en": "Settings",
+      "zh": "设置",
+      "fr": "Paramètres",
+      "es": "Ajustes",
+      "ja": "設定"
     },
     "Các bài lab có tấn công thật không?": {
       "en": "Do the labs perform real attacks?",
@@ -1282,6 +1541,13 @@
       "fr": "Contient des chiffres",
       "es": "Contiene números",
       "ja": "数字を含む"
+    },
+    "Có hiệu ứng chuyển động": {
+      "en": "Use animations",
+      "zh": "启用动画效果",
+      "fr": "Avec effets de mouvement",
+      "es": "Con efectos de movimiento",
+      "ja": "動きのある演出を使う"
     },
     "Có ký tự đặc biệt": {
       "en": "Contains special characters",
@@ -1416,6 +1682,27 @@
       "es": "Hay más puertos de servicio abiertos de los realmente necesarios",
       "ja": "実際に必要な数よりも多くのサービスポートが開いている"
     },
+    "Cỡ chữ": {
+      "en": "Text size",
+      "zh": "字号",
+      "fr": "Taille du texte",
+      "es": "Tamaño de letra",
+      "ja": "文字サイズ"
+    },
+    "Cửa này bị chặn": {
+      "en": "This vector is blocked",
+      "zh": "此途径被拦截",
+      "fr": "Ce vecteur est bloqué",
+      "es": "Este vector está bloqueado",
+      "ja": "この経路は遮断されました"
+    },
+    "Cửa này ăn": {
+      "en": "This vector succeeds",
+      "zh": "此途径成功",
+      "fr": "Ce vecteur aboutit",
+      "es": "Este vector tiene éxito",
+      "ja": "この経路は成功します"
+    },
     "DATA LEAKED — Rò rỉ toàn bộ bảng Users!": {
       "en": "DATA LEAKED — Entire Users table leaked!",
       "zh": "数据泄露 —— Users 表整体泄露！",
@@ -1528,6 +1815,13 @@
       "es": "Detener",
       "ja": "停止"
     },
+    "Dữ liệu của bạn": {
+      "en": "Your data",
+      "zh": "你的数据",
+      "fr": "Tes données",
+      "es": "Tus datos",
+      "ja": "あなたのデータ"
+    },
     "Email Templates → Create New Template. Đặt tiêu đề, nội dung dùng biến": {
       "en": "Email Templates → Create New Template. Set the subject and the body using the variables",
       "zh": "Email Templates → Create New Template。设置标题，并在正文中使用变量",
@@ -1591,12 +1885,33 @@
       "es": "FPS del navegador",
       "ja": "ブラウザ FPS"
     },
+    "File không có mục dữ liệu nào.": {
+      "en": "The file contains no data entries.",
+      "zh": "文件里没有任何数据项。",
+      "fr": "Le fichier ne contient aucune donnée.",
+      "es": "El archivo no contiene ningún dato.",
+      "ja": "このファイルにはデータ項目がありません。"
+    },
+    "File không đọc được. Cần file .json do chính CySim xuất ra.": {
+      "en": "The file could not be read. You need a .json file exported by CySim itself.",
+      "zh": "文件无法读取。请使用 CySim 自己导出的 .json 文件。",
+      "fr": "Fichier illisible. Il faut un fichier .json exporté par CySim lui-même.",
+      "es": "No se puede leer el archivo. Hace falta un .json exportado por el propio CySim.",
+      "ja": "ファイルを読み込めません。CySim 自身が書き出した .json ファイルが必要です。"
+    },
     "File lạ bị đổi đuôi kèm một tờ đòi tiền, trình duyệt tự cài thành phần mở rộng, tiến trình lạ chiếm hết CPU để đào coin, thiết bị USB tự chạy chương trình, và máy chậm hẳn khi đang quét toàn bộ ổ.": {
       "en": "Unknown files renamed with a ransom note attached, the browser installing an extension by itself, a strange process using all the CPU to mine coins, a USB stick running programs on its own, and the machine crawling while the whole disk is being scanned.",
       "zh": "陌生文件被改名并附了一张勒索说明、浏览器自行装上扩展、可疑进程占满 CPU 挖矿、U 盘自己运行程序、以及全盘扫描时机器明显变慢。",
       "fr": "Des fichiers inconnus renommés avec une note de rançon jointe, le navigateur qui installe une extension tout seul, un processus inconnu qui monopolise le CPU pour miner, une clé USB qui exécute des programmes sans demande, et la machine qui s'enlise pendant l'analyse du disque entier.",
       "es": "Archivos desconocidos renombrados con una nota de rescate, el navegador instalando una extensión solo, un proceso extraño usando toda la CPU para minar, una memoria USB ejecutando programas sin que se le pida, y la máquina arrastrándose mientras se escanea todo el disco.",
       "ja": "見知らぬファイルが身代金要求のメモとともに改名される、ブラウザが拡張機能を勝手に導入する、正体不明のプロセスが CPU を使い切って採掘する、USB が自らプログラムを起動する、ディスク全体のスキャン中に機械が極端に遅くなる、といった現象です。"
+    },
+    "File này không chứa dữ liệu của tài khoản đang đăng nhập.": {
+      "en": "This file does not contain data for the account you are signed in with.",
+      "zh": "此文件不包含当前登录账户的数据。",
+      "fr": "Ce fichier ne contient pas les données du compte actuellement connecté.",
+      "es": "Este archivo no contiene datos de la cuenta con la que has iniciado sesión.",
+      "ja": "このファイルには、ログイン中のアカウントのデータが含まれていません。"
     },
     "File trên 10MB — bỏ qua bước băm hash": {
       "en": "File over 10MB — hashing step skipped",
@@ -1668,6 +1983,13 @@
       "es": "Falsificación de solicitud entre sitios",
       "ja": "サイト間リクエスト偽装"
     },
+    "Giới hạn hỏi AI": {
+      "en": "AI question limit",
+      "zh": "AI 提问上限",
+      "fr": "Limite de questions IA",
+      "es": "Límite de preguntas a la IA",
+      "ja": "AI への質問上限"
+    },
     "Giữ dịch vụ sống: CDN/ISP scrubbing, scale thêm tài nguyên": {
       "en": "Keep the service alive: CDN/ISP scrubbing, scaling extra resources",
       "zh": "保持服务可用：CDN/ISP 流量清洗、扩容资源",
@@ -1710,12 +2032,26 @@
       "es": "Escribe la traducción correcta (déjalo vacío para solo reportar, no corregir):",
       "ja": "正しい訳を入力してください（空欄は報告のみ、修正なし）："
     },
+    "Gõ vài chữ để tìm nhiệm vụ, chủ đề lý thuyết hoặc trang.": {
+      "en": "Type a few words to find a mission, a theory topic or a page.",
+      "zh": "输入几个字即可查找任务、理论主题或页面。",
+      "fr": "Tapez quelques mots pour trouver une mission, un thème théorique ou une page.",
+      "es": "Escribe unas palabras para encontrar una misión, un tema teórico o una página.",
+      "ja": "少し入力すると、タスク・理論のテーマ・ページを検索できます。"
+    },
     "Gắn token chống CSRF không đoán được cho từng form và kiểm tra ở máy chủ, đặt cookie cùng phiên ở chế độ bị hạn chế gửi ra ngoài, yêu cầu xác thực lại với hành động nhạy cảm, và không bao giờ đổi trạng thái bằng GET.": {
       "en": "Attach an unpredictable CSRF token to every form and verify it on the server, set session cookies so other sites cannot send them, require re-authentication for sensitive actions, and never change state with GET.",
       "zh": "为每个表单配上无法预测的 CSRF token 并在服务器端校验；设置会话 cookie 使其不会被其他站点带上；敏感操作要求重新认证；绝不用 GET 改变状态。",
       "fr": "Attachez un jeton CSRF imprévisible à chaque formulaire et vérifiez-le côté serveur, configurez les cookies de session pour qu'ils ne partent pas depuis un autre site, exigez une re-authentification pour les actions sensibles, et ne changez jamais l'état avec une requête GET.",
       "es": "Añade a cada formulario un token CSRF impredecible y verifícalo en el servidor, configura las cookies de sesión para que no viajen desde otros sitios, exige volver a autenticarte en las acciones sensibles y nunca cambies el estado con una petición GET.",
       "ja": "全てのフォームに予測できない CSRF トークンを付け、サーバー側で検証します。セッションの cookie は他サイトから送られない設定にし、重要な操作は再認証を要求し、状態変更を GET で行うことは絶対にやめます。"
+    },
+    "Gặp chữ gì lạ? Gõ câu hỏi vào khung Trợ lý AI ở góc dưới trái — nó biết 13 bài trong app này và trả lời đúng thứ tiếng bạn đang dùng.": {
+      "en": "Seen a word you don't know? Type your question into the AI Assistant box in the lower-left corner — it knows all 13 lessons in this app and answers in the language you are using.",
+      "zh": "遇到陌生的词？把问题输入左下角的 AI 助手对话框——它了解本应用的 13 课内容，并用你当前使用的语言回答。",
+      "fr": "Un mot te semble bizarre ? Tape ta question dans la zone Assistant IA, en bas à gauche — elle connaît les 13 leçons de cette appli et répond dans la langue que tu utilises.",
+      "es": "¿Ves una palabra rara? Escribe tu pregunta en el cuadro Asistente IA, abajo a la izquierda — conoce las 13 lecciones de esta app y responde en el idioma que estés usando.",
+      "ja": "分からない言葉が出たら、左下の AI アシスタント欄に質問を入力してください。このアプリの13課を知っていて、使っている言語で答えます。"
     },
     "Gợi ý: Cả 3 cuộc tấn công đến từ IP": {
       "en": "Hint: All 3 attacks come from IP",
@@ -1772,6 +2108,13 @@
       "fr": "Échec de l'envoi :",
       "es": "Error al enviar:",
       "ja": "送信に失敗:"
+    },
+    "HTTP/1.1 403 Forbidden (thiếu Access-Control-Allow-Origin cho origin này)": {
+      "en": "HTTP/1.1 403 Forbidden (missing Access-Control-Allow-Origin for this origin)",
+      "zh": "HTTP/1.1 403 Forbidden（缺少针对该 origin 的 Access-Control-Allow-Origin）",
+      "fr": "HTTP/1.1 403 Forbidden (Access-Control-Allow-Origin absent pour cet origin)",
+      "es": "HTTP/1.1 403 Forbidden (falta Access-Control-Allow-Origin para este origin)",
+      "ja": "HTTP/1.1 403 Forbidden（この origin 向けの Access-Control-Allow-Origin が無い）"
     },
     "Hash là phép biến đổi một chiều: máy chủ lưu kết quả hash chứ không lưu mật khẩu gốc, nên database bị rò cũng không lộ ngay thứ dùng để đăng nhập.": {
       "en": "A hash is a one-way transformation: the server stores the hash result rather than the original password, so even a leaked database does not immediately expose what people use to sign in.",
@@ -1927,6 +2270,13 @@
       "es": "Guía de uso de CySim",
       "ja": "CySim 使用ガイド"
     },
+    "Hạ xuống học viên": {
+      "en": "Demote to learner",
+      "zh": "降为学员",
+      "fr": "Rétrograder en apprenant",
+      "es": "Degradar a alumno",
+      "ja": "学習者に戻す"
+    },
     "Hạng": {
       "en": "Rank",
       "zh": "排名",
@@ -1955,13 +2305,6 @@
       "es": "Ecosistema de formación en ciberseguridad",
       "ja": "サイバーセキュリティ研修エコシステム"
     },
-    "Hệ sinh thái đào tạo an ninh mạng toàn diện với mô phỏng Phishing, DDoS, SQL Injection, XSS, CSRF, IDOR, SIEM Log Analysis, Truy vấn IP thực tế và Cấp chứng chỉ hoàn thành.": {
-      "en": "A comprehensive cybersecurity training ecosystem with simulated Phishing, DDoS, SQL Injection, XSS, CSRF, IDOR, SIEM Log Analysis, real IP Lookup and Completion Certificate issuance.",
-      "zh": "全面的网络安全培训生态系统，包含钓鱼、DDoS、SQL 注入、XSS、CSRF、IDOR、SIEM 日志分析、真实 IP 查询以及结业证书颁发的模拟实验。",
-      "fr": "Un écosystème complet de formation en cybersécurité avec des simulations de Phishing, DDoS, injection SQL, XSS, CSRF, IDOR, analyse de logs SIEM, consultation d'IP réelle et délivrance d'un certificat de fin de parcours.",
-      "es": "Un ecosistema integral de formación en ciberseguridad con simulaciones de Phishing, DDoS, inyección SQL, XSS, CSRF, IDOR, análisis de logs SIEM, consulta de IP real y expedición de certificado de finalización.",
-      "ja": "フィッシング、DDoS、SQL インジェクション、XSS、CSRF、IDOR、SIEM ログ分析、実際の IP 検索、修了証明書の発行を模擬体験できる、総合的なサイバーセキュリティ研修エコシステム。"
-    },
     "Hệ thống tự động tính toán:": {
       "en": "The system automatically calculates:",
       "zh": "系统会自动计算：",
@@ -1989,6 +2332,13 @@
       "fr": "La mention imprimée sur le certificat suit la partie la moins bien notée : au-dessus de 15 c'est Excellent, de 10 à 15 c'est Bien, en dessous de 10 il n'y a pas de certificat.",
       "es": "La calificación impresa en el título sigue la parte con menos puntos: por encima de 15 es Sobresaliente, de 10 a 15 es Notable, por debajo de 10 no se concede.",
       "ja": "証明書に印刷される評価は、得点が高いほうではなく低いほうのパートに基づきます。15 超は「優秀」、10〜15 は「良好」、10 未満は発行されません。"
+    },
+    "Học viên": {
+      "en": "Learner",
+      "zh": "学员",
+      "fr": "Apprenant",
+      "es": "Alumno",
+      "ja": "学習者"
     },
     "Học viên / Chuyên gia": {
       "en": "Student / Expert",
@@ -2081,12 +2431,33 @@
       "es": "Al escribir",
       "ja": "入力時"
     },
+    "Khi nào cần tới trang này?": {
+      "en": "When do you need this page?",
+      "zh": "什么时候需要这个页面？",
+      "fr": "Quand as-tu besoin de cette page ?",
+      "es": "¿Cuándo necesitas esta página?",
+      "ja": "どんなときにこのページを使いますか？"
+    },
     "Khi server dùng": {
       "en": "When the server uses",
       "zh": "当服务器使用",
       "fr": "Quand le serveur utilise",
       "es": "Cuando el servidor usa",
       "ja": "サーバーが使う"
+    },
+    "Khung render bình luận: mã độc được cô lập trong iframe sandbox": {
+      "en": "Comment render frame: malicious code is isolated inside a sandboxed iframe",
+      "zh": "评论渲染框：恶意代码被隔离在 sandbox iframe 中",
+      "fr": "Zone de rendu des commentaires : le code malveillant est isolé dans une iframe sandbox",
+      "es": "Marco donde se renderizan los comentarios: el código malicioso queda aislado en un iframe con sandbox",
+      "ja": "コメント表示フレーム：悪意のあるコードは sandbox 付き iframe の中に閉じ込められています"
+    },
+    "Khách": {
+      "en": "Guest",
+      "zh": "访客",
+      "fr": "Invité",
+      "es": "Invitado",
+      "ja": "ゲスト"
     },
     "Khái niệm": {
       "en": "Concept",
@@ -2102,6 +2473,13 @@
       "es": "Bloqueo de puertos del firewall",
       "ja": "ファイアウォールのポート封じ込め"
     },
+    "Không có cách lấy lại mật khẩu: CySim không có máy chủ nên không có email đặt lại. Quên mật khẩu là phải tạo tài khoản khác, và bản sao dữ liệu ở trang Cài đặt là thứ duy nhất mang theo được.": {
+      "en": "There is no way to recover a password: CySim has no server, so there is no reset email. Forget it and you must create another account — the data copy on the Settings page is the only thing you can take with you.",
+      "zh": "密码无法找回：CySim 没有服务器，所以没有重置邮件。忘记了就只能另建一个账户——唯一能带走的是“设置”页面里导出的数据副本。",
+      "fr": "Impossible de récupérer un mot de passe : CySim n'a pas de serveur, donc pas d'e-mail de réinitialisation. L'oublier oblige à créer un autre compte — seule la copie de données prise depuis Réglages te suit.",
+      "es": "No hay forma de recuperar una contraseña: CySim no tiene servidor, así que no hay correo de restablecimiento. Olvidarla obliga a crear otra cuenta — lo único que te llevas es la copia de datos de la página Configuración.",
+      "ja": "パスワードを取り戻す方法はありません。CySim にはサーバーが無いので、再設定用のメールもありません。忘れたら別のアカウントを作るしかなく、持ち出せるのは設定ページのエクスポートしたデータのコピーだけです。"
+    },
     "Không có dấu nháy đơn đóng, nên FROM, SELECT, OR chỉ là chữ thường — SQL không coi chúng là lệnh.": {
       "en": "There is no closing single quote, so FROM, SELECT and OR stay ordinary words — SQL does not treat them as commands.",
       "zh": "没有闭合的单引号，因此 FROM、SELECT、OR 只是普通文本 —— SQL 不会把它们当作命令。",
@@ -2116,12 +2494,26 @@
       "es": "Sin internet (según el navegador) — las lecciones, el examen y todos los laboratorios siguen funcionando; solo el asistente de IA, la consulta de IP y la traducción necesitan red.",
       "ja": "ブラウザの表示ではインターネット接続がありません — 授業、試験、すべてのラボはそのまま使えます。AI アシスタント、IP 検索、翻訳のみ通信が必要です。"
     },
+    "Không có mục nào khớp với": {
+      "en": "Nothing matches",
+      "zh": "没有匹配的结果：",
+      "fr": "Aucun élément ne correspond à",
+      "es": "Nada coincide con",
+      "ja": "一致する項目なし："
+    },
     "Không có trong từ điển. Chuyển sang brute-force có giới hạn...": {
       "en": "Not in the dictionary. Switching to limited brute-force...",
       "zh": "字典里没有这个密码。改用有限次数的暴力破解...",
       "fr": "Absent du dictionnaire. Passage à un brute-force limité...",
       "es": "No está en el diccionario. Se pasa a un brute-force limitado...",
       "ja": "辞書に登録がありません。回数を限定したブルートフォースに切り替えます..."
+    },
+    "Không có tài khoản thì vẫn làm được 12 phòng lab. Có tài khoản để tiến độ và lịch sử chat AI mang theo tên bạn, để bảng xếp hạng ghi đúng người, và để tấm chứng chỉ tốt nghiệp mang tên thật thay vì chữ \"Khách\".": {
+      "en": "Without an account you can still do all 12 labs. An account is what puts your progress and your AI chat history under your name, records the right person on the leaderboard, and makes your graduation certificate carry a real name instead of 'Guest'.",
+      "zh": "没有账户也能完成全部 12 个实验室。有账户才能让进度和 AI 聊天记录记在你名下，让排行榜写对人名，让毕业证书印上真实姓名而不是「访客」。",
+      "fr": "Sans compte, tu peux déjà faire les 12 labos. Avoir un compte sert à mettre ta progression et tes conversations IA à ton nom, à inscrire la bonne personne au classement et à faire porter à ton certificat un vrai nom au lieu d'« Invité ».",
+      "es": "Sin cuenta igual puedes hacer los 12 laboratorios. La cuenta sirve para que el progreso y el historial de chat con la IA queden a tu nombre, para que la clasificación registre a la persona correcta y para que tu certificado de graduación lleve tu nombre real en lugar de «Invitado».",
+      "ja": "アカウントがなくても 12 個のラボはすべてできます。アカウントがあると、進捗や AI との会話履歴が自分の名前で残り、ランキングに正しい人が載り、修了証明書に「ゲスト」ではなく本名が印刷されます。"
     },
     "Không gọi được máy chủ AI ở địa chỉ đã khai. Máy chủ miễn phí có thể đang ngủ — bấm Thử lại và chờ một phút; nếu vẫn im thì máy chủ chưa chạy, hoặc chưa khai tên trang này vào CYSIM_ORIGINS.": {
       "en": "The AI server did not answer at the address this page is set to call. A free host may be asleep — press Try again and wait a minute; if it stays silent, the server is not running or this site is not listed in CYSIM_ORIGINS.",
@@ -2143,6 +2535,13 @@
       "fr": "Impossible d'envoyer l'e-mail. Vérifiez votre configuration EmailJS puis réessayez.",
       "es": "No se pudo enviar el correo electrónico. Revise su configuración de EmailJS e inténtelo de nuevo.",
       "ja": "メールを送信できません。EmailJS の設定を確認してからもう一度お試しください。"
+    },
+    "Không kiểm tra gì": {
+      "en": "Checks nothing",
+      "zh": "什么都不检查",
+      "fr": "Ne vérifie rien",
+      "es": "No comprueba nada",
+      "ja": "何もチェックしない"
     },
     "Không lưu được bài thi (bộ nhớ trình duyệt đã đầy).": {
       "en": "The exam could not be saved (browser storage is full).",
@@ -2193,6 +2592,13 @@
       "es": "No figura en la lista de contraseñas comunes",
       "ja": "一般的なパスワードのリストにない"
     },
+    "Không thể hạ admin cuối cùng.": {
+      "en": "The last administrator cannot be demoted.",
+      "zh": "不能把最后一名管理员降为学员。",
+      "fr": "On ne peut pas rétrograder le dernier administrateur.",
+      "es": "No se puede degradar al último administrador.",
+      "ja": "最後の管理者を降格することはできません。"
+    },
     "Không thể kết nối": {
       "en": "Cannot connect",
       "zh": "无法连接",
@@ -2221,6 +2627,20 @@
       "es": "No se encontró ningún usuario con el ID:",
       "ja": "ユーザーが見つかりません。ID："
     },
+    "Không tải được CySim AI (thiếu mạng hoặc file bị xoá).": {
+      "en": "Could not load CySim AI (no network, or the file is missing).",
+      "zh": "无法加载 CySim AI（网络中断或文件缺失）。",
+      "fr": "Impossible de charger CySim AI (pas de réseau ou fichier manquant).",
+      "es": "No se pudo cargar CySim AI (sin red o falta el archivo).",
+      "ja": "CySim AI を読み込めませんでした（ネットワークエラーまたはファイルが存在しません）。"
+    },
+    "Không tải được phòng lab này (thiếu mạng hoặc file bị xoá). Hãy thử lại.": {
+      "en": "Could not load this lab (no network, or the file is missing). Please try again.",
+      "zh": "无法加载此实验室（网络中断或文件缺失）。请重试。",
+      "fr": "Impossible de charger ce laboratoire (pas de réseau ou fichier manquant). Réessayez.",
+      "es": "No se pudo cargar este laboratorio (sin red o falta el archivo). Inténtalo de nuevo.",
+      "ja": "このラボを読み込めませんでした（ネットワークエラーまたはファイルが存在しません）。もう一度お試しください。"
+    },
     "Không đăng nhập từ link trong thư: tự mở trang bằng bookmark. Kiểm tra tên miền thật trên thanh địa chỉ, dùng app xác thực hoặc khoá phần cứng, và bật khoá hai bước cho email trước tiên vì hộp thư là chìa khoá của mọi tài khoản khác.": {
       "en": "Never sign in from a link inside an email: open the site from your own bookmark. Check the real domain in the address bar, use an authenticator app or a hardware key, and turn on two-step verification for your mailbox first, because the mailbox is the key to every other account.",
       "zh": "不要从邮件里的链接登录：自己用书签打开网站。核对地址栏里的真实域名，使用验证器 App 或硬件密钥，并且最先给邮箱开启两步验证，因为邮箱是所有其他账号的钥匙。",
@@ -2241,6 +2661,13 @@
       "fr": "Impossible de lire cette image — essayez-en une autre.",
       "es": "No se pudo leer esta imagen; prueba otra.",
       "ja": "この画像を読み込めません — 別の画像を試してください。"
+    },
+    "Không đổi được vai trò.": {
+      "en": "The role could not be changed.",
+      "zh": "角色无法更改。",
+      "fr": "Le rôle n'a pas pu être modifié.",
+      "es": "No se pudo cambiar el rol.",
+      "ja": "役割を変更できませんでした。"
     },
     "Không. Mọi thứ là mô phỏng chạy trong trình duyệt. Chỉ thử các kỹ thuật này trên hệ thống của chính bạn hoặc hệ thống được cho phép.": {
       "en": "No. Everything is a simulation running in your browser. Only try these techniques on your own systems or ones you have permission to test.",
@@ -2270,12 +2697,26 @@
       "es": "Comprobación Time-to-Crack",
       "ja": "破砕時間チェック"
     },
+    "Kiểm tra chủ sở hữu (user_id của phiên)": {
+      "en": "Checks ownership (the session's user_id)",
+      "zh": "检查所有者（会话的 user_id）",
+      "fr": "Contrôle la propriété (le user_id de la session)",
+      "es": "Comprueba la propiedad (el user_id de la sesión)",
+      "ja": "所有者を確認（セッションの user_id）"
+    },
     "Kiểm tra các dịch vụ đang mở trên máy chủ để tìm diện tấn công.": {
       "en": "Checking for open services on a server to find the attack surface.",
       "zh": "检查服务器上开放的服务，以找出攻击面。",
       "fr": "Recherche des services ouverts sur un serveur pour identifier la surface d'attaque.",
       "es": "Se revisan los servicios abiertos en un servidor para identificar la superficie de ataque.",
       "ja": "サーバー上で開放されているサービスを確認し、攻撃対象領域を見つける行為です。"
+    },
+    "Kiểm tra cả ba cửa": {
+      "en": "Check all three vectors",
+      "zh": "检查全部三种途径",
+      "fr": "Vérifier les trois vecteurs",
+      "es": "Comprobar los tres vectores",
+      "ja": "3つの経路をすべて検査"
     },
     "Kiểm tra mạng hoặc thử IP khác.": {
       "en": "Check network or try another IP.",
@@ -2396,6 +2837,13 @@
       "es": "El examen solo se abre cuando has completado las 12 misiones de laboratorio.",
       "ja": "試験は、12 個の実験室ミッションをすべて完了すると開かれます。"
     },
+    "Kỳ thi tốt nghiệp & Chứng chỉ": {
+      "en": "Graduation Exam & Certificate",
+      "zh": "毕业考试与证书",
+      "fr": "Examen de fin de cursus et certificat",
+      "es": "Examen de graduación y certificado",
+      "ja": "卒業試験と修了証明書"
+    },
     "Kỳ thi tốt nghiệp CySim": {
       "en": "CySim graduation exam",
       "zh": "CySim 结业考试",
@@ -2423,6 +2871,13 @@
       "fr": "Détaillé — réponse plus fouillée, parfois plus longue",
       "es": "Detallado — respuesta más profunda, puede tardar más",
       "ja": "詳細 — 答えは深くなるが、時間はかかることがある"
+    },
+    "Lax — chỉ gửi cho navigation GET (mặc định của trình duyệt)": {
+      "en": "Lax — sent only on GET navigation (the browser default)",
+      "zh": "Lax — 仅在 GET 导航时发送（浏览器默认）",
+      "fr": "Lax — envoyé uniquement pour les navigations GET (valeur par défaut du navigateur)",
+      "es": "Lax — solo se envía en navegaciones GET (valor predeterminado del navegador)",
+      "ja": "Lax — GET ナビゲーション時のみ送信（ブラウザの既定）"
     },
     "Log stream từ hệ thống (2026-10-17)": {
       "en": "System log stream (2026-10-17)",
@@ -2648,12 +3103,26 @@
       "es": "El fallo se produce cuando la aplicación no comprueba la propiedad de los recursos. Al atacante basta con cambiar",
       "ja": "この脆弱性は、アプリがリソースの所有者を確認しないために発生します。攻撃者が書き換えるのは次の部分だけです："
     },
+    "LỘ hồ sơ của người khác": {
+      "en": "SOMEONE ELSE'S RECORD LEAKED",
+      "zh": "泄露了他人的档案",
+      "fr": "FUITE DU DOSSIER D'AUTRUI",
+      "es": "SE FILTRA EL REGISTRO DE OTRA PERSONA",
+      "ja": "他人の記録が漏れました"
+    },
     "Lộ ra ngoài": {
       "en": "Exposed",
       "zh": "暴露",
       "fr": "Exposé",
       "es": "Expuesto",
       "ja": "露出"
+    },
+    "Lớn": {
+      "en": "Large",
+      "zh": "大",
+      "fr": "Grand",
+      "es": "Grande",
+      "ja": "大きめ"
     },
     "Lớp giám sát và phản ứng: log/SIEM, bản vá, backup, 2FA": {
       "en": "Monitoring and response layer: logs/SIEM, patches, backups, 2FA",
@@ -2690,12 +3159,33 @@
       "es": "Consejo de seguridad:",
       "ja": "セキュリティのアドバイス："
     },
+    "Muốn khoá thật sự thì cần một máy chủ đứng giữa, hoặc ít nhất Web Crypto AES-GCM với khoá dẫn xuất từ mật khẩu. Bản này cố ý không làm, vì cái giá phải trả là mất đúng thứ khiến nó dùng được trong lớp học: mở là chạy, không tài khoản thật, không cần internet.": {
+      "en": "To really lock the data you need a server in the middle, or at least Web Crypto AES-GCM with a key derived from the password. This build deliberately does not do it, because the price would be losing exactly what makes it usable in a classroom: open it and it runs, no real accounts, no internet needed.",
+      "zh": "要真正锁住数据，需要中间有一台服务器，或至少用 Web Crypto 的 AES-GCM 加密码派生的密钥。这个版本有意没有这么做，因为代价就是失去它在课堂上真正好用的地方：打开就能跑、不需要真实账号、也不需要联网。",
+      "fr": "Pour vraiment chiffrer ces données il faudrait un serveur au milieu, ou au moins Web Crypto en AES-GCM avec une clé dérivée du mot de passe. Cette version ne le fait volontairement pas, car le prix serait de perdre précisément ce qui la rend utilisable en classe : ça s'ouvre et ça tourne, pas de vrai compte, pas besoin d'internet.",
+      "es": "Para cifrarlos de verdad haría falta un servidor en medio, o al menos Web Crypto con AES-GCM y una clave derivada de la contraseña. Esta versión a propósito no lo hace, porque el precio sería perder justo lo que la hace útil en el aula: abrir y funcionar, sin cuentas reales y sin necesidad de internet.",
+      "ja": "データを本当に施錠するなら途中にサーバーが必要で、最低でも Web Crypto の AES-GCM にパスワードから導出した鍵を使うことになります。この版は意図的にそうしていません。その代償は、教室で使えるようにしているまさにその部分——開けば動く、本物のアカウントは不要、ネット接続も不要——を手放すことになるからです。"
+    },
     "MÃ ĐỘC — Hãy xóa ngay và không mở các file này!": {
       "en": "MALWARE — Delete these files immediately and do not open them!",
       "zh": "恶意软件——请立即删除这些文件，切勿打开！",
       "fr": "CODE MALVEILLANT — Supprimez ces fichiers immédiatement et ne les ouvrez pas !",
       "es": "MALWARE — ¡Elimine estos archivos de inmediato y no los abra!",
       "ja": "マルウェア — このファイルをすぐに削除し、開かないでください！"
+    },
+    "Màu màn hình": {
+      "en": "Screen colours",
+      "zh": "屏幕配色",
+      "fr": "Couleurs de l'écran",
+      "es": "Colores de pantalla",
+      "ja": "画面の色"
+    },
+    "Máy chưa có mã nào: lần nhập đầu tiên sẽ đặt luôn mã cho máy. Có mã rồi: nhập đúng thì tài khoản này lên quản trị và mở được trang Quản trị để bật/tắt tính năng cho cả lớp.": {
+      "en": "No code is set on this machine yet: the first entry becomes its code. Once a code exists, entering it correctly promotes this account to administrator and unlocks the Admin page, where you can switch features on or off for the whole class.",
+      "zh": "这台电脑尚未设置管理码：第一次输入就会成为本机管理码。已有管理码时，输入正确即可让这个账户升为管理员，并打开管理页面为全班开启或关闭功能。",
+      "fr": "Aucun code n'est encore défini sur cet appareil : la première saisie devient son code. Une fois le code fixé, le saisir correctement promeut ce compte en administrateur et ouvre la page d'administration, où l'on active ou désactive les fonctions pour toute la classe.",
+      "es": "Este equipo aún no tiene código: la primera entrada pasa a ser su código. Cuando ya existe, escribirlo bien sube esta cuenta a administrador y abre la página de administración para activar o desactivar funciones de toda la clase.",
+      "ja": "このパソコンにはまだコードがありません。最初に入力したものがコードになります。コードが決まった後は、正しく入力するとこのアカウントが管理者になり、クラス全体の機能を ON/OFF できる管理ページが開きます。"
     },
     "Máy chủ AI chưa chạy. Nháy đúp file chay-ai.bat ở thư mục dự án, hoặc mở terminal rồi chạy:": {
       "en": "The AI server is not running. Open a terminal in the project folder and run:",
@@ -2732,6 +3222,13 @@
       "es": "Los servidores de Google están saturados y no han podido responder. Espere un momento y pulse Enviar de nuevo.",
       "ja": "Google のサーバーが混雑して応答できませんでした。少し待ってから「送信」を押し直してください。"
     },
+    "Máy chủ bắt buộc CSRF token": {
+      "en": "Server requires a CSRF token",
+      "zh": "服务器强制要求 CSRF token",
+      "fr": "Le serveur exige un jeton CSRF",
+      "es": "El servidor exige un token CSRF",
+      "ja": "サーバーが CSRF トークンを必須にする"
+    },
     "Máy chủ chỉ nhìn ID do người dùng gửi mà không kiểm tra quyền sở hữu": {
       "en": "The server only looks at the ID sent by the user, without checking who owns it",
       "zh": "服务器只看用户提交的 ID，不校验归属权",
@@ -2752,6 +3249,13 @@
       "fr": "Le serveur a refusé les images jointes (format incorrect ou trop nombreuses). Réessayez avec 1-2 images PNG/JPEG/WebP/GIF.",
       "es": "El servidor rechazó las imágenes adjuntas (formato incorrecto o demasiadas). Inténtalo de nuevo con 1-2 imágenes PNG/JPEG/WebP/GIF.",
       "ja": "サーバーが添付画像を拒否しました（形式不正または枚数超過）。PNG/JPEG/WebP/GIF を 1〜2 枚で再試行してください。"
+    },
+    "Máy chủ kiểm tra Origin": {
+      "en": "Server checks the Origin header",
+      "zh": "服务器检查 Origin",
+      "fr": "Le serveur vérifie l'Origin",
+      "es": "El servidor comprueba el Origin",
+      "ja": "サーバーが Origin を検証する"
     },
     "Máy chủ phơi cổng 22, 445 hoặc 3306 ra Internet; log ghi chuỗi SYN tới nhiều cổng liên tiếp từ cùng một IP; dịch vụ chạy bằng quyền hệ thống và không có quy tắc nào được rà lại từ lâu.": {
       "en": "The server exposes ports 22, 445 or 3306 to the internet; logs record a run of SYN packets to several consecutive ports from one IP; services run with system privileges and no rule set has been reviewed for a long time.",
@@ -2843,6 +3347,62 @@
       "fr": "Chiffrer tout le disque dur du serveur",
       "es": "Cifrar todo el disco duro del servidor",
       "ja": "サーバーのディスク全体を暗号化する"
+    },
+    "Mã phải có ít nhất 8 ký tự.": {
+      "en": "The code must be at least 8 characters long.",
+      "zh": "管理码至少要有 8 个字符。",
+      "fr": "Le code doit comporter au moins 8 caractères.",
+      "es": "El código debe tener al menos 8 caracteres.",
+      "ja": "コードは8文字以上が必要です。"
+    },
+    "Mã quản trị (để trống nếu bạn là học viên)": {
+      "en": "Admin code (leave empty if you are a learner)",
+      "zh": "管理码（如果你是学员请留空）",
+      "fr": "Code d'administration (laisse vide si tu es apprenant)",
+      "es": "Código de administración (déjalo vacío si eres alumno)",
+      "ja": "管理コード（学習者の場合は空のまま）"
+    },
+    "Mã quản trị cần ít nhất 8 ký tự, hoặc để trống ô này.": {
+      "en": "The admin code needs at least 8 characters — or leave this field empty.",
+      "zh": "管理码至少需要 8 个字符，或者把此栏留空。",
+      "fr": "Le code d'administration exige au moins 8 caractères, ou laisse ce champ vide.",
+      "es": "El código de administración necesita al menos 8 caracteres, o deja vacío este campo.",
+      "ja": "管理コードは8文字以上にしてください。またはこの欄を空のままに。"
+    },
+    "Mã quản trị của máy này": {
+      "en": "This machine's admin code",
+      "zh": "本机管理码",
+      "fr": "Code d'administration de cet appareil",
+      "es": "Código de administración de este equipo",
+      "ja": "このパソコンの管理コード"
+    },
+    "Mã quản trị không khớp với máy này. Đăng nhập vẫn chưa xong — để trống ô đó rồi bấm lại nếu bạn chỉ muốn làm học viên.": {
+      "en": "The admin code does not match this machine's. Sign-in is not finished — clear that field and click again if you only want to be a learner.",
+      "zh": "管理码与本机不符，登录尚未完成——如果你只想当学员，请清空该栏后重新点击。",
+      "fr": "Le code d'administration ne correspond pas à celui de cet appareil. La connexion n'est pas terminée — vide ce champ et clique de nouveau si tu veux juste être apprenant.",
+      "es": "El código de administración no coincide con el de este equipo. El acceso no ha terminado — borra ese campo y vuelve a pulsar si solo quieres ser alumno.",
+      "ja": "管理コードがこのパソコンのものとは一致しません。ログインは完了していません。学習者のままでよいなら欄を空にして、もう一度押してください。"
+    },
+    "Mã quản trị không khớp với máy này. Để trống ô đó nếu bạn chỉ muốn làm học viên.": {
+      "en": "The admin code does not match this machine's. Leave that field empty if you only want to be a learner.",
+      "zh": "管理码与本机不符。如果你只想当学员，请把该栏留空。",
+      "fr": "Le code d'administration ne correspond pas à celui de cet appareil. Laisse ce champ vide si tu veux juste être apprenant.",
+      "es": "El código de administración no coincide con el de este equipo. Deja vacío ese campo si solo quieres ser alumno.",
+      "ja": "管理コードがこのパソコンのものとは一致しません。学習者のままでよいなら、その欄を空にしてください。"
+    },
+    "Mã quản trị không đúng.": {
+      "en": "Wrong admin code.",
+      "zh": "管理码不正确。",
+      "fr": "Code d'administration incorrect.",
+      "es": "Código de administración incorrecto.",
+      "ja": "管理コードが正しくありません。"
+    },
+    "Mã quản trị tự đặt": {
+      "en": "Admin code you choose",
+      "zh": "自设管理码",
+      "fr": "Code d'administration au choix",
+      "es": "Código de administración a tu elección",
+      "ja": "自分で決める管理コード"
     },
     "Mã sai. Số lượt thử còn lại:": {
       "en": "Wrong code. Attempts left:",
@@ -3012,6 +3572,13 @@
       "es": "Contraseñas hasheadas con un algoritmo obsoleto",
       "ja": "古いアルゴリズムでハッシュ化されたパスワード"
     },
+    "Mật khẩu chỉ để mở giao diện trên máy này, không khoá dữ liệu: tiến độ và lịch sử chat của bạn nằm trong trình duyệt dưới dạng đọc được, và không có máy chủ nào đứng sau.": {
+      "en": "The password only unlocks the interface on this machine — it does not encrypt anything: your progress and chat history sit in this browser in readable form, and there is no server behind them.",
+      "zh": "密码只是打开这台电脑上的界面，并不加密任何东西：你的进度和聊天记录以可读的形式留在这个浏览器里，背后没有服务器。",
+      "fr": "Le mot de passe ouvre seulement l'interface de cet appareil — il ne chiffre rien : ta progression et ton historique de discussion restent lisibles dans ce navigateur, et aucun serveur derrière.",
+      "es": "La contraseña solo abre la interfaz de este equipo, no cifra nada: tu progreso y tu historial de chat quedan legibles en este navegador, y no hay ningún servidor detrás.",
+      "ja": "パスワードはこのパソコンで画面を開けるだけで、何も暗号化しません。進捗やチャット履歴はこのブラウザに読める形で残り、裏にサーバーはありません。"
+    },
     "Mật khẩu cần ít nhất 8 ký tự, gồm chữ và số.": {
       "en": "Password needs at least 8 characters, with letters and numbers.",
       "zh": "密码至少需要 8 个字符，包含字母和数字。",
@@ -3054,6 +3621,13 @@
       "es": "Todos los proveedores están ocupados ahora. Espera unos minutos y vuelve a pulsar: la cuota gratuita se cuenta por IP, no por navegador.",
       "ja": "すべてのデータ提供元が混み合っています。数分待ってからもう一度押してください。無料枠はIP単位で数えられ、ブラウザ単位ではありません。"
     },
+    "Mọi thiết lập ở trang này chỉ áp dụng cho máy này, lưu trong trình duyệt của máy này.": {
+      "en": "Every setting on this page applies to this machine only and is stored in this machine's browser.",
+      "zh": "本页的所有设置只在这台电脑生效，保存在本机浏览器中。",
+      "fr": "Tous les réglages de cette page ne s'appliquent qu'à cet appareil et sont stockés dans le navigateur de cet appareil.",
+      "es": "Todos los ajustes de esta página solo afectan a este equipo y se guardan en el navegador de este equipo.",
+      "ja": "このページの設定はこのパソコンにだけ適用され、このパソコンのブラウザに保存されます。"
+    },
     "Mỗi chủ đề đi theo bốn mục: khái niệm, cơ chế vận hành, dấu hiệu nhận biết và cách phòng thủ, đúng thứ tự một người làm SOC phải hỏi. Đọc trước khi vào lab để biết mình đang thử cái gì, đọc lại sau khi làm để chắc mình hiểu vì sao nó chạy được.": {
       "en": "Each topic follows four headings: concept, how it works, warning signs and defences — the exact order a SOC analyst has to ask. Read before the lab to know what you are testing, read again after to be sure you understand why it worked.",
       "zh": "每个主题都按四个小标题展开：概念、运作机制、识别征兆与防御办法，正是做 SOC 的人必须追问的顺序。进实验室前先读，弄清自己在试什么；做完后再读，确认自己明白它为什么能成立。",
@@ -3095,6 +3669,13 @@
       "fr": "Un mot de passe long et différent par site, l'authentification à deux facteurs activée, une application ou une clé matérielle plutôt que le SMS, une limite sur les tentatives de connexion, et une notification à l'utilisateur à chaque nouvel appareil mémorisé.",
       "es": "Una contraseña larga y distinta para cada sitio, activar la autenticación en dos pasos, preferir una app o una llave física antes que el SMS, limitar el número de intentos de acceso y avisar al usuario cada vez que se recuerda un dispositivo nuevo.",
       "ja": "サイトごとに長く異なるパスワードを使い、二段階認証をオンにし、SMS よりアプリやハードウェア鍵を優先し、ログイン試行回数を制限し、新しい端末を記憶するたびにユーザーへ通知します。"
+    },
+    "Một app chạy hoàn toàn trong trình duyệt không thể giữ bí mật với chính người ngồi trước màn hình: mở DevTools là xem và sửa được tất cả. Đây là công cụ để một người lớn trông một lớp trên chung một máy, không phải cơ chế phân quyền thật.": {
+      "en": "An app that runs entirely in the browser cannot keep secrets from the person sitting in front of the screen: opening DevTools lets anyone see and change everything. This is a tool for one adult supervising a class on a shared machine, not a real access-control mechanism.",
+      "zh": "完全在浏览器里运行的应用，无法对坐在屏幕前的人保密：打开 DevTools 就能看到并修改一切。这是一位成人在共用电脑上照看一个班级用的工具，不是真正的权限控制机制。",
+      "fr": "Une appli qui tourne entièrement dans le navigateur ne peut rien cacher à la personne assise devant l'écran : ouvrir DevTools permet de tout voir et de tout modifier. C'est un outil pour qu'un adulte surveille une classe sur un même appareil, pas un véritable mécanisme de contrôle d'accès.",
+      "es": "Una app que corre por completo en el navegador no puede guardar secretos frente a quien está delante de la pantalla: abrir DevTools permite ver y modificar todo. Es una herramienta para que un adulto supervise una clase en un equipo compartido, no un control de acceso real.",
+      "ja": "ブラウザだけで動くアプリは、画面の前に座る本人に秘密を守れません。DevTools を開けばすべてが見えて変更もできます。これは大人の人が共有パソコンでクラスを見守るための道具であり、本物の権限管理ではありません。"
     },
     "Một máy chủ đã bị xâm nhập. Trình bày quy trình năm bước xử lý sự cố (incident response) và vì sao thứ tự lại quan trọng.": {
       "en": "A server has been compromised. Describe the five-step incident response process and explain why the order matters.",
@@ -3152,6 +3733,20 @@
       "es": "Abrir el laboratorio correspondiente",
       "ja": "対応するラボを開く"
     },
+    "Mở to chữ lên khi đọc không rõ.": {
+      "en": "Make the text bigger when it is hard to read.",
+      "zh": "看不清时把字调大。",
+      "fr": "Agrandis le texte quand il est difficile à lire.",
+      "es": "Agranda la letra cuando no se lee bien.",
+      "ja": "読みづらいときは文字を大きくできます。"
+    },
+    "Mở trang Quản trị": {
+      "en": "Open the Admin page",
+      "zh": "打开管理页面",
+      "fr": "Ouvrir la page d'administration",
+      "es": "Abrir la página de administración",
+      "ja": "管理ページを開く"
+    },
     "Mục tiêu": {
       "en": "Target",
       "zh": "目标",
@@ -3194,12 +3789,26 @@
       "es": "Fuente de datos",
       "ja": "データソース"
     },
+    "Ngôn ngữ": {
+      "en": "Language",
+      "zh": "语言",
+      "fr": "Langue",
+      "es": "Idioma",
+      "ja": "言語"
+    },
     "Ngôn ngữ cần dịch": {
       "en": "Language to translate",
       "zh": "需要翻译的语言",
       "fr": "Langue à traduire",
       "es": "Idioma a traducir",
       "ja": "翻訳対象の言語"
+    },
+    "Ngôn ngữ giao diện": {
+      "en": "Interface language",
+      "zh": "界面语言",
+      "fr": "Langue de l'interface",
+      "es": "Idioma de la interfaz",
+      "ja": "表示言語"
     },
     "Ngăn chặn các luồng IP độc hại dội bom làm sập máy chủ.": {
       "en": "Prevent malicious IP streams from bombing and crashing the server.",
@@ -3243,6 +3852,13 @@
       "es": "Misión",
       "ja": "ミッション"
     },
+    "Nhiệm vụ, chủ đề lý thuyết, trang…": {
+      "en": "Missions, theory topics, pages…",
+      "zh": "任务、理论主题、页面…",
+      "fr": "Missions, thèmes théoriques, pages…",
+      "es": "Misiones, temas teóricos, páginas…",
+      "ja": "タスク、理論のテーマ、ページ…"
+    },
     "Nhà cung cấp dữ liệu": {
       "en": "Data provider",
       "zh": "数据提供来源",
@@ -3263,6 +3879,13 @@
       "fr": "Code malveillant injecté dans la page",
       "es": "Código malicioso inyectado en la página",
       "ja": "ページへの悪意あるコード埋め込み"
+    },
+    "Nhưng tiến độ, khung chat và chứng chỉ thì KHÔNG được mã hoá: chúng nằm nguyên trong localStorage của máy, mở DevTools là đọc và sửa được.": {
+      "en": "But your progress, chat history and certificate are NOT encrypted: they sit as plain text in this machine's localStorage, and opening DevTools lets anyone read and change them.",
+      "zh": "但学习进度、聊天记录和证书并没有加密：它们原样存放在本机的 localStorage 中，打开 DevTools 就能读取并修改。",
+      "fr": "Mais ta progression, l'historique du chat et ton certificat ne sont PAS chiffrés : ils restent en clair dans le localStorage de cet appareil, et ouvrir DevTools permet de les lire et de les modifier.",
+      "es": "Pero el progreso, el historial del chat y el certificado NO están cifrados: quedan en texto plano en el localStorage de este equipo, y abrir DevTools permite leerlos y modificarlos.",
+      "ja": "ただし進捗・チャットの履歴・修了証明書は暗号化されていません。このパソコンの localStorage にそのまま入っているので、DevTools を開けば読めるし変更もできます。"
     },
     "Nhược điểm lớn nhất của antivirus chỉ dựa vào signature là gì?": {
       "en": "What is the biggest weakness of an antivirus that relies only on signatures?",
@@ -3397,6 +4020,34 @@
       "es": "Introduce una dirección IP (p. ej., 8.8.8.8) o déjela en blanco...",
       "ja": "IP アドレス（例: 8.8.8.8）を入力、または空白のままにしてください..."
     },
+    "None — gửi mọi nơi, bắt buộc kèm Secure": {
+      "en": "None — sent everywhere, must be paired with Secure",
+      "zh": "None — 发送到任何地方，必须搭配 Secure",
+      "fr": "None — envoyé partout, obligatoirement avec Secure",
+      "es": "None — se envía a todas partes, obligatorio con Secure",
+      "ja": "None — 常に送信、Secure が必須"
+    },
+    "Nói thẳng về chính app này, vì đây là phòng lab dạy bảo mật: mật khẩu bạn vừa đặt chỉ để mở giao diện trên máy này. Nó được băm bằng PBKDF2-SHA256 với muối ngẫu nhiên 16 byte và 150.000 vòng, nên không ai lấy lại được mật khẩu từ file.": {
+      "en": "Speaking plainly about this app itself, because it is a security lab: the password you just set only unlocks the interface on this machine. It is hashed with PBKDF2-SHA256, a random 16-byte salt and 150,000 rounds, so nobody can recover the password from the file.",
+      "zh": "既然这是一个安全教室，我们就直说自己：您刚设置的密码只是用来在本机打开界面。它经过 PBKDF2-SHA256 哈希，使用随机 16 字节盐值和 150,000 轮迭代，所以没人能从文件里还原出密码。",
+      "fr": "Pour être honnête à propos de cette appli elle-même, puisqu'il s'agit d'un labo de sécurité : le mot de passe que tu viens de définir sert seulement à ouvrir l'interface sur cet appareil. Il est haché avec PBKDF2-SHA256, un sel aléatoire de 16 octets et 150 000 tours, donc personne ne peut retrouver le mot de passe à partir du fichier.",
+      "es": "Hablamos claro sobre esta propia app, porque es un laboratorio de seguridad: la contraseña que acaba de poner solo sirve para abrir la interfaz en este equipo. Se procesa con PBKDF2-SHA256, una sal aleatoria de 16 bytes y 150.000 iteraciones, así que nadie puede recuperar la contraseña a partir del archivo.",
+      "ja": "セキュリティの実験室なので、このアプリ自身について正直に言います。いま設定したパスワードは、このパソコンで画面を開くためだけのものです。PBKDF2-SHA256、ランダムな 16 バイトのソルト、15 万回の反復でハッシュ化するので、ファイルからパスワードを復元することは誰にもできません。"
+    },
+    "Nạp lại từ file": {
+      "en": "Restore from file",
+      "zh": "从文件重新载入",
+      "fr": "Recharger depuis un fichier",
+      "es": "Restaurar desde un archivo",
+      "ja": "ファイルから読み戻す"
+    },
+    "Nền tối là màu thật của một phòng trực an ninh. Thấy khó đọc thì đổi sang nền sáng — bài học không đổi gì cả.": {
+      "en": "Dark is the real colour of a security operations room. If it is hard to read, switch to a light background — the lessons stay exactly the same.",
+      "zh": "深色是安全值班室的真实配色。如果觉得难读，可以换成浅色背景——课程内容完全不变。",
+      "fr": "Le fond sombre est la couleur réelle d'un centre de supervision. Si c'est dur à lire, passe au fond clair — les leçons ne changent en rien.",
+      "es": "El fondo oscuro es el color real de una sala de vigilancia de seguridad. Si cuesta leerlo, pasa al fondo claro — las lecciones no cambian nada.",
+      "ja": "暗い配色はセキュリティ監視室の実際の色です。読みづらければ明るい背景に変えてください。授業の内容はそのままです。"
+    },
     "Nộp bài ngày": {
       "en": "Submitted on",
       "zh": "提交日期",
@@ -3424,6 +4075,13 @@
       "fr": "DÉTECTÉ",
       "es": "DETECTADO",
       "ja": "検出"
+    },
+    "PHÒNG THỦ ĐỨNG — với cấu hình này cả ba cửa đều chết.": {
+      "en": "DEFENCE HOLDS — with this configuration all three vectors die.",
+      "zh": "防御成立——在这个配置下三种途径全部失效。",
+      "fr": "DÉFENSE TENANT BON — avec cette configuration, les trois vecteurs échouent.",
+      "es": "LA DEFENSA AGUANTA — con esta configuración los tres vectores fallan.",
+      "ja": "防御が機能 — この設定では3つの経路はすべて失敗します。"
     },
     "Payload 4: Thẻ HTML vô hại": {
       "en": "Payload 4: Harmless HTML tag",
@@ -3467,6 +4125,13 @@
       "es": "Versión del protocolo",
       "ja": "プロトコルバージョン"
     },
+    "Phiên này đã đăng nhập": {
+      "en": "This session is logged in",
+      "zh": "此会话已登录",
+      "fr": "Cette session est connectée",
+      "es": "Esta sesión ha iniciado sesión",
+      "ja": "このセッションはログイン済み"
+    },
     "Phiên xác minh vẫn còn hiệu lực. Nhập mã hoặc bấm Gửi lại mã.": {
       "en": "Your verification session is still active. Enter the code or click Resend code.",
       "zh": "验证会话仍然有效。请输入验证码，或点击“重新发送验证码”。",
@@ -3495,6 +4160,13 @@
       "es": "Detección y registro: alarmas, logs, apertura de una incidencia",
       "ja": "検知と記録：アラート、ログ、チケット起票"
     },
+    "Phân quyền theo vai trò (RBAC)": {
+      "en": "Role-based access control (RBAC)",
+      "zh": "基于角色的访问控制（RBAC）",
+      "fr": "Contrôle d'accès par rôle (RBAC)",
+      "es": "Control de acceso por rol (RBAC)",
+      "ja": "ロールベースのアクセス制御（RBAC）"
+    },
     "Phân tích log SIEM": {
       "en": "SIEM log analysis",
       "zh": "SIEM 日志分析",
@@ -3522,6 +4194,13 @@
       "fr": "Labo « Piège d'hameçonnage »",
       "es": "Laboratorio «Trampa de phishing»",
       "ja": "「フィッシングの罠」ラボ"
+    },
+    "Phòng lab": {
+      "en": "Labs",
+      "zh": "实验室",
+      "fr": "Laboratoires",
+      "es": "Laboratorios",
+      "ja": "ラボ"
     },
     "Phòng thi tốt nghiệp": {
       "en": "Graduation exam room",
@@ -3586,6 +4265,13 @@
       "es": "Ampliar el chat",
       "ja": "チャット枠を拡大"
     },
+    "Phải còn ít nhất một tài khoản quản trị.": {
+      "en": "At least one administrator account must remain.",
+      "zh": "必须至少保留一个管理员账户。",
+      "fr": "Il doit rester au moins un compte administrateur.",
+      "es": "Debe quedar al menos una cuenta de administrador.",
+      "ja": "管理者アカウントを少なくとも1つ残す必要があります。"
+    },
     "Phần 1 · Trắc nghiệm": {
       "en": "Part 1 · Multiple choice",
       "zh": "第一部分 · 选择题",
@@ -3649,6 +4335,13 @@
       "es": "Escaneo completo del sistema (simulado)",
       "ja": "システム全体のスキャン（シミュレーション）"
     },
+    "Quét cả sáu ID": {
+      "en": "Scan all six IDs",
+      "zh": "扫描全部六个 ID",
+      "fr": "Analyser les six ID",
+      "es": "Escanear los seis IDs",
+      "ja": "6つのIDをすべてスキャン"
+    },
     "Quét cổng là gì?": {
       "en": "What is a port scan?",
       "zh": "端口扫描是什么？",
@@ -3677,6 +4370,13 @@
       "es": "Análisis real de virus",
       "ja": "実ファイルのウイルススキャン"
     },
+    "Quản trị": {
+      "en": "Admin",
+      "zh": "管理员",
+      "fr": "Admin",
+      "es": "Admin",
+      "ja": "管理者"
+    },
     "Quốc gia": {
       "en": "Country",
       "zh": "国家",
@@ -3697,6 +4397,13 @@
       "fr": "Retour d'expérience post-incident : mettre à jour le runbook, recalibrer les seuils d'alerte",
       "es": "Aprendizaje tras el incidente: actualizar el runbook y reajustar los umbrales de alerta",
       "ja": "事後の振り返り：ランブックの更新、警報しきい値の調整"
+    },
+    "Rất lớn": {
+      "en": "Very large",
+      "zh": "特大",
+      "fr": "Très grand",
+      "es": "Muy grande",
+      "ja": "特大"
     },
     "Rất mạnh": {
       "en": "Very strong",
@@ -3761,12 +4468,47 @@
       "es": "¡SQLMAP EXITOSO — Escaneo completado y vulnerabilidad de inyección SQL encontrada!",
       "ja": "SQLMAP 成功 — スキャンで SQL インジェクションの脆弱性を発見しました！"
     },
+    "Sai": {
+      "en": "Wrong",
+      "zh": "答错",
+      "fr": "Faux",
+      "es": "Incorrecto",
+      "ja": "誤り"
+    },
     "Sai quá nhiều lần. Thử lại sau vài giây.": {
       "en": "Too many failed attempts. Try again in a few seconds.",
       "zh": "错误次数过多。请几秒后再试。",
       "fr": "Trop d'erreurs. Réessayez dans quelques secondes.",
       "es": "Demasiados errores. Inténtelo de nuevo en unos segundos.",
       "ja": "誤りが多すぎます。数秒後に再試行してください。"
+    },
+    "SameSite=Lax chỉ tha cho navigation GET; request cross-site này bị giữ cookie lại.": {
+      "en": "SameSite=Lax only spares GET navigation; this cross-site request has its cookie withheld.",
+      "zh": "SameSite=Lax 只放行 GET 导航；这个跨站请求的 cookie 被扣下了。",
+      "fr": "SameSite=Lax n'épargne que les navigations GET ; le cookie de cette requête cross-site est retenu.",
+      "es": "SameSite=Lax solo perdona las navegaciones GET; a esta petición cross-site se le retiene la cookie.",
+      "ja": "SameSite=Lax は GET ナビゲーションだけを通します。このサイト横断のリクエストには cookie が付きません。"
+    },
+    "SameSite=Lax vẫn đính cookie cho navigation GET — mà link của kẻ tấn công đúng là một navigation GET.": {
+      "en": "SameSite=Lax still attaches the cookie to a GET navigation — and the attacker's link is exactly a GET navigation.",
+      "zh": "SameSite=Lax 仍会为 GET 导航附上 cookie——而攻击者的链接正是一次 GET 导航。",
+      "fr": "SameSite=Lax attache quand même le cookie aux navigations GET — or le lien de l'attaquant est précisément une navigation GET.",
+      "es": "SameSite=Lax sí adjunta la cookie en una navegación GET; y el enlace del atacante es justamente una navegación GET.",
+      "ja": "SameSite=Lax でも GET ナビゲーションには cookie が付きます。攻撃者のリンクはまさに GET ナビゲーションです。"
+    },
+    "SameSite=None kèm Secure: cookie được đính cả cho request từ trang khác.": {
+      "en": "SameSite=None with Secure: the cookie is attached even to requests coming from another site.",
+      "zh": "SameSite=None 且带 Secure：来自其他网站的请求也会附上 cookie。",
+      "fr": "SameSite=None avec Secure : le cookie est transmis même pour les requêtes provenant d'un autre site.",
+      "es": "SameSite=None con Secure: la cookie se adjunta también a las peticiones de otro sitio.",
+      "ja": "SameSite=None ＋ Secure：他のサイトからのリクエストにも cookie が付きます。"
+    },
+    "SameSite=Strict giữ cookie ở lại: request sinh ra từ trang khác không được đính kèm.": {
+      "en": "SameSite=Strict keeps the cookie home: a request born on another site is not given it.",
+      "zh": "SameSite=Strict 把 cookie 留在原地：由其他网站发起的请求不会带上它。",
+      "fr": "SameSite=Strict garde le cookie sur place : une requête née sur un autre site ne le reçoit pas.",
+      "es": "SameSite=Strict retiene la cookie: una petición nacida en otro sitio no la lleva.",
+      "ja": "SameSite=Strict は cookie を手元に残します。他のサイトで生まれたリクエストには付きません。"
     },
     "So sánh 2 giao diện song song để vạch mặt 3 điểm lừa đảo tinh vi.": {
       "en": "Compare 2 interfaces side-by-side to expose 3 subtle scam indicators.",
@@ -3782,6 +4524,20 @@
       "es": "Compare las interfaces Real y Falsa y encuentre 3 diferencias peligrosas.",
       "ja": "本物と偽物の画面を比較し、危険な違い 3 つを見つけてください。"
     },
+    "Strict — không gửi cookie sang trang khác": {
+      "en": "Strict — never sends the cookie to another site",
+      "zh": "Strict — 不向其他网站发送 cookie",
+      "fr": "Strict — aucun cookie vers un autre site",
+      "es": "Strict — nunca envía la cookie a otro sitio",
+      "ja": "Strict — 他サイトには cookie を送らない"
+    },
+    "Sáng": {
+      "en": "Light",
+      "zh": "浅色",
+      "fr": "Clair",
+      "es": "Claro",
+      "ja": "明るい"
+    },
     "Sạch:": {
       "en": "Clean:",
       "zh": "干净：",
@@ -3795,6 +4551,20 @@
       "fr": "Solde :",
       "es": "Saldo:",
       "ja": "残高:"
+    },
+    "Số hồ sơ của người khác vẫn bị lộ:": {
+      "en": "Records of other users still leaked:",
+      "zh": "仍然泄露的他人档案数：",
+      "fr": "Dossiers d'autres utilisateurs encore exposés :",
+      "es": "Registros de otros usuarios que aún se filtran:",
+      "ja": "まだ漏れている他人の記録数："
+    },
+    "Số lượt hỏi tối đa một ngày cho mỗi tài khoản (0 = không giới hạn)": {
+      "en": "Maximum number of AI questions per day for each account (0 = no limit)",
+      "zh": "每个账户每天最多提问次数（0 = 不限）",
+      "fr": "Nombre maximum de questions IA par jour et par compte (0 = pas de limite)",
+      "es": "Número máximo de preguntas a la IA por día y por cuenta (0 = sin límite)",
+      "ja": "1つのアカウントが1日に質問できる回数（0 = 無制限）"
     },
     "Số nhiệm vụ cần hoàn thành để đạt cấp:": {
       "en": "Missions needed to reach each level:",
@@ -3978,6 +4748,13 @@
       "es": "vietnamita",
       "ja": "ベトナム語"
     },
+    "Tiện ích": {
+      "en": "Utilities",
+      "zh": "工具",
+      "fr": "Utilitaires",
+      "es": "Utilidades",
+      "ja": "ユーティリティ"
+    },
     "Toàn bộ chạy cục bộ trong trình duyệt. Không có dữ liệu nào gửi lên máy chủ ngoài các phần kiểm tra kết nối API thật.": {
       "en": "Runs entirely locally in the browser. No data is sent to the server except for real API connection tests.",
       "zh": "所有内容都仅在浏览器本地运行。除了真实 API 的连接测试外，不会向服务器发送任何数据。",
@@ -4034,6 +4811,34 @@
       "es": "Se consultaron con éxito datos de IP reales",
       "ja": "実際の IP データの照会に成功しました"
     },
+    "Trang": {
+      "en": "Page",
+      "zh": "页面",
+      "fr": "Page",
+      "es": "Página",
+      "ja": "ページ"
+    },
+    "Trang Giám sát": {
+      "en": "Monitor page",
+      "zh": "监控页面",
+      "fr": "Page Surveillance",
+      "es": "Página de supervisión",
+      "ja": "監視ページ"
+    },
+    "Trang Hướng dẫn": {
+      "en": "Guide page",
+      "zh": "指南页面",
+      "fr": "Page Guide",
+      "es": "Página de guía",
+      "ja": "ガイドページ"
+    },
+    "Trang Lý thuyết": {
+      "en": "Theory page",
+      "zh": "理论页面",
+      "fr": "Page Théorie",
+      "es": "Página de teoría",
+      "ja": "理論ページ"
+    },
     "Trang Ngân hàng (Nạn nhân)": {
       "en": "Bank Page (Victim)",
       "zh": "银行页面（受害者）",
@@ -4061,6 +4866,13 @@
       "fr": "Cette page n'est que du texte, pas des exercices. Pour gagner de l'XP, il faut toujours entrer dans le laboratoire et le faire soi-même.",
       "es": "Esta página solo tiene texto, no tareas. Para ganar XP todavía debes entrar en el laboratorio y hacerlo tú mismo.",
       "ja": "このページは文章だけで、課題ではありません。XP が欲しいなら、やはりラボに入って自分でやる必要があります。"
+    },
+    "Trang này chỉ dành cho tài khoản quản trị. Bạn có thể đăng ký tài khoản mới kèm mã quản trị.": {
+      "en": "This page is for administrator accounts only. You can register a new account together with the admin code.",
+      "zh": "此页面仅限管理员账户。你可以连同管理码一起注册一个新账户。",
+      "fr": "Cette page est réservée aux comptes administrateurs. Tu peux créer un nouveau compte avec le code d'administration.",
+      "es": "Esta página es solo para cuentas de administrador. Puedes registrar una cuenta nueva con el código de administración.",
+      "ja": "このページは管理者アカウント専用です。管理コードを指定して新しいアカウントを作成できます。"
     },
     "Trang này đang mở bằng file:// nên trình duyệt chặn mọi request tới máy chủ AI. Chạy app qua http rồi mở lại:": {
       "en": "This page is opened through file://, so the browser blocks every request to the AI server. Serve the app over http, then reload:",
@@ -4188,6 +5000,20 @@
       "es": "Trần Thị Admin",
       "ja": "Trần Thị Admin"
     },
+    "Trần Thị B": {
+      "en": "Trần Thị B",
+      "zh": "Trần Thị B",
+      "fr": "Trần Thị B",
+      "es": "Trần Thị B",
+      "ja": "Trần Thị B"
+    },
+    "Trợ lý AI": {
+      "en": "AI Assistant",
+      "zh": "AI 助手",
+      "fr": "Assistant IA",
+      "es": "Asistente IA",
+      "ja": "AI アシスタント"
+    },
     "Trợ lý AI của CySim": {
       "en": "CySim AI assistant",
       "zh": "CySim AI 助手",
@@ -4195,12 +5021,26 @@
       "es": "Asistente de IA de CySim",
       "ja": "CySim AI アシスタント"
     },
+    "Trợ lý AI đang bị tắt. Hỏi người quản lý máy này để bật lại.": {
+      "en": "The AI Assistant is switched off. Ask the person who manages this machine to turn it back on.",
+      "zh": "AI 助手已被关闭。请让管理这台电脑的人重新开启。",
+      "fr": "L'Assistant IA est désactivé. Demande à la personne qui gère cet appareil de le réactiver.",
+      "es": "El Asistente IA está apagado. Pide a quien gestiona este equipo que lo vuelva a encender.",
+      "ja": "AI アシスタントはオフになっています。このパソコンを管理している人に頼んで入れ直してもらってください。"
+    },
     "Tài khoản": {
       "en": "Account",
       "zh": "账户",
       "fr": "Compte",
       "es": "Cuenta",
       "ja": "アカウント"
+    },
+    "Tài khoản của bạn": {
+      "en": "Your account",
+      "zh": "你的账户",
+      "fr": "Ton compte",
+      "es": "Tu cuenta",
+      "ja": "あなたのアカウント"
     },
     "Tài khoản demo": {
       "en": "Demo account",
@@ -4215,6 +5055,55 @@
       "fr": "Compte démo & Cassage de mot de passe",
       "es": "Cuenta demo & Descifrado de contraseñas",
       "ja": "デモアカウントとパスワードクラック"
+    },
+    "Tài khoản này đã dùng hết số lượt hỏi AI hôm nay. Ngày mai lại hỏi được.": {
+      "en": "This account has used up its AI questions for today. You can ask again tomorrow.",
+      "zh": "此账户今天的 AI 提问次数已用完。明天可以继续提问。",
+      "fr": "Ce compte a épuisé ses questions IA pour aujourd'hui. Tu pourras redemander demain.",
+      "es": "Esta cuenta ya gastó todas sus preguntas a la IA de hoy. Mañana podrás volver a preguntar.",
+      "ja": "このアカウントは今日の AI 質問回数を使い切りました。明日からまた質問できます。"
+    },
+    "Tài khoản này đã hỏi": {
+      "en": "This account has asked",
+      "zh": "此账户已提问",
+      "fr": "Ce compte a déjà posé",
+      "es": "Esta cuenta ha hecho",
+      "ja": "このアカウントは本日"
+    },
+    "Tài khoản này đã là quản trị. Mọi công tắc bên dưới mở được.": {
+      "en": "This account is already an administrator. Every switch below can now be used.",
+      "zh": "此账户已经是管理员。下面的所有开关都能操作。",
+      "fr": "Ce compte est déjà administrateur. Tous les interrupteurs ci-dessous sont utilisables.",
+      "es": "Esta cuenta ya es de administrador. Todos los interruptores de abajo ya se pueden usar.",
+      "ja": "このアカウントはすでに管理者です。下のスイッチはすべて操作できます。"
+    },
+    "Tài khoản trong CySim là gì: một cái tên để máy này biết dữ liệu nào là của bạn. Tiến độ, điểm thi và hội thoại AI gắn theo tên đăng nhập; chứng chỉ tốt nghiệp in đúng tên bạn gõ. Nó KHÔNG phải hàng rào bảo mật — mọi thứ nằm trong trình duyệt của máy này, không có máy chủ nào đứng sau, và ai ngồi đúng máy này với DevTools mở ra đều xem được.": {
+      "en": "What an account is in CySim: a name that tells this machine which data belongs to you. Progress, exam scores and AI chats follow your sign-in name, and the graduation certificate prints exactly the name you type. It is NOT a security barrier — everything sits in this machine's browser, there is no server behind it, and anyone who sits at this machine with DevTools open can see it all.",
+      "zh": "在 CySim 里，账户就是一个名字，让这台电脑知道哪些数据属于你。进度、考试成绩和 AI 对话都跟着登录名走；毕业证书按你输入的名字印刷。它不是一道安全防线——一切都保存在本机浏览器里，背后没有服务器，任何坐在这台电脑前并打开 DevTools 的人都能看到。",
+      "fr": "Un compte dans CySim, c'est un nom qui indique à cet appareil quelles données sont les tiennes : progression, scores d'examen et conversations IA suivent ton identifiant, et le certificat imprime exactement le nom que tu tapes. Ce N'EST PAS une barrière de sécurité — tout est dans le navigateur de cet appareil, aucun serveur derrière, et toute personne assise devant cet appareil avec DevTools ouvert peut tout voir.",
+      "es": "Una cuenta en CySim es un nombre que le dice a este equipo qué datos son tuyos: el progreso, los puntajes del examen y las conversaciones con la IA siguen tu nombre de acceso, y el certificado de graduación imprime exactamente el nombre que escribas. NO es una barrera de seguridad — todo está en el navegador de este equipo, no hay ningún servidor detrás, y quien se siente ante este equipo con DevTools abierto puede verlo todo.",
+      "ja": "CySim でのアカウントとは、このパソコンに「どのデータがあなたのものか」を教える名前です。進捗・試験の点数・AI との会話はログイン名に紐づき、修了証明書は入力した名前そのままに印刷されます。これはセキュリティ上の壁ではありません。すべてはこのパソコンのブラウザの中にあり、裏にサーバーは無いので、このパソコンで DevTools を開けば誰でも読めます。"
+    },
+    "Tài khoản trên máy này": {
+      "en": "Accounts on this machine",
+      "zh": "本机的账户",
+      "fr": "Comptes sur cet appareil",
+      "es": "Cuentas en este equipo",
+      "ja": "このパソコンのアカウント"
+    },
+    "Tài khoản tạo ra sẽ là quản trị và mở được trang Quản trị cho cả lớp. Máy chưa có mã thì lần khai đầu đặt luôn mã cho máy.": {
+      "en": "The account created will be an administrator and can open the Admin page for the whole class. If this machine has no code yet, the first entry sets it.",
+      "zh": "所创建的账户将是管理员，并能为全班打开管理页面。若本机还没有管理码，第一次输入即设为本机管理码。",
+      "fr": "Le compte créé sera administrateur et pourra ouvrir la page d'administration pour toute la classe. Si cet appareil n'a pas encore de code, la première saisie le définit.",
+      "es": "La cuenta que se cree será de administrador y podrá abrir la página de administración para toda la clase. Si este equipo aún no tiene código, la primera entrada lo fija.",
+      "ja": "作成されるアカウントは管理者になり、クラス全体の管理ページを開けます。このパソコンにまだコードが無ければ、最初に入力したものがコードになります。"
+    },
+    "Tài khoản đang bị điều tra": {
+      "en": "Account under investigation",
+      "zh": "该账户正在被调查",
+      "fr": "Compte en cours d'enquête",
+      "es": "Cuenta en investigación",
+      "ja": "調査中のアカウント"
     },
     "Tài khoản đã lưu trên máy này": {
       "en": "Accounts saved on this device",
@@ -4244,6 +5133,13 @@
       "es": "Impacto psicológico",
       "ja": "心理的なインパクト"
     },
+    "Tên": {
+      "en": "Name",
+      "zh": "姓名",
+      "fr": "Nom",
+      "es": "Nombre",
+      "ja": "名前"
+    },
     "Tên miền giả mạo, tạo cảm giác gấp gáp, link rút gọn": {
       "en": "A spoofed domain, manufactured urgency, shortened links",
       "zh": "仿冒域名、制造紧迫感、短链接",
@@ -4271,6 +5167,41 @@
       "fr": "Trouvez 3 points suspects sur la page frauduleuse (à droite) :",
       "es": "Encuentre 3 puntos sospechosos en la página falsa (a la derecha):",
       "ja": "偽ページ（右側）にある疑わしい点を 3 つ見つけてください："
+    },
+    "Tìm kiếm": {
+      "en": "Search",
+      "zh": "搜索",
+      "fr": "Rechercher",
+      "es": "Buscar",
+      "ja": "検索"
+    },
+    "Tìm trong CySim": {
+      "en": "Search in CySim",
+      "zh": "在 CySim 中搜索",
+      "fr": "Rechercher dans CySim",
+      "es": "Buscar en CySim",
+      "ja": "CySim で検索"
+    },
+    "Tích \"Ghi nhớ đăng nhập\" nghĩa là ai mở trình duyệt này trong 30 ngày tới cũng vào đúng tài khoản của bạn. Máy dùng chung thì bỏ tích.": {
+      "en": "Ticking \"Remember me\" means anyone who opens this browser in the next 30 days walks straight into your account. On a shared computer, leave it unticked.",
+      "zh": "勾选“记住登录”意味着接下来 30 天内任何打开这个浏览器的人都能直接进入你的账户。共用电脑时请不要勾选。",
+      "fr": "Cocher « Se souvenir de moi » veut dire que quiconque ouvrira ce navigateur dans les 30 prochains jours arrivera directement sur ton compte. Sur un appareil partagé, laisse la case décochée.",
+      "es": "Marcar «Recordar sesión» significa que cualquiera que abra este navegador en los próximos 30 días entrará directamente en tu cuenta. En un equipo compartido, deja la casilla sin marcar.",
+      "ja": "「ログイン状態を保持する」にチェックを入れると、今後 30 日間はこのパソコンのブラウザを開いた人なら誰でもあなたのアカウントにそのまま入れます。共用のパソコンではチェックを外してください。"
+    },
+    "Tính năng": {
+      "en": "Features",
+      "zh": "功能",
+      "fr": "Fonctionnalités",
+      "es": "Funciones",
+      "ja": "機能"
+    },
+    "Tính năng này đang bị tắt. Mở trang Quản trị để bật lại.": {
+      "en": "This feature is switched off. Open the Admin page to turn it back on.",
+      "zh": "此功能已被关闭。打开管理页面即可重新开启。",
+      "fr": "Cette fonctionnalité est désactivée. Ouvre la page d'administration pour la réactiver.",
+      "es": "Esta función está apagada. Abre la página de administración para volver a activarla.",
+      "ja": "この機能はオフになっています。管理ページで再度オンにできます。"
     },
     "Tính toán chính xác thời gian siêu máy tính dò ra mật khẩu của bạn.": {
       "en": "Calculate exactly how long a supercomputer takes to crack your password.",
@@ -4391,6 +5322,13 @@
       "es": "Descargar los reportes de traducción",
       "ja": "報告をダウンロード"
     },
+    "Tải bản sao trước khi xoá lịch sử trình duyệt.": {
+      "en": "Download a backup before clearing the browser history.",
+      "zh": "在清除浏览器记录之前先下载备份。",
+      "fr": "Télécharge une copie avant d'effacer l'historique du navigateur.",
+      "es": "Descarga una copia antes de borrar el historial del navegador.",
+      "ja": "ブラウザの履歴を消す前に、バックアップをダウンロードしてください。"
+    },
     "Tải chứng chỉ (PNG)": {
       "en": "Download Certificate (PNG)",
       "zh": "下载证书（PNG）",
@@ -4404,6 +5342,13 @@
       "fr": "Télécharger le fichier JSON",
       "es": "Descargar archivo JSON",
       "ja": "JSON ファイルをダウンロード"
+    },
+    "Tải một bản sao dữ liệu": {
+      "en": "Download a data backup",
+      "zh": "下载数据备份",
+      "fr": "Télécharger une copie des données",
+      "es": "Descargar una copia de los datos",
+      "ja": "データのコピーをダウンロード"
     },
     "Tản mờ phần cuối của IP trong nhật ký, đặt thời hạn lưu rõ ràng, chỉ tin header định vị khi nó đến từ proxy do mình kiểm soát, và luôn cho người dùng cách liên hệ mà không cần bị định vị.": {
       "en": "Blur the tail of the IP in logs, set an explicit retention limit, trust a geolocation header only when it comes from a proxy you control, and always give users a way to contact you without being located.",
@@ -4433,6 +5378,13 @@
       "es": "Desactivar el modo de reporte",
       "ja": "報告モードをオフ"
     },
+    "Tắt hiệu ứng nếu chữ chạy làm bạn chóng mặt.": {
+      "en": "Turn animations off if moving text makes you dizzy.",
+      "zh": "如果文字滚动让你头晕，请关闭特效。",
+      "fr": "Désactive les effets si le texte en mouvement te donne la nausée.",
+      "es": "Apaga los efectos si el texto en movimiento te marea.",
+      "ja": "文字が動いて酔うようなら、エフェクトを切ってください。"
+    },
     "Tỉnh / Khu vực": {
       "en": "Region / State",
       "zh": "省 / 地区",
@@ -4446,6 +5398,13 @@
       "fr": "Coordonnées géographiques",
       "es": "Coordenadas geográficas",
       "ja": "地理座標"
+    },
+    "Tối": {
+      "en": "Dark",
+      "zh": "深色",
+      "fr": "Sombre",
+      "es": "Oscuro",
+      "ja": "暗い"
     },
     "Tốt nghiệp loại giỏi": {
       "en": "Graduated with distinction",
@@ -4489,6 +5448,13 @@
       "es": "Denegación de servicio",
       "ja": "サービス拒否"
     },
+    "Từ khoá tìm kiếm": {
+      "en": "Search keywords",
+      "zh": "搜索关键词",
+      "fr": "Mots-clés de recherche",
+      "es": "Palabras clave de búsqueda",
+      "ja": "検索キーワード"
+    },
     "Từ đăng ký, làm nhiệm vụ đến lên cấp và nhận chứng chỉ — mọi thứ bạn cần để bắt đầu.": {
       "en": "From signing up to completing missions, leveling up and earning your certificate — everything you need to get started.",
       "zh": "从注册、完成任务，到升级和领取证书——开始使用所需的一切都在这里。",
@@ -4503,6 +5469,13 @@
       "es": "Traduzca usted mismo la interfaz",
       "ja": "UI を自分で翻訳する"
     },
+    "Tự tay gõ và bấm, đừng chỉ đọc. Cú tấn công chỉ thật sự hiểu khi chính bạn gây ra nó rồi chặn nó lại.": {
+      "en": "Type and click yourself — don't just read. You only really understand an attack when you cause it and then stop it with your own hands.",
+      "zh": "请亲自动手输入和点击，不要只读。只有当自己引发一次攻击再亲手挡住，才算真正理解它。",
+      "fr": "Tape et clique de tes propres mains, ne te contente pas de lire. On ne comprend vraiment une attaque que quand on la provoque soi-même, puis qu'on la bloque.",
+      "es": "Escribe y pulsa tú mismo, no solo leas. Un ataque solo se entiende de verdad cuando lo provocas y luego lo paras con tus manos.",
+      "ja": "読むだけではなく、自分の手で入力して押してください。攻撃は、自分で起こして自分で止めてみたときに初めて本当に理解できます。"
+    },
     "Tự tay thử trước.": {
       "en": "Try it yourself first.",
       "zh": "先自己动手试一试。",
@@ -4516,6 +5489,20 @@
       "fr": "Testez l'attaque vous-même, puis apprenez à la bloquer.",
       "es": "Pruebe el ataque usted mismo y luego aprenda a bloquearlo.",
       "ja": "自分の手で攻撃を試してから、それを遮断する方法を学びます。"
+    },
+    "Tự đặt mã quản trị (ít nhất 8 ký tự)": {
+      "en": "Choose your own admin code (at least 8 characters)",
+      "zh": "自设管理码（至少 8 个字符）",
+      "fr": "Choisis ton propre code d'administration (au moins 8 caractères)",
+      "es": "Elige tu propio código de administración (al menos 8 caracteres)",
+      "ja": "管理コードを自分で決める（8文字以上）"
+    },
+    "Tự đặt, ít nhất 8 ký tự": {
+      "en": "Your own, at least 8 characters",
+      "zh": "自设，至少 8 个字符",
+      "fr": "Au choix, au moins 8 caractères",
+      "es": "A tu elección, al menos 8 caracteres",
+      "ja": "自分で決める、8文字以上"
     },
     "URL hoặc JSON chứa id dạng số tuần tự; hai tài khoản cùng vai trò thấy số bản ghi khác nhau; endpoint quản trị xuất hiện trong danh sách công khai hoặc trong tài liệu API ai cũng đọc được.": {
       "en": "URLs or JSON carrying sequential numeric ids; two accounts with the same role seeing different record counts; an admin endpoint appearing in a public listing or in API documentation anyone can read.",
@@ -4537,6 +5524,13 @@
       "fr": "Ex. : je suis en 4e, les maths sont ma meilleure matière, j'aime les exemples courts et immédiatement exécutables…",
       "es": "P. ej.: estoy en 8.º, lo que más se me da son matemáticas, prefiero ejemplos cortos que se puedan ejecutar enseguida…",
       "ja": "例：中学2年生です。数学が一番得意で、短くてすぐ動かせる例が好きです……。"
+    },
+    "Vai trò": {
+      "en": "Role",
+      "zh": "角色",
+      "fr": "Rôle",
+      "es": "Rol",
+      "ja": "役割"
     },
     "Vinh danh \"Top 10 Chuyên gia bảo mật\" xuất sắc nhất.": {
       "en": "Honoring the \"Top 10 Security Experts\".",
@@ -4573,6 +5567,13 @@
       "es": "Por hacer",
       "ja": "やること"
     },
+    "Việc của quản trị": {
+      "en": "Admin actions",
+      "zh": "管理员操作",
+      "fr": "Actions d'administration",
+      "es": "Acciones de administración",
+      "ja": "管理者にできること"
+    },
     "Vui lòng nhập email hợp lệ.": {
       "en": "Please enter a valid email.",
       "zh": "请输入有效的电子邮箱地址。",
@@ -4600,6 +5601,13 @@
       "fr": "Rendez-vous sur emailjs.com et inscrivez-vous gratuitement avec votre propre Gmail.",
       "es": "Vaya a emailjs.com y regístrese gratis con su propio Gmail.",
       "ja": "emailjs.com にアクセスし、お使いの Gmail で無料で登録してください。"
+    },
+    "Vào học ngay, không cần tài khoản": {
+      "en": "Start learning now, no account needed",
+      "zh": "立即开始学习，无需账户",
+      "fr": "Commencer tout de suite, sans compte",
+      "es": "Empezar a aprender ya, sin cuenta",
+      "ja": "今すぐ学ぶ（アカウント不要）"
     },
     "Vào phòng thi": {
       "en": "Enter the exam room",
@@ -4664,6 +5672,13 @@
       "es": "Porque el firewall siempre elimina esa cabecera",
       "ja": "ファイアウォールがこのヘッダーを常に削除するから"
     },
+    "Vì vậy một lớp 30 máy là 30 bảng xếp hạng riêng biệt, không phải một bảng của cả lớp: muốn xếp hạng chung thì cần một nơi chứa dữ liệu dùng chung, tức một backend — thứ mà bản không-cài-đặt này cố ý không có.": {
+      "en": "So a class of 30 machines is 30 separate leaderboards, not one class-wide board: a shared ranking needs a shared place to store the data — a backend — which this no-install build deliberately does not have.",
+      "zh": "因此一个 30 台电脑的班级会有 30 个各自独立的排行榜，而不是全班共用的一张：想要统一排名就需要一个共用的数据存放处，也就是后端——而这个免安装版本有意没有它。",
+      "fr": "Du coup, une classe de 30 machines donne 30 classements séparés, pas un seul classement de classe : un classement commun exige un endroit où stocker les données ensemble, donc un backend — ce que cette version sans installation n'a volontairement pas.",
+      "es": "Así, una clase de 30 equipos son 30 rankings separados, no uno solo de toda la clase: un ranking compartido necesita un lugar donde guardar los datos en común, es decir un backend, y esta versión sin instalación a propósito no lo tiene.",
+      "ja": "つまりパソコンが 30 台あるクラスなら、ランキングも 30 の個別の表で、クラス全員の一枚にはなりません。共通のランキングにはみんなが使うデータ置き場、つまりバックエンドが必要で、インストール不要のこの版には意図的にそれがありません。"
+    },
     "Ví dụ minh hoạ": {
       "en": "Illustrative example",
       "zh": "示例说明",
@@ -4692,12 +5707,26 @@
       "es": "Todavía hay preguntas de opción múltiple sin responder.",
       "ja": "未回答の択一式問題が残っています。"
     },
+    "Vẫn còn cửa sống:": {
+      "en": "Vectors still alive:",
+      "zh": "仍然存活的途径：",
+      "fr": "Vecteurs encore vivants :",
+      "es": "Vectores que siguen vivos:",
+      "ja": "まだ生きている経路："
+    },
     "Về an toàn:": {
       "en": "About safety:",
       "zh": "关于安全：",
       "fr": "Sécurité :",
       "es": "Sobre seguridad:",
       "ja": "安全について:"
+    },
+    "Vừa": {
+      "en": "Medium",
+      "zh": "标准",
+      "fr": "Normal",
+      "es": "Normal",
+      "ja": "標準"
     },
     "XSS THÀNH CÔNG — Mã JavaScript độc hại đã chạy trong trình duyệt nạn nhân!": {
       "en": "XSS SUCCESSFUL — Malicious JavaScript executed in the victim's browser!",
@@ -4811,6 +5840,13 @@
       "es": "Borrar el historial",
       "ja": "履歴を消去"
     },
+    "Xoá toàn bộ dữ liệu của tài khoản này trên máy": {
+      "en": "Delete all of this account's data on this machine",
+      "zh": "删除此账户在本机的全部数据",
+      "fr": "Supprimer toutes les données de ce compte sur cet appareil",
+      "es": "Eliminar todos los datos de esta cuenta en este equipo",
+      "ja": "このパソコンから、このアカウントのデータをすべて削除"
+    },
     "Xác minh email": {
       "en": "Email verification",
       "zh": "邮箱验证",
@@ -4831,6 +5867,13 @@
       "fr": "Confirmer",
       "es": "Confirmar",
       "ja": "確認"
+    },
+    "Xác nhận mã, lên quản trị": {
+      "en": "Confirm code, become admin",
+      "zh": "确认管理码，升为管理员",
+      "fr": "Confirmer le code, devenir administrateur",
+      "es": "Confirmar el código y ser administrador",
+      "ja": "コードを確認して管理者になる"
     },
     "Xác nhận sự cố thật: so traffic với baseline, đọc log và alarm": {
       "en": "Confirm the incident is real: compare traffic with the baseline, read logs and alarms",
@@ -4902,13 +5945,6 @@
       "es": "[!] Error: no se puede conectar (",
       "ja": "[!] エラー: 接続できません ("
     },
-    "[!] Đang gửi request ẩn...": {
-      "en": "[!] Sending hidden request...",
-      "zh": "[!] 正在发送隐藏请求……",
-      "fr": "[!] Envoi d'une requête cachée...",
-      "es": "[!] Enviando solicitud oculta...",
-      "ja": "[!] 隠しリクエストを送信しています..."
-    },
     "[*] Hệ thống sẵn sàng. Nhập IP hoặc nhấn nút để bắt đầu truy vấn thực tế...": {
       "en": "[*] System ready. Enter an IP or click a button to start a real query...",
       "zh": "[*] 系统已就绪。输入 IP 或点击按钮以开始真实查询……",
@@ -4923,26 +5959,12 @@
       "es": "[+] Análisis de paquetes de red completado.",
       "ja": "[+] ネットワークパケットの解析が完了しました。"
     },
-    "[✓] Giao dịch thành công!": {
-      "en": "[✓] Transaction successful!",
-      "zh": "[✓] 交易成功！",
-      "fr": "[✓] Transaction réussie !",
-      "es": "[✓] ¡Transacción exitosa!",
-      "ja": "[✓] 取引が成功しました！"
-    },
     "[✓] TRUY VẤN THÀNH CÔNG DỮ LIỆU THỰC TẾ:": {
       "en": "[✓] SUCCESSFULLY QUERIED REAL DATA:",
       "zh": "[✓] 成功查询到真实数据：",
       "fr": "[✓] REQUÊTE DE DONNÉES RÉELLES RÉUSSIE :",
       "es": "[✓] CONSULTA DE DATOS REALES EXITOSA:",
       "ja": "[✓] 実データの照会に成功しました："
-    },
-    "[✓] Trình duyệt tự động đính kèm Cookie hợp lệ!": {
-      "en": "[✓] The browser automatically attaches a valid Cookie!",
-      "zh": "[✓] 浏览器自动附带了有效的 Cookie！",
-      "fr": "[✓] Le navigateur attache automatiquement un Cookie valide !",
-      "es": "[✓] ¡El navegador adjunta automáticamente una Cookie válida!",
-      "ja": "[✓] ブラウザが有効な Cookie を自動的に添付しました！"
     },
     "antivirus hệ thống.": {
       "en": "system antivirus.",
@@ -4965,6 +5987,20 @@
       "es": "a elegir dentro del ecosistema CySim.",
       "ja": "（CySim エコシステム内の任意のミッション）。"
     },
+    "chưa xác minh email": {
+      "en": "email not verified",
+      "zh": "邮箱未验证",
+      "fr": "e-mail non vérifié",
+      "es": "correo sin verificar",
+      "ja": "メール未確認"
+    },
+    "chế độ khách — chưa có tài khoản": {
+      "en": "guest mode — no account yet",
+      "zh": "访客模式——尚无账户",
+      "fr": "mode invité — pas de compte",
+      "es": "modo invitado — sin cuenta",
+      "ja": "ゲストモード（アカウント未作成）"
+    },
     "chỉ lưu trên máy này": {
       "en": "stored on this machine only",
       "zh": "仅保存在本机",
@@ -4985,6 +6021,13 @@
       "fr": "premier texte",
       "es": "primer texto",
       "ja": "最初の文字"
+    },
+    "cookie chưa từng được lưu: SameSite=None bắt buộc phải kèm cờ Secure.": {
+      "en": "the cookie was never stored: SameSite=None requires the Secure flag.",
+      "zh": "cookie 从未被保存：SameSite=None 必须搭配 Secure 标志。",
+      "fr": "le cookie n'a jamais été enregistré : SameSite=None exige la marque Secure.",
+      "es": "la cookie nunca se guardó: SameSite=None exige la marca Secure.",
+      "ja": "cookie は保存されませんでした：SameSite=None には Secure フラグが必須です。"
     },
     "câu lệnh bị gãy ngay tại dấu nháy bạn chèn vào.": {
       "en": "the query breaks right at the quotation mark you insert.",
@@ -5105,6 +6148,20 @@
       "es": "puestos son todos datos de ejemplo: inicia sesión y completa misiones para aparecer aquí.",
       "ja": "位はすべてサンプルデータです。ログインしてミッションをこなすと、ここに名前が出ます。"
     },
+    "hồ sơ của chính bạn": {
+      "en": "your own record",
+      "zh": "你自己的档案",
+      "fr": "votre propre dossier",
+      "es": "tu propio registro",
+      "ja": "あなた自身の記録"
+    },
+    "hội thoại AI": {
+      "en": "AI chats",
+      "zh": "次 AI 对话",
+      "fr": "conversations IA",
+      "es": "conversaciones con la IA",
+      "ja": "件の AI 会話"
+    },
     "key Gemini này đang bị Google xếp hàng. Cách duy nhất hết chậm: thay key mới trong .env rồi bật lại chay-ai.bat.": {
       "en": "this Gemini key is being queued by Google. The only real fix: put a new key in .env and restart chay-ai.bat.",
       "zh": "此 Gemini 密钥正被 Google 排队处理。唯一真正有效的办法：在 .env 中更换新密钥，然后重新启动 chay-ai.bat。",
@@ -5118,6 +6175,13 @@
       "fr": "le volet d'aperçu ci-dessus est",
       "es": "el panel de vista previa de arriba es",
       "ja": "上のプレビュー枠は"
+    },
+    "không có hồ sơ nào mang ID này.": {
+      "en": "no record carries this ID.",
+      "zh": "不存在带此 ID 的档案。",
+      "fr": "aucun dossier ne porte cet ID.",
+      "es": "no existe ningún registro con este ID.",
+      "ja": "この ID の記録は存在しません。"
     },
     "không phản hồi": {
       "en": "no response",
@@ -5154,12 +6218,40 @@
       "es": "caracteres",
       "ja": "文字"
     },
+    "kết quả tìm được": {
+      "en": "results found",
+      "zh": "条结果",
+      "fr": "résultats trouvés",
+      "es": "resultados encontrados",
+      "ja": "件見つかりました"
+    },
     "loại tấn công.": {
       "en": "attack types.",
       "zh": "攻击类型。",
       "fr": "types d'attaque.",
       "es": "tipos de ataque.",
       "ja": "種類の攻撃。"
+    },
+    "lượt hôm nay — chưa đặt giới hạn nên không lượt nào bị chặn.": {
+      "en": "questions today — no limit is set, so none are blocked.",
+      "zh": "次 — 尚未设置上限，不会拦截任何提问。",
+      "fr": "questions aujourd'hui — aucune limite n'est fixée, rien n'est bloqué.",
+      "es": "preguntas hoy — no hay límite fijado, así que no se bloquea ninguna.",
+      "ja": "回質問しました。上限未設定なので、どの回も止まりません。"
+    },
+    "lượt hôm nay — còn": {
+      "en": "questions today —",
+      "zh": "次 — 还剩",
+      "fr": "questions aujourd'hui, il reste",
+      "es": "preguntas hoy, quedan",
+      "ja": "回質問しました。残り"
+    },
+    "lượt.": {
+      "en": "left.",
+      "zh": "次。",
+      "fr": "questions.",
+      "es": "preguntas.",
+      "ja": "回。"
     },
     "lần thử": {
       "en": "attempts",
@@ -5175,6 +6267,62 @@
       "es": "último inicio de sesión",
       "ja": "前回のログイン"
     },
+    "máy chủ bắt buộc CSRF token; request giả không có token nên bị 403.": {
+      "en": "the server requires a CSRF token; the forged request has none, so 403.",
+      "zh": "服务器要求 CSRF token；伪造的请求没有 token，因此 403。",
+      "fr": "le serveur exige un jeton CSRF ; la requête forgée n'en a pas, d'où 403.",
+      "es": "el servidor exige un token CSRF; la petición falsificada no lo lleva, por eso 403.",
+      "ja": "サーバーは CSRF トークンを必須としています。偽のリクエストにトークンが無いので 403 です。"
+    },
+    "máy chủ chỉ kiểm tra có phiên hợp lệ, không kiểm tra quyền trên từng bản ghi — vẫn là IDOR.": {
+      "en": "the server only checks that a valid session exists, not permission on each record — still an IDOR.",
+      "zh": "服务器只检查有没有有效会话，不检查每条记录的访问权——这仍然是 IDOR。",
+      "fr": "le serveur vérifie seulement l'existence d'une session valide, pas le droit sur chaque enregistrement — c'est toujours une IDOR.",
+      "es": "el servidor solo comprueba que exista una sesión válida, no el permiso sobre cada registro; sigue siendo un IDOR.",
+      "ja": "サーバーは有効なセッションの有無だけを見て、記録ごとの権限は見ていません。これは依然として IDOR です。"
+    },
+    "máy chủ hỏi đã đăng nhập chưa, và lần này là chưa.": {
+      "en": "the server asked whether you are logged in, and this time you are not.",
+      "zh": "服务器问了有没有登录，而这次没有。",
+      "fr": "le serveur a demandé si vous étiez connecté, et cette fois non.",
+      "es": "el servidor preguntó si habías iniciado sesión, y esta vez no.",
+      "ja": "サーバーはログイン済みかを尋ねましたが、今回はされていません。"
+    },
+    "máy chủ không hề hỏi ai đang xem.": {
+      "en": "the server never asked who is looking.",
+      "zh": "服务器压根没问是谁在看。",
+      "fr": "le serveur n'a jamais demandé qui consultait.",
+      "es": "el servidor no preguntó en ningún momento quién está mirando.",
+      "ja": "サーバーは誰が見ているかを一切確認していません。"
+    },
+    "máy chủ không thấy cookie phiên nào, trả 401 và bỏ giao dịch.": {
+      "en": "the server sees no session cookie, returns 401 and drops the transaction.",
+      "zh": "服务器看不到会话 cookie，返回 401 并丢弃交易。",
+      "fr": "le serveur ne voit aucun cookie de session, renvoie 401 et abandonne la transaction.",
+      "es": "el servidor no ve ninguna cookie de sesión, responde 401 y descarta la transacción.",
+      "ja": "サーバーはセッション cookie を見つけられないので 401 を返し、取引を取り消します。"
+    },
+    "máy chủ kiểm tra Origin và thấy nó thuộc trang quà tặng -> 403.": {
+      "en": "the server checks Origin and sees it belongs to the gift page -> 403.",
+      "zh": "服务器检查 Origin，发现它来自那个礼品页 -> 403。",
+      "fr": "le serveur contrôle l'Origin et voit qu'il vient de la page cadeau -> 403.",
+      "es": "el servidor comprueba el Origin y ve que pertenece a la página de regalos -> 403.",
+      "ja": "サーバーが Origin を検査し、贈り物ページのものと判別して 403。"
+    },
+    "máy chủ so user_id của phiên với ID xin xem, không khớp -> 403.": {
+      "en": "the server compares the session's user_id with the requested ID; they differ -> 403.",
+      "zh": "服务器把会话的 user_id 与请求查看的 ID 对比，不一致 -> 403。",
+      "fr": "le serveur compare le user_id de la session avec l'ID demandé ; ils diffèrent -> 403.",
+      "es": "el servidor compara el user_id de la sesión con el ID solicitado; no coinciden -> 403.",
+      "ja": "サーバーはセッションの user_id と要求された ID を比べ、一致しないため 403。"
+    },
+    "máy chủ thấy cookie hợp lệ và không kiểm tra thêm gì -> 200, giao dịch chạy.": {
+      "en": "the server finds a valid cookie and checks nothing else -> 200, the transaction runs.",
+      "zh": "服务器看到有效 cookie 后不再做任何检查 -> 200，交易执行。",
+      "fr": "le serveur trouve un cookie valide et ne vérifie rien d'autre -> 200, la transaction passe.",
+      "es": "el servidor ve una cookie válida y no comprueba nada más -> 200, la transacción se ejecuta.",
+      "ja": "サーバーは有効な cookie を見つけるとそれ以上何も確認せず、200 を返して取引を実行します。"
+    },
     "mã thử": {
       "en": "test code",
       "zh": "测试验证码",
@@ -5188,6 +6336,27 @@
       "fr": "signes de logiciels malveillants (hashes, signature EICAR, motifs PowerShell/JS obfusqués, extensions de fichier dangereuses),",
       "es": "señales de malware (hashes, firma EICAR, patrones de PowerShell/JS ofuscados, extensiones de archivo peligrosas),",
       "ja": "マルウェアの特徴（ハッシュ、EICAR 署名、難読化された PowerShell/JS パターン、危険なファイル拡張子）、"
+    },
+    "mục dữ liệu của chế độ khách vào tài khoản này.": {
+      "en": "guest-mode data entries into this account.",
+      "zh": "条访客模式数据到此账户。",
+      "fr": "données du mode invité vers ce compte.",
+      "es": "elementos de datos del modo invitado a esta cuenta.",
+      "ja": "件、このアカウントへ移しました。"
+    },
+    "mục dữ liệu trên máy này": {
+      "en": "data entries on this machine",
+      "zh": "条数据",
+      "fr": "entrées de données",
+      "es": "elementos de datos",
+      "ja": "件のデータを保存しています"
+    },
+    "mục. Đang tải lại màn hình.": {
+      "en": "items. Reloading the screen.",
+      "zh": "项。正在重新加载页面。",
+      "fr": "entrées. Rechargement de l'écran.",
+      "es": "elementos. Recargando la pantalla.",
+      "ja": "件読み込みました。画面を作り直します。"
     },
     "ngày": {
       "en": "days",
@@ -5321,6 +6490,20 @@
       "fr": "u_xxxxxxxxxxx",
       "es": "u_xxxxxxxxxxx",
       "ja": "u_xxxxxxxxxxx"
+    },
+    "vai trò SuperAdmin của bạn được đọc mọi hồ sơ.": {
+      "en": "your SuperAdmin role is allowed to read every record.",
+      "zh": "你的 SuperAdmin 角色可以读取所有档案。",
+      "fr": "votre rôle SuperAdmin autorise à lire tous les dossiers.",
+      "es": "tu rol SuperAdmin puede leer todos los registros.",
+      "ja": "SuperAdmin ロールなので全ての記録が読めます。"
+    },
+    "vai trò User không đủ quyền đọc hồ sơ của người khác.": {
+      "en": "the User role is not privileged enough to read someone else's record.",
+      "zh": "User 角色权限不足，无法读取他人的档案。",
+      "fr": "le rôle User n'a pas assez de droits pour lire le dossier d'un autre.",
+      "es": "el rol User no tiene privilegios para leer el registro de otra persona.",
+      "ja": "User ロールでは他人の記録を読む権限が足りません。"
     },
     "và": {
       "en": "and",
@@ -5546,6 +6729,13 @@
       "es": "¡CONTRASEÑA SIN PROTECCIÓN ENCONTRADA!",
       "ja": "無防備なパスワードを発見！"
     },
+    "ĐÚNG QUYỀN — đây là hồ sơ của bạn.": {
+      "en": "PROPERLY AUTHORISED — this is your own record.",
+      "zh": "权限正确——这是你自己的档案。",
+      "fr": "DROIT VALIDE — voici votre propre dossier.",
+      "es": "PERMISO CORRECTO — este es tu propio registro.",
+      "ja": "権限どおり — これはあなた自身の記録です。"
+    },
     "Đánh chặn DDoS": {
       "en": "DDoS Defense",
       "zh": "DDoS 拦截",
@@ -5601,6 +6791,13 @@
       "fr": "Ceci est un environnement de simulation. Les labs ne contiennent pas de vulnérabilités réelles sur le serveur. Le véritable outil SQLMap sera simulé dans le Terminal ci-dessous.",
       "es": "Este es un entorno de simulación. Los laboratorios no contienen vulnerabilidades reales en el servidor. La herramienta SQLMap real se simulará en la Terminal de abajo.",
       "ja": "これは Simulation（シミュレーション）環境です。Lab にサーバー上の実際の脆弱性は含まれていません。実際の SQLMap ツールは、下の Terminal でシミュレートされます。"
+    },
+    "Đã chuyển": {
+      "en": "Moved",
+      "zh": "已迁移",
+      "fr": "Transfert de",
+      "es": "Se han transferido",
+      "ja": "ゲストモードのデータを"
     },
     "Đã chạy SQLMap (mô phỏng)": {
       "en": "Ran SQLMap (simulated)",
@@ -5707,6 +6904,27 @@
       "es": "Enviado a",
       "ja": "送信先"
     },
+    "Đã hiểu IDOR và đã chọn đúng chế độ phân quyền": {
+      "en": "Understood IDOR and chose the correct access-control mode",
+      "zh": "已理解 IDOR，并选择了正确的权限模式",
+      "fr": "IDOR compris et bon mode de contrôle d'accès choisi",
+      "es": "Entendiste el IDOR y elegiste el modo correcto de control de acceso",
+      "ja": "IDOR を理解し、正しい権限設定モードを選べました"
+    },
+    "Đã hiểu cả lỗ hổng lẫn cách bịt CSRF": {
+      "en": "Understood both the CSRF flaw and how to close it",
+      "zh": "既理解了 CSRF 漏洞，也理解了如何堵住它",
+      "fr": "CSRF : la faille et sa parade sont comprises",
+      "es": "Entendiste a la vez la vulnerabilidad CSRF y cómo cerrarla",
+      "ja": "CSRF の脆弱性と、その塞ぎ方の両方を理解しました"
+    },
+    "Đã hoàn thành": {
+      "en": "Completed",
+      "zh": "已完成",
+      "fr": "Terminé",
+      "es": "Completado",
+      "ja": "完了"
+    },
     "Đã huỷ lượt truy vấn vì bạn rời khỏi trang này.": {
       "en": "Lookup cancelled because you left this page.",
       "zh": "因为你离开了本页，查询已取消。",
@@ -5749,6 +6967,13 @@
       "es": "Guardado. Pulse «Enviar correo de prueba» para comprobarlo.",
       "ja": "保存しました。確認するには「テストメールを送信」を押してください。"
     },
+    "Đã lưu. Mọi tài khoản trên máy này nhận thay đổi ngay.": {
+      "en": "Saved. Every account on this machine sees the change right away.",
+      "zh": "已保存。本机所有账户会立即看到改动。",
+      "fr": "Enregistré. Tous les comptes de cet appareil voient le changement immédiatement.",
+      "es": "Guardado. Todas las cuentas de este equipo ven el cambio enseguida.",
+      "ja": "保存しました。このパソコンのすべてのアカウントにすぐ反映されます。"
+    },
     "Đã mô phỏng tấn công CSRF": {
       "en": "Simulated CSRF attack",
       "zh": "已模拟 CSRF 攻击",
@@ -5769,6 +6994,13 @@
       "fr": "Trop de tentatives infructueuses. Veuillez demander un nouveau code.",
       "es": "Demasiados intentos incorrectos. Solicite un código nuevo.",
       "ja": "誤入力が上限回数を超えました。新しいコードを再リクエストしてください。"
+    },
+    "Đã nạp": {
+      "en": "Loaded",
+      "zh": "已载入",
+      "fr": "Chargement de",
+      "es": "Se han cargado",
+      "ja": "データを"
     },
     "Đã nối được máy chủ AI.": {
       "en": "Connected to the AI server.",
@@ -5854,6 +7086,13 @@
       "es": "Lista de reportes descargada — intégrala en tools/translation_review.json y ejecuta python tools/gen_translations.py.",
       "ja": "報告リストをダウンロードしました — tools/translation_review.json に統合し、python tools/gen_translations.py を実行してください。"
     },
+    "Đã tải một bản sao dữ liệu về máy.": {
+      "en": "A data backup has been downloaded to this machine.",
+      "zh": "已把一份数据备份下载到本机。",
+      "fr": "Une copie des données a été téléchargée sur cet appareil.",
+      "es": "Se ha descargado una copia de los datos en este equipo.",
+      "ja": "データのコピーをこのパソコンにダウンロードしました。"
+    },
     "Đã tắt chế độ báo lỗi.": {
       "en": "Report mode turned off.",
       "zh": "报告模式已关闭。",
@@ -5888,6 +7127,13 @@
       "fr": "Configuration supprimée — retour au mode démo.",
       "es": "Configuración eliminada — se vuelve al modo demo.",
       "ja": "設定を削除しました — デモモードに戻ります。"
+    },
+    "Đã xoá dữ liệu trên máy này. Đang tải lại màn hình.": {
+      "en": "Data deleted from this machine. Reloading the screen.",
+      "zh": "已删除本机数据。正在重新加载页面。",
+      "fr": "Données supprimées de cet appareil. Rechargement de l'écran.",
+      "es": "Datos borrados de este equipo. Recargando la pantalla.",
+      "ja": "このパソコンのデータを削除しました。画面を作り直します。"
     },
     "Đã xoá lịch sử chat của tài khoản này.": {
       "en": "Chat history for this account has been cleared.",
@@ -6064,6 +7310,13 @@
       "es": "Cerrar sesión",
       "ja": "ログアウト"
     },
+    "Đăng xuất không xoá dữ liệu — chỉ xoá mới mất.": {
+      "en": "Signing out does not delete data — only deleting does.",
+      "zh": "登出不会删除数据——只有删除才会丢失。",
+      "fr": "Se déconnecter n'efface pas les données — seule la suppression le fait.",
+      "es": "Cerrar sesión no borra los datos — solo al borrar se pierden.",
+      "ja": "ログアウトしてもデータは消えません。消えるのは削除したときだけです。"
+    },
     "Đơn vị mạng (ISP)": {
       "en": "Network (ISP)",
       "zh": "网络服务商（ISP）",
@@ -6091,6 +7344,20 @@
       "fr": "Placez un CDN et un service de filtrage de trafic devant, limitez le nombre de requêtes par IP et par compte, éteignez les services inutiles, concevez plusieurs liaisons et des régions de repli, et préparez à l'avance le message d'information aux clients en cas de panne.",
       "es": "Pon delante un CDN y un servicio de filtrado de tráfico, limita el número de peticiones por IP y por cuenta, apaga los servicios que no necesites, diseña varios enlaces y regiones de respaldo y ten ya redactado el aviso a los clientes cuando el servicio caiga.",
       "ja": "前に CDN と通信フィルタリングサービスを置き、IP とアカウント単位で要求数を制限し、不要なサービスを止め、複数回線と予備リージョンを設計し、障害時に顧客へ出す連絡文をあらかじめ用意しておきます。"
+    },
+    "Đặt làm quản trị": {
+      "en": "Make admin",
+      "zh": "设为管理员",
+      "fr": "Promouvoir administrateur",
+      "es": "Hacer administrador",
+      "ja": "管理者にする"
+    },
+    "Đặt mã và lên quản trị": {
+      "en": "Set the code and become admin",
+      "zh": "设置管理码并升为管理员",
+      "fr": "Définir le code et devenir administrateur",
+      "es": "Fijar el código y ser administrador",
+      "ja": "コードを設定して管理者になる"
     },
     "Đặt tên đăng nhập và mật khẩu demo. Đừng dùng mật khẩu thật.": {
       "en": "Set a demo username and password. Do not use a real password.",
@@ -6127,12 +7394,19 @@
       "es": "Una dirección del remitente que cambia en un carácter, un saludo genérico, un plazo urgente, una exigencia de secreto, un enlace que muestra una dirección pero lleva a otra, un adjunto comprimido o con macros y la petición de dictar el código OTP por teléfono.",
       "ja": "送り主のアドレスが 1 文字違う、曖昧な呼称、急がせる締切、秘密にしろという要求、表示と違う場所へ飛ぶリンク、圧縮ファイルやマクロの添付、そして電話で OTP を読み上げさせる指示。"
     },
-    "Đối tượng tình nghi": {
-      "en": "Suspect",
-      "zh": "可疑目标",
-      "fr": "Sujet suspect",
-      "es": "Sujeto sospechoso",
-      "ja": "不審な対象"
+    "Đọc chữ nhỏ thấy mệt? Chọn nền sáng và cỡ chữ to ở trang": {
+      "en": "Small text tiring? Pick a light background and larger type in",
+      "zh": "看小字累吗？换浅色背景、放大字号请到",
+      "fr": "Tu fatigues sur les petits caractères ? Choisis un fond clair et une police plus grande dans la page",
+      "es": "¿Te cansa la letra pequeña? Elige un fondo claro y una letra más grande en",
+      "ja": "文字が小さくて読みにくい時は、明るい背景と大きめの文字を"
+    },
+    "Đọc dễ hơn": {
+      "en": "Easier reading",
+      "zh": "更易阅读",
+      "fr": "Lecture plus facile",
+      "es": "Lectura más fácil",
+      "ja": "読みやすく"
     },
     "Đổi mật khẩu cơ sở dữ liệu định kỳ": {
       "en": "Rotating the database password periodically",
@@ -6190,6 +7464,13 @@
       "es": "Latencia del ping",
       "ja": "Ping 遅延"
     },
+    "đang có": {
+      "en": "has",
+      "zh": "在本机上有",
+      "fr": "possède sur cet appareil",
+      "es": "tiene en este equipo",
+      "ja": "はこのパソコンに"
+    },
     "đang nghỉ vì vừa báo quá tải, bỏ qua lượt này": {
       "en": "is resting after reporting overload — skipped this round",
       "zh": "刚报告过载，正在休息，本次跳过",
@@ -6224,6 +7505,13 @@
       "fr": "s'est connecté. Lancez l'attaque de test :",
       "es": "ha iniciado sesión. Inicie el ataque de prueba:",
       "ja": "はログインしました。テスト攻撃を開始します："
+    },
+    "đúng là hồ sơ của bạn nên máy chủ cho xem.": {
+      "en": "this really is your own record, so the server shows it.",
+      "zh": "这确实是你的档案，所以服务器允许查看。",
+      "fr": "c'est bien votre dossier, donc le serveur l'affiche.",
+      "es": "es efectivamente tu registro, así que el servidor lo muestra.",
+      "ja": "確かにあなたの記録なので、サーバーは表示します。"
     },
     "để chặn ngay IP cũ nhất mà không cần chấm tay vào thẻ.": {
       "en": "to block the oldest IP immediately without tapping the tiles by hand.",
@@ -6337,6 +7625,13 @@
       "es": "— archivos como",
       "ja": "— ファイル例:"
     },
+    "— không mất bài học nào cả.": {
+      "en": "— no lesson is lost.",
+      "zh": "页面 — 不会丢掉任何一课。",
+      "fr": "— tu ne perds aucune leçon.",
+      "es": "— no pierdes ninguna lección.",
+      "ja": "で選べます — レッスンはそのまま残ります。"
+    },
     "— kẻ tấn công điển hình.": {
       "en": "— typical attackers.",
       "zh": "——典型攻击者。",
@@ -6420,13 +7715,6 @@
       "fr": "❌ Mot de passe incorrect. Saisissez le mot de passe que vous venez de créer.",
       "es": "❌ Contraseña incorrecta. Introduzca la contraseña que acaba de crear.",
       "ja": "❌ パスワードが違います。作成したばかりの正しいパスワードを入力してください。"
-    },
-    "🌐 Language / Ngôn ngữ": {
-      "en": "🌐 Language",
-      "zh": "🌐 语言",
-      "fr": "🌐 Langue",
-      "es": "🌐 Idioma",
-      "ja": "🌐 言語"
     },
     "🎉 Chúc mừng! Bạn nhận được 500k": {
       "en": "🎉 Congratulations! You received 500k",

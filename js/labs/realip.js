@@ -211,7 +211,7 @@
         const conNghi = resting(provider.name);
         if (conNghi > 0) {
           nghiNhiem++;
-          CyUtil.logLine(term, "t-warn", `[!] ${provider.name} ${t("đang nghỉ vì vừa báo quá tải, bỏ qua lượt này")}: ${Math.ceil(conNghi / 60000)} ${t("phút")}`);
+          CyUtil.logLine(term, "t-warn", `[!] ${provider.name} ${t("đang nghỉ vì vừa báo quá tải, bỏ qua lượt này")}: ${Math.ceil(conNghi / 60000)} ${tdem(Math.ceil(conNghi / 60000), "phút")}`);
           continue;
         }
         CyUtil.logLine(term, "t-muted", `[*] ${t("Nhà cung cấp dữ liệu")}: ${provider.name}`);

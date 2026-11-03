@@ -6,14 +6,14 @@
              mặc định gemini-flash-lite-latest, đổi ở .env) kèm lịch sử của tài
              khoản đang dùng, nên AI nhớ những gì vừa nói.
              MÁY CHỦ AI NẰM Ở ĐÂU phụ thuộc chỗ mở trang: trên chính máy này thì
-             gọi http://127.0.0.1:8000; trên một domain công khai thì gọi
-             /api/gemini CÙNG NGUỒN (host đó phải tự chạy máy chủ AI), hoặc gọi THẲNG
-             MAI_CONG_KHAI khi máy chủ Python chạy ở một host khác (Render / Railway
-             / VPS). Host tĩnh không chạy Python, nên bản web công khai chỉ có AI
-             khi ai đó deploy thêm một máy chủ. Không có chuyện "thiếu API key" trên
-             Netlify: .env không được tải lên (đã chặn trong .gitignore) và cũng
-             KHÔNG bao giờ được dán vào file tĩnh, vì mọi file trên host tĩnh là mọi
-             người đều tải được. URL một máy chủ công khai thì KHÔNG phải bí mật
+             gọi http://127.0.0.1:8000; trên một domain công khai thì gọi THẲNG máy
+             chủ khai ở MAI_CONG_KHAI — hiện là https://cysim-backend.onrender.com,
+             một Render Free chạy đúng server/gemini_proxy.py. MAI_CONG_KHAI để trống
+             thì mới quay về /api/gemini CÙNG NGUỒN, và đường đó chỉ sống khi chính
+             host biết chạy Python (Netlify chỉ nhận hàm JS/TS/Go, không chạy .py).
+             Không có chuyện "thiếu API key" trên Netlify: .env không được deploy lên
+             host tĩnh, và cũng KHÔNG bao giờ được dán vào một file tĩnh, vì mọi file
+             trên host tĩnh là mọi người đều tải được. URL một máy chủ công khai thì KHÔNG phải bí mật
              (key mới là bí mật, và key nằm lại phía máy chủ) — nhưng nó là nơi câu
              hỏi và ảnh của người dùng đi tới, nên chỉ dán URL máy chủ do chính mình
              chạy, không phải một URL nhặt trên mạng.
@@ -25,16 +25,36 @@
              (những câu đó do server/gemini_proxy.py áp SystemInstruction,
              không phải JS tự bịa).
    CHẠY     : Bấm #aiFab -> hiện #aiPanel, nạp lịch sử của Auth.id() và hỏi
-              /api/health để vẽ #aiStatus (sẵn sàng / chưa có key / chưa chạy
+              /api/health để vẽ #aiStatus (sẵn sàng / chưa có key / key bị Google
+              từ chối / chưa chạy
               máy chủ / mở bằng file:// / mất internet / bản web không kèm máy chủ
               AI / máy chủ công khai đang không trả lời) — người dùng thấy bệnh
-              trước khi gõ, không phải gõ xong mới nhận một bong bóng lỗi. Ở năm
-              trạng thái "offline", "no_key", "no_net", "remote" và "external" dòng
+              trước khi gõ, không phải gõ xong mới nhận một bong bóng lỗi. Ở sáu
+              trạng thái "offline", "no_key", "bad_key", "no_net", "remote" và "external" dòng
               đó vẽ thêm nút
-              "Thử lại" (`.ai-retry`) gọi thẳng checkServer(): bật chay-ai.bat
-              xong bấm tại chỗ là biết máy chủ đã sống, không phải đóng/mở panel
-              hay gửi nhầm một câu. Máy mất mạng cũng tự vẽ lại dòng đó nhờ hai
+              "Thử lại" (`.ai-retry`) gọi thẳng checkServer(true): bật chay-ai.bat
+              xong bấm tại chỗ là biết máy chủ đã sống; dán key mới vào .env xong
+              bấm là biết key đã được Google nhận — checkServer() không tham số chỉ
+              lấy kết luận key đã cache 5 phút trong proxy, nên nó KHÔNG dùng được
+              cho nút này. Máy mất mạng cũng tự vẽ lại dòng đó nhờ hai
               listener "online"/"offline" — không phải mở lại khung chat.
+              BẰNG CHỨNG NGAY TRÊN DÒNG LỖI (01-11-2026): ở "bad_key", chip kỹ
+              thuật in luôn hình dạng chuỗi mà MÁY CHỦ đang đọc từ .env — ".env:
+              AQ.A…(53)" — vì câu "GEMINI_API_KEY không hợp lệ" bị cãi lại là
+              "key này hợp lệ mà": người đọc đang cầm một chuỗi khác với chuỗi
+              trong file, và 4 ký tự đầu + độ dài đủ để so tại chỗ mà không lộ key.
+              Cùng ngày: mọi chỗ focus ô gõ đi qua vaoO() = focus({preventScroll})
+              vì .ai-panel là hộp overflow:hidden NHƯNG VẪN CUỘN ĐƯỢC bằng code,
+              và cú cuộn đó chính là thứ đẩy nút ✕ ra khỏi mép (đo: scrollTop 221px,
+              ✕ ở y = -76px). Xem README mục 5.7.
+              NHỊP 30 GIÂY (30-10-2026): khung ĐANG MỞ + tab ĐANG NHÌN THẤY thì
+              checkServer() tự chạy lại mỗi 30 giây (NHIP_KHOE_MS) — key bị Google
+              thu, host miễn phí ngủ, proxy chết giữa buổi đều hiện ra trên dòng
+              trạng thái chứ không đợi tới lúc bấm Gửi. Đóng khung là tắt nhịp;
+              tab ẩn không đốt request; quay lại tab thì hỏi ngay một lần. Mọi
+              nguồn gọi đi qua một chốt "một lượt hỏi máy chủ một lần" (dangKiemTra
+              + một lượt xếp hàng), nên năm chỗ cùng gọi cũng chỉ có một fetch đang
+              chạy. Xem README mục 5.
               Gõ + Enter (hoặc "Gửi") ->
               addMessage(user) -> ask(): POST {prompt, lang, stream, history, profile,
               depth, images?} tới endpoint — "lang" là ngôn ngữ đang hiển thị, server dùng nó để
@@ -114,25 +134,27 @@
      chạy trên máy có nháy đúp chay-ai.bat; nó không đi theo file tĩnh, và trình
      duyệt của người lạ cũng không có đường gọi về máy của tác giả. Nên:
        - mở trên chính máy này (127.0.0.1 / localhost / [::1] / file://) -> proxy cục bộ;
-       - mở từ một domain công khai -> "/api/gemini" CÙNG NGUỒN, tức là bản web đó
-         phải tự kèm máy chủ AI; Netlify chỉ nhận hàm JS/TS/Go nên .py không chạy ở đó;
-       - cũng từ domain công khai, nếu MAI_CONG_KHAI có giá trị -> gọi THẲNG máy chủ
-         Python ở host khác, và đây là đường giữ được chữ về dần (SSE) vì một tiến
-         trình thật không bị trần 60 giây của serverless cắt ngang.
+       - mở từ một domain công khai khi MAI_CONG_KHAI có giá trị (mặc định của bản
+         hôm nay) -> gọi THẲNG máy chủ Python ở host khác; đây là đường giữ được
+         chữ về dần (SSE) vì một tiến trình thật không bị trần 60 giây của
+         serverless cắt ngang;
+       - cũng từ domain công khai nhưng MAI_CONG_KHAI để trống -> "/api/gemini"
+         CÙNG NGUỒN, tức là bản web đó phải tự kèm máy chủ AI; Netlify chỉ nhận hàm
+         JS/TS/Go nên .py không chạy ở đó.
      KHÔNG có lối tắt "dán đại API key vào file cho nó chạy trên Netlify": host tĩnh
      phát MỌI file cho MỌI người tải, key nằm trong bundle là key công khai — và một
      sản phẩm dạy bảo mật thì không được tự tay làm cái điều nó dạy đừng làm. */
   const MAY_TINH_NAY = /^(127\.0\.0\.1|localhost|\[::1\])$/;
   /* Máy chủ AI ở NƠI CÔNG KHAI, không cùng nguồn với trang (đường Render/Railway/
-     VPS chạy chính server/gemini_proxy.py). Dán URL gốc vào đây MỘT lần, ví dụ
-     "https://cysim-ai.onrender.com" — để trống nghĩa là gọi "/api/gemini" cùng
-     nguồn như cũ (chỉ sống nếu chính host đó chạy được máy chủ AI).
+     VPS chạy chính server/gemini_proxy.py). Dán URL gốc vào đây MỘT lần — dòng
+     dưới đang trỏ máy chủ Render thật của dự án này. Để trống nghĩa là gọi
+     "/api/gemini" cùng nguồn (chỉ sống khi chính host đó tự chạy được máy chủ AI).
      Vì sao phải gọi THẲNG mà không để Netlify chuyển tiếp hộ: rewrite làm proxy
      của Netlify cắt ở 26 giây (docs), trong khi một câu trả lời đo thật hôm
      29-10-2026 mất 176,9 giây — đi đường vòng là chắc chắn chết giữa chừng, dù
      máy chủ chậm đó vẫn sống tốt. URL máy chủ không phải bí mật (key thì có, và
-     key nằm lại phía máy chủ). */
-  const MAI_CONG_KHAI = "";
+     key nằm lại phía Render trong dashboard, không nằm trong repo). */
+  const MAI_CONG_KHAI = "https://cysim-backend.onrender.com";
   const macDinh = MAY_TINH_NAY.test(location.hostname) || location.hostname === ""
     ? "http://127.0.0.1:8000/api/gemini"
     : (MAI_CONG_KHAI ? MAI_CONG_KHAI.replace(/\/+$/, "") + "/api/gemini" : "/api/gemini");
@@ -177,11 +199,19 @@
      bảo người ta bật chay-ai.bat) và "đang thử URL nào" (để in ra khi sai). Dùng
      cho bản deploy: tác giả trỏ endpoint sang một proxy ở nơi khác thì không được
      còn nhắc file .bat của máy mình nữa. */
- const noiGoi = (duongDan) => {
+  const noiGoi = (duongDan) => {
     const e = duongDan || endpoint();
-    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(e) || e.startsWith("//")) return e;
-    return "https://cysim-backend.onrender.com" + (e.startsWith("/") ? e : "/" + e);
-};
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(e) || e.startsWith("//")) return e;
+    /* Đường dẫn tương đối (đặc biệt là ô ghi đè cysim-ai-endpoint chỉ gõ
+       "/api/gemini") phải được giải thích theo NƠI TRANG ĐANG CHẠY, không được
+       cứng vào một host nào: mở bằng file:// thì không có origin để mà "cùng
+       nguồn", nên mới cần tới MAI_CONG_KHAI (chưa khai thì fallback về proxy của
+       máy này); mở từ một domain thì origin của chính domain đó thắng. */
+    const goc = /^file:/.test(location.protocol)
+      ? (MAI_CONG_KHAI || "http://127.0.0.1:8000")
+      : location.origin;
+    return goc + (e.startsWith("/") ? e : "/" + e);
+  };
 
   const mayChuCuaToi = () =>
     /^https?:\/\/((127\.0\.0\.1|localhost|\[::1\])(:|$))/i.test(noiGoi());
@@ -242,7 +272,7 @@
     if (!line) return;
     const n = hoSo.trim().length;
     line.textContent = n
-      ? `${t("Đang gửi kèm hồ sơ của bạn")}: ${n} ${t("ký tự")} · ${t("chỉ lưu trên máy này")}`
+      ? `${t("Đang gửi kèm hồ sơ của bạn")}: ${n} ${tdem(n, "ký tự")} · ${t("chỉ lưu trên máy này")}`
       : t("Chưa có hồ sơ nào được gửi — AI trả lời chung, không biết gì về bạn.");
     /* SKIP_TAGS của i18n.js có TEXTAREA: nội dung ô là chữ người dùng gõ nên
        engine cố tình không đụng tới — hệ luỵ là placeholder và aria-label của
@@ -373,7 +403,7 @@
     /* CyUtil.formatBytes tự chọn B / KB / MB: một tấm ảnh 68 byte mà ghi
        "0.00 MB" thì người dùng nghĩ hệ thống chưa nhận gì cả. */
     dong.textContent = anh.length
-      ? `${anh.length}/${MAX_IMAGES} ${t("ảnh")} · ${CyUtil.formatBytes(tong)} · ${t("chỉ đi kèm lượt hỏi này, không lưu lại")}`
+      ? `${anh.length}/${MAX_IMAGES} ${tdem(anh.length, "ảnh")} · ${CyUtil.formatBytes(tong)} · ${t("chỉ đi kèm lượt hỏi này, không lưu lại")}`
       : t("Chưa đính kèm ảnh — câu hỏi chỉ có chữ.");
     const nut = $("aiImageBtn");
     if (nut) nut.disabled = anh.length >= MAX_IMAGES;
@@ -414,10 +444,19 @@
     nut.title = nhan;
   }
 
+  /* Focus mà KHÔNG cuộn. .ai-panel là hộp overflow:hidden (cần cho bo góc và
+     cho resize:both) nhưng overflow:hidden vẫn cuộn được bằng code: gọi
+     $("aiInput").focus() — ô nhập nằm CUỐI khung — làm trình duyệt cuộn cả
+     khung lên để lộ nó, và header nơi có đúng một nút ✕ bị đẩy ra khỏi mép
+     (đo thật 01-11-2026: scrollTop 221px, ✕ nằm ở y = -76px). Sticky đã giữ
+     ✕ ở lại; preventScroll cắt luôn cơ chế từ gốc, và nếu trình duyệt nào
+     không hỗ trợ thì nó chỉ im lặng bỏ qua — sticky vẫn còn. */
+  const vaoO = () => $("aiInput").focus({ preventScroll: true });
+
   function daoRong() {
     localStorage.setItem(RONG_KEY, localStorage.getItem(RONG_KEY) === "1" ? "0" : "1");
     veRong();
-    $("aiInput").focus();
+    vaoO();
   }
 
   /* ---------- độ sâu câu trả lời ----------
@@ -535,7 +574,7 @@
     messages = [];
     CyUtil.removeKey(localStorage, HISTORY_KEY(Auth.id()));
     render();
-    $("aiInput").focus();
+    vaoO();
     showToast("Đã xoá lịch sử chat của tài khoản này.");
   }
 
@@ -569,7 +608,7 @@
     } else if (typeof anhKem === "number" && anhKem > 0) {
       const ghi = document.createElement("i");
       ghi.className = "ai-img-note";
-      ghi.textContent = `${anhKem} ${t("ảnh đã gửi kèm lượt này · không còn trong bộ nhớ, hỏi tiếp phải đính lại ảnh")}`;
+      ghi.textContent = `${anhKem} ${tdem(anhKem, "ảnh đã gửi kèm lượt này · không còn trong bộ nhớ, hỏi tiếp phải đính lại ảnh")}`;
       wrap.append(ghi);
     }
     const body = document.createElement("p");
@@ -642,11 +681,20 @@
   const healthUrl = () => endpoint().replace(/\/api\/gemini\/?$/, "/api/health");
   let serverState = "checking";
   let serverModel = "";
+  let serverKeyShape = "";
 
   const LOI_TRANG_THAI = {
     checking: () => t("Đang kiểm tra máy chủ AI…"),
     ready: () => t("Đã nối được máy chủ AI."),
     no_key: () => t("Máy chủ đã chạy nhưng file .env chưa có GEMINI_API_KEY."),
+    /* Bệnh KHÁC hẳn no_key: ở đó là thiếu một dòng, dán vào là xong; ở đây là có
+       key trong file mà CHÍNH GOOGLE đuổi (401/403) — thường vì dán nhầm loại
+       credential, một access token OAuth không dùng được ở chỗ API key. Không có
+       trạng thái này thì /api/health vẫn báo "ready" (nó chỉ nhìn "có chuỗi sau
+       dấu bằng hay không") và người dùng chỉ biết bệnh sau khi gõ câu hỏi + ngồi
+       chờ — đúng cái vòng mà cả khối chẩn đoán này sinh ra để cắt. Chuỗi vẽ lại
+       lấy nguyên câu của loiTuCode("bad_key") để không sinh thêm khoá dịch mới. */
+    bad_key: () => t("GEMINI_API_KEY không hợp lệ hoặc chưa được bật cho mô hình này."),
     offline: () => t("Máy chủ AI chưa chạy. Nháy đúp file chay-ai.bat ở thư mục dự án, hoặc mở terminal rồi chạy:"),
     file: () => t("Trang này đang mở bằng file:// nên trình duyệt chặn mọi request tới máy chủ AI. Chạy app qua http rồi mở lại:"),
     /* Bệnh KHÁC hẳn "offline": trang được mở từ một domain công khai (Netlify,
@@ -683,6 +731,14 @@
     const tech = document.createElement("code");
     if (serverState === "offline") tech.textContent = "python server/gemini_proxy.py";
     else if (serverState === "file") tech.textContent = "python -m http.server 8137 --bind 127.0.0.1";
+    /* bad_key trỏ thẳng vào nơi phải sửa: không phải bật lại máy chủ mà là thay
+       chuỗi trong .env. Định danh kỹ thuật nên nằm ngoài t(), giống mọi mẩu
+       <code> khác ở đây. Từ 01-11, chip còn in HÌNH DẠNG chuỗi máy chủ đang đọc
+       ("AQ.…(53)"): câu "key không hợp lệ" bị cãi lại là "key này hợp lệ mà" vì
+       người đọc đang cầm một chuỗi khác với chuỗi trong file — chỉ cần 4 ký tự
+       đầu + độ dài là so được tại chỗ, và vẫn không lộ key. */
+    else if (serverState === "bad_key")
+      tech.textContent = serverKeyShape ? `.env: ${serverKeyShape}` : ".env";
     /* Bản công khai phải IN RA đúng URL đã gọi: người deploy cần biết là app đang
        gõ cửa "/api/gemini" cùng nguồn hay một host khai ở MAI_CONG_KHAI — hai bệnh
        khác nhau, sửa ở hai chỗ khác nhau. Định danh kỹ thuật nên nằm ngoài t(),
@@ -691,16 +747,17 @@
     else if (serverState === "ready" && serverModel) tech.textContent = serverModel;
     if (tech.textContent) box.append(document.createTextNode(" "), tech);
     /* Nút "Thử lại": người dùng vừa nháy đúp chay-ai.bat thì phải có cách hỏi lại
-       NGAY TẠI CHỖ. checkServer() chỉ chạy lúc mở panel và lúc bấm Gửi, nên không
-       có nút này thì cách duy nhất để biết máy chủ đã sống là đóng/mở panel hoặc gửi
-       nhầm một câu — đúng cái vòng lặp khiến "AI không chạy" trông như lỗi app.
+       NGAY TẠI CHỖ. checkServer() chạy lúc mở panel, mỗi 30 giây khi khung còn mở,
+       và khi một lượt Gửi thất bại — nhưng cả ba đều không phải "bấm ngay bây giờ",
+       nên không có nút này thì cách duy nhất vẫn là đóng/mở panel hoặc gửi nhầm một
+       câu — đúng cái vòng lặp khiến "AI không chạy" trông như lỗi app.
        Ở trạng thái "file" thì thử lại vô nghĩa (trình duyệt chặn tận nơi), nên
        không vẽ nút. "no_net" thì CÓ nút: cắm lại cáp rồi bấm tại chỗ nhanh hơn là
        đóng/mở cả khung. "remote" cũng có: người deploy vừa gắn máy chủ AI vào
        domain thì bấm một cái là biết nó sống, không cần tải lại cả trang.
        "external" càng phải có: host miễn phí thức dậy sau cú gọi đầu, nên bấm
        Thử lại lần hai khoảng một phút sau là đường thoát duy nhất tại chỗ. */
-    if (serverState === "offline" || serverState === "no_key" || serverState === "no_net" || serverState === "remote" || serverState === "external") {
+    if (serverState === "offline" || serverState === "no_key" || serverState === "bad_key" || serverState === "no_net" || serverState === "remote" || serverState === "external") {
       const retry = document.createElement("button");
       retry.type = "button";
       retry.className = "ai-retry";
@@ -708,13 +765,46 @@
       retry.addEventListener("click", () => {
         serverState = "checking";
         renderStatus();
-        checkServer();
+        /* checkServer(true) — bản cũ chỉ hỏi lại bằng đúng câu đã cache: người
+           dùng dán key mới vào .env, bấm "Thử lại", máy chủ trả lại chính kết luận
+           "key hỏng" của 5 phút trước. Buộc kiểm tra là ý nghĩa duy nhất của nút
+           này. */
+        checkServer(true);
       });
       box.append(retry);
     }
   }
 
-  async function checkServer() {
+  /* MỘT LƯỢT HỎI MÁY CHỦ MỘT LẦN. checkServer() được gọi từ năm chỗ (mở panel,
+     bấm Gửi thất bại, online, offline, nút Thử lại) và nay thêm nhịp 30 giây,
+     nên phải có chốt: bản cũ cứ mỗi nguồn gọi là bắn thêm một fetch /api/health
+     song song, và khi proxy đang ngủ (host miễn phí) mỗi fetch đó treo tới lúc
+     timeout — người dùng thấy khung AI đổi trạng thái liên tục vì năm câu trả
+     lời về tới lui không theo thứ tự. `lenKe` giữ tối đa một lượt chờ, không
+     phải hàng đợi: tám lượt xếp hàng cho cùng một thông tin là vô nghĩa. */
+  let dangKiemTra = false;
+  let kiemTraLenKe = false;
+
+  /* `buoc` = "?probe=1": hỏi THẲNG Google lại lần nữa thay vì lấy kết luận key đã
+     cache 5 phút. Chỉ nút "Thử lại" dùng, vì đó là đúng lúc người dùng vừa dán key
+     mới — một câu trả lời cũ ở đây là một câu trả lời sai. */
+  function checkServer(buoc) {
+    if (dangKiemTra) {
+      kiemTraLenKe = kiemTraLenKe || !!buoc; // một lượt xếp hàng, nhớ kèm lý do xếp
+      return Promise.resolve();
+    }
+    dangKiemTra = true;
+    return thoMatMay(buoc).finally(() => {
+      dangKiemTra = false;
+      if (kiemTraLenKe) {
+        const lai = kiemTraLenKe;
+        kiemTraLenKe = false;
+        checkServer(lai);
+      }
+    });
+  }
+
+  async function thoMatMay(buoc) {
     renderStatus();
     /* file:// thì không fetch nào đi được, kể cả khi proxy đang chạy tốt. Phải
        nói thẳng bệnh ở đây: để lọt xuống nhánh offline là bảo người ta đi bật
@@ -738,12 +828,21 @@
     }
     let next = mayChuCuaToi() ? "offline" : mayChuBenNgoai() ? "external" : "remote";
     let model = "";
+    let hinhKey = "";
     try {
-      const res = await fetch(healthUrl());
+      const res = await fetch(healthUrl() + (buoc ? "?probe=1" : ""));
       const data = await res.json().catch(() => null);
       if (data && data.ok === true) {
         model = String(data.model || "");
-        next = data.keyConfigured ? "ready" : "no_key";
+        /* Bản proxy cũ (chưa có keyShape) thì để trống — chip chỉ in ".env", đúng
+           như trước khi có trường này, thay vì bịa ra một hình dạng. */
+        hinhKey = String(data.keyShape || "");
+        /* Ba nhánh, không phải hai. keyValid === false là máy chủ vừa hỏi Google
+           và bị đuổi 401/403 — bệnh thật, phải nói trước khi người dùng gõ. Còn
+           null/undefined (mạng đứt, hoặc một proxy cũ chưa có trường này) thì
+           KHÔNG được suy ra "key hỏng": kết luận một bệnh không có bằng chứng là
+           đúng cái kiểu mà cả khối chẩn đoán này cố tránh. */
+        next = !data.keyConfigured ? "no_key" : data.keyValid === false ? "bad_key" : "ready";
       }
     } catch (err) {
       /* Trên máy này: fetch bị từ chối nghĩa là chưa bật proxy, "offline" là kết
@@ -753,7 +852,45 @@
     }
     serverState = next;
     serverModel = model;
+    serverKeyShape = hinhKey;
     renderStatus();
+  }
+
+  /* ---------- nhịp đo khi khung chat đang mở ---------- */
+  /* ĐỀ BÀI (người duyệt, nhược điểm #9): "proxy AI phụ thuộc key/mạng Google mà
+     giao diện chỉ hỏi /api/health một lần". Dòng "Sẵn sàng" cũ có thể nói dối cả
+     tiếng: Google rút key, host miễn phí ngủ, hoặc proxy chết giữa buổi — màn
+     hình vẫn báo sẵn sàng tới lúc người học bấm Gửi và nhận lỗi.
+     CHỌN 30 GIÂY: ngắn đủ để một lần chết máy chủ không kịp đốt hết buổi học,
+     dài đủ để không thành bắn DOS vào chính máy chủ của mình (một lượt hỏi thật
+     đã nặng hơn nhiều so với một /api/health). Không phải con số đo được từ
+     Google, chỉ là thoả thuận giữa "biến đổi kịp" và "không đốt pin/đường truyền".
+     BA RÀO CẢN để nó không thành máy đếm vô tận: (1) tab ẩn thì không hỏi —
+     setInterval vốn đã bị trình duyệt bóp khi ẩn, nhưng người dùng chuyển tab
+     giữa lúc chờ là chuyện thường, nên chặn hẳn; (2) panel đóng là tắt nhịp,
+     mở lại mới bật; (3) tab hiện lại thì hỏi ngay một lần, vì "30 giây trước"
+     ở đây nghĩa là "30 giây trước khi bạn quay lại". */
+  const NHIP_KHOE_MS = 30000;
+  let nhipKho = null;
+
+  function dungNhipKho() {
+    if (nhipKho) {
+      clearInterval(nhipKho);
+      nhipKho = null;
+    }
+  }
+
+  function batNhipKho() {
+    if (nhipKho || location.protocol === "file:") return;
+    nhipKho = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      const panel = $("aiPanel");
+      if (!panel || panel.hidden) {
+        dungNhipKho();
+        return;
+      }
+      checkServer();
+    }, NHIP_KHOE_MS);
   }
 
   /* ---------- trả lời ngay tại máy khi proxy không gọi được ---------- */
@@ -967,6 +1104,18 @@
       if (anh.length) showToast("Đã có ảnh, nhưng chưa có câu hỏi — gõ vài chữ rồi bấm Gửi.");
       return;
     }
+    /* Hai chốt quản trị, kiểm tra TRƯỚC khi xoá ô nhập: câu hỏi đang gõ mà bị
+       nuốt rồi mới báo "tính năng đang tắt" là mất bài của người dùng.
+       Flags và AiBudget định nghĩa trong app.js (nạp trước file này);
+       check vẫn có || !Flags để một bản thử chỉ nạp ai.js không nổ ở đây. */
+    if (typeof Flags !== "undefined" && !Flags.on("ai")) {
+      showToast(t("Trợ lý AI đang bị tắt. Hỏi người quản lý máy này để bật lại."));
+      return;
+    }
+    if (typeof AiBudget !== "undefined" && !AiBudget.choPhep()) {
+      showToast(t("Tài khoản này đã dùng hết số lượt hỏi AI hôm nay. Ngày mai lại hỏi được."));
+      return;
+    }
     $("aiInput").value = "";
     /* Ảnh chỉ sống cho đúng một lượt: gỡ khỏi khay đính kèm NGAY TRƯỚC khi gửi
        để không ai tưởng nhầm tấm ảnh này sẽ đi kèm mọi câu hỏi về sau. */
@@ -1031,6 +1180,20 @@
     }
     clearInterval(dongHo);
     hieu = null;
+    /* LOG KHI MÁY CHỦ TRẢ LỜI BẰNG MODEL KHÁC CÁI NÓ VỪA QUẢNG CÁO ở
+       /api/health — nhược điểm #9: proxy im lặng đổi model lúc Google quá tải,
+       nên "sao hôm nay AI trả lời khác vậy" không có bằng chứng nào ngoài cảm
+       giác. Màn hình đã in tên model thật trong dòng .ai-time; dòng console này
+       là để mở DevTools lên đọc, và proxy cũng ghi một dòng tương ứng phía máy
+       chủ. Chỉ log khi cả hai tên đều có thật — /api/health chết thì serverModel
+       rỗng, mà rỗng thì không có quyền kết luận ai đổi ai. */
+    if (tenModel && serverModel && tenModel !== serverModel) {
+      console.warn(
+        "[ai] proxy dùng model khác với /api/health đã báo: \"" +
+        serverModel + "\" -> \"" + tenModel +
+        "\" (thường là Google quá tải, proxy tự đổi model dự phòng)."
+      );
+    }
     /* Đồng hồ cho bong bóng: "chữ đầu" là lúc mảnh SSE đầu tiên tới màn hình,
        "hoàn tất" là lúc stream đóng. Bấm Dừng giữa chừng thì mốc "hoàn tất" là lúc bấm —
        vẫn là thời gian thật người dùng đã ngồi chờ, không phải con số bịa. */
@@ -1052,6 +1215,11 @@
        lại, và nói THÊM nguyên nhân bằng một dòng hệ thống — ẩn cả hai là mất
        bài, mà im luôn thì người dùng tưởng app tự ý cắt. */
     if (answer) addMessage("model", answer, false, null, thoiGian);
+    /* Chỉ đếm một lượt khi máy chủ thực sự trả chữ. Lượt lỗi, lượt bị dừng
+       trước khi có chữ, và câu danh tính trả lời tại chỗ (không nhấc máy) đều
+       không được trừ vào hạn mức — người dùng bị máy chủ từ chối mà còn mất
+       lượt thì đúng là bị phạt vì lỗi của người khác. */
+    if (answer && !tuMay && typeof AiBudget !== "undefined") AiBudget.them();
     if (doDung) {
       if (!answer) hoi.transient = true;
       addMessage(
@@ -1088,12 +1256,14 @@
     $("aiFab").setAttribute("aria-expanded", String(open));
     document.body.classList.toggle("ai-open", open);
     if (open) {
-      $("aiInput").focus();
+      vaoO();
       checkServer(); // biết máy chủ sống/chết ngay lúc mở, không phải sau khi gửi
+      batNhipKho();
     } else {
       /* Đóng bằng Esc/✕ mà để focus rơi về <body> thì người dùng bàn phím phải
          Tab lại từ đầu trang. Trả nó về đúng nút đã mở panel. */
       $("aiFab").focus();
+      dungNhipKho(); // không hỏi /api/health cho một khung đang ẩn
     }
     syncAccount();
   }
@@ -1162,6 +1332,15 @@
        không chờ người dùng đóng/mở khung chat. */
     window.addEventListener("online", checkServer);
     window.addEventListener("offline", checkServer);
+    /* Người dùng quay lại tab sau vài phút: dòng trạng thái trên màn hình là
+       ảnh chụp của lúc mở khung, không phải hiện tại. Hỏi lại một lần ngay khi
+       tab hiện lại — nhịp 30 giây vốn đã bị trình duyệt bóp khi tab ẩn, nên
+       không có dòng này thì phải chờ trọn một nhịp mới thấy máy chủ chết. */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible") return;
+      const panel = $("aiPanel");
+      if (panel && !panel.hidden) checkServer();
+    });
   }
 
   bind();

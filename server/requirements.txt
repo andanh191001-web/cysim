@@ -1,4 +1,5 @@
 # Cầu nối Gemini (server/gemini_proxy.py). Bản đã kiểm thử: google-genai 2.33.0 + Flask 3.1.3, Python 3.13.
+# KHÔNG thêm flask-cors: CORS đặt tay trong add_cors() của gemini_proxy.py, hai lớp
+# cùng đặt một header chỉ sinh lỗi "multiple values" và Render phải cài thêm vô ích.
 google-genai>=1.0,<3
 Flask>=3.0,<4
-flask-cors

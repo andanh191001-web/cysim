@@ -7,7 +7,11 @@ LÀ GÌ   : Trọng tài chất lượng bản dịch. Không sửa file nào, c
          cáo — dùng để chứng minh con số "% đã kiểm chứng" trên giao diện là
          thật, không phải nói dối.
 CHẠY    : python tools/check_i18n.py --strict  (exit 1 khi còn LỖI thật;
-         mục [2] chỉ là checklist tham khảo nên không chặn exit).
+         mục [2] chỉ là checklist tham khảo nên không chặn exit), hoặc
+         python tools/check_i18n.py --ci để chạy luôn bảy khối kiểm tra của dự
+         án trong một lệnh — i18n, node --check, ba bộ test JS, tự kiểm của
+         proxy, quét phạm vi toàn cục, soi cách JS nối DOM, và chặn key Google
+         lọt vào file git theo dõi (xem hàm ci()).
 
 Bộ kiểm tra chất lượng (không gọi mạng, chạy được trước khi commit):
 
@@ -23,6 +27,7 @@ Dùng:  python tools/check_i18n.py            # báo cáo đầy đủ
 """
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -34,6 +39,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from i18n_scan import VI_LETTER, keep, normalize, scan  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+# Hai hình dạng key Google: "AQ." (AI Studio hiện nay) và "AIza" (kiểu cũ).
+KEY_GOOGLE = re.compile(r"(?<![A-Za-z0-9_-])(?:AQ\.[A-Za-z0-9_-]{40,}|AIza[0-9A-Za-z_-]{35})")
 LANG_DIR = ROOT / "js" / "lang"
 REVIEW_FILE = ROOT / "tools" / "translation_review.json"
 LANGS = ("en", "zh", "fr", "es", "ja")
@@ -47,6 +54,24 @@ CODEISH = re.compile(r"^[\x21-\x7E]+$")  # toàn ASCII in được -> không ph�
 # inline ra cuối câu.
 FRAGMENT_HEAD = re.compile(r"^[\s\)\]\};,.\-—/:>|”\"']|^-> |^\u2192 ")
 FRAGMENT_TAIL = re.compile(r"[\(\[\{,:;\-—>]$")
+# Khai báo nằm ở CỘT 0 của một file <script> thường = tên rơi ra phạm vi toàn cục.
+# Chỉ khối [5] của --ci dùng, để bắt hai file cùng khai một tên (xem giải thích
+# in ra tại đó).
+TOP_DECL = re.compile(r"^(?:const|let|var|function|class)\s+([A-Za-z_$][\w$]*)")
+# Tên BÊN TRONG một IIFE nhưng bị gán thẳng ra window/globalThis/self: cũng là
+# một tên toàn cục, chỉ khác ở chỗ cột 0 của nó không còn là `const` nên TOP_DECL
+# không thấy. Khối [5] quét thêm dòng này để lỗ hổng "im lặng" của bản cũ khép
+# lại — xem vì sao in ra tại đó.
+GLOBAL_ASSIGN = re.compile(r"(?:^|[^\w$])(?:window|globalThis|self)\.([A-Za-z_$][\w$]*)\s*=[^=]")
+# Khối [6]: mọi cách tham chiếu id trong JS + mọi cách một id được sinh ra.
+ID_USE = re.compile(
+    r"""\$\(\s*["']([A-Za-z][\w:-]*)["']|getElementById\(\s*["']([A-Za-z][\w:-]*)["']"""
+    r"""|querySelector(?:All)?\(\s*["']#([A-Za-z][\w:-]*)["']"""
+)
+ID_BORN = re.compile(r"(?:\.id\s*=\s*|setAttribute\(\s*[\"']id[\"']\s*,\s*)[\"']([A-Za-z][\w:-]*)[\"']|id=[\"']([A-Za-z][\w:-]*)[\"']")
+# Gán innerHTML = một chuỗi HTML được parse. Dự án đã chuyển hết sang
+# createElement/textContent; khối [6] giữ con số đó bằng 0 thay vì bằng lời hứa.
+INNER_HTML = re.compile(r"\.innerHTML\s*=[^=]")
 
 
 def load_json(path, default):
@@ -238,7 +263,243 @@ def main():
           % (n_unwrapped, "không có" if not n_unwrapped else "xem mục [2]"))
     if strict and problems:
         sys.exit(1)
+    return len(problems)
+
+
+def chay(cmd, tail=6):
+    """Chạy một lệnh kiểm tra, trả (mã_thoát, mấy dòng cuối in ra). Mọi khối đều
+    có thể thất bại, nên không được phép nộp một chuỗi "ĐẠT" không có bằng chứng:
+    đường này giữ lại đúng câu lệnh in ra để người đọc thấy tận mắt."""
+    import subprocess
+
+    try:
+        p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=300)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return 127, ["không chạy được: %s" % exc]
+    out = (p.stdout or "") + (p.stderr or "")
+    lines = [l for l in out.splitlines() if l.strip()]
+    return p.returncode, lines[-tail:]
+
+
+def ci():
+    """--ci: MỘT lệnh cho toàn bộ cửa kiểm tra trước khi nộp bài.
+
+    Người duyệt (nhược điểm 6) đòi CI / pre-commit tự động kiểm tra i18n. Hình
+    thức cho phép ở đây: dự án không có bước build và không được thêm file (trần
+    52 đã cắt), nên "CI" chính là lệnh này — `python tools/check_i18n.py --ci` —
+    còn pre-commit hook thì phải do người dùng tự tạo trong `.git/hooks`; không
+    có file nào trong repo thay được họ làm việc đó.
+
+    Bảy khối: (1) i18n + từ điển, (2) `node --check` từng file js (kể cả `test/`),
+    (3) ba bộ test JS, (4) tự kiểm của proxy, (5) trùng tên khai báo cấp cao nhất
+    VÀ tên bị đẩy ra window/globalThis, (6) mọi id mà JS tham chiếu phải có node
+    thật + không còn chỗ nào gán innerHTML, (7) không file nào git theo dõi chứa
+    `.env` hay một chuỗi có hình dạng key Google.
+    Khối nào thiếu dụng cụ chạy (không có node, thiếu Flask/SDK) in "BỎ QUA" ra mặt,
+    không im lặng — một cái "xanh" giả còn tệ hơn "đỏ", vì người ta sẽ tưởng mọi thứ
+    đã được kiểm. Riêng khối (5) và (6) không cần dụng cụ gì: chúng là lý do hai khối
+    cần node không còn là chỗ duy nhất soi được phạm vi toàn cục và cách JS nối DOM."""
+    import importlib.util
+    import shutil
+
+    results = []
+    print("\n=== [1/7] i18n: từ điển + chất lượng bản dịch ===")
+    results.append(("i18n + từ điển", main(), None))
+
+    node = shutil.which("node")
+    if not node and os.environ.get("CYSIM_NODE"):
+        # May khong cai `node` trong PATH van phai chay duoc CA DUONG KIEM TRA,
+        # khong chi duoc mot nu: CYSIM_NODE tro toi mot binary Node/Electron bat
+        # ky (Qoder.exe cung duoc) + ELECTRON_RUN_AS_NODE thi no hanh xu nhu
+        # `node` tran. Tu do nam khoi chua BỎ QUA nao cung co the xanh that.
+        node = os.environ["CYSIM_NODE"]
+        os.environ.setdefault("ELECTRON_RUN_AS_NODE", "1")
+        print("\n(dùng CYSIM_NODE thay `node` trong PATH: %s)" % node)
+    # test/ cũng là JS mà không có gì soi cú pháp hộ; gộp vào cùng một cửa.
+    js = sorted(list(ROOT.rglob("js/**/*.js")) + list(ROOT.rglob("test/**/*.js")))
+    if not node:
+        print("\n=== [2/7] node --check %d file js+test ===" % len(js))
+        print("BỎ QUA: không tìm thấy 'node' trong PATH — đặt biến CYSIM_NODE=đường-dẫn "
+              "binary Node/Electron rồi chạy lại để hai khối 2 và 3 thật sự chạy.")
+        results.append(("node --check", None, "thiếu node"))
+    else:
+        bad = []
+        for f in js:
+            rc, tail = chay([node, "--check", str(f)])
+            if rc:
+                bad.append("%s: %s" % (f.relative_to(ROOT), " | ".join(tail[:2])))
+        print("\n=== [2/7] node --check %d file js+test ===" % len(js))
+        print("  %s (%d file)" % ("ĐẠT" if not bad else "LỖI %d file" % len(bad), len(js)))
+        for b in bad:
+            print("  ! %s" % b)
+        results.append(("node --check", len(bad), None))
+
+    if not node:
+        print("\n=== [3/7] test tự động ===")
+        print("BỎ QUA: không tìm thấy 'node' trong PATH.")
+        results.append(("test JS", None, "thiếu node"))
+    else:
+        fail = []
+        print("\n=== [3/7] test tự động ===")
+        for t in ("test/exam.test.js", "test/i18n.test.js", "test/labs.test.js"):
+            rc, tail = chay([node, str(ROOT / t)])
+            print("  %-22s %s" % (t, "ĐẠT" if rc == 0 else "LỖI"))
+            for l in tail[-2:]:
+                print("      %s" % l[:100])
+            if rc:
+                fail.append(t)
+        results.append(("test JS", len(fail), None))
+
+    thieu = [m for m in ("flask", "google.genai") if importlib.util.find_spec(m) is None]
+    print("\n=== [4/7] server/gemini_proxy.py --check ===")
+    if thieu:
+        print("BỎ QUA: thiếu package %s (pip install -r server/requirements.txt)."
+              % ", ".join(thieu))
+        results.append(("proxy --check", None, "thiếu package"))
+    else:
+        rc, tail = chay([sys.executable, "server/gemini_proxy.py", "--check"])
+        for l in tail:
+            print("  %s" % l[:100])
+        results.append(("proxy --check", 0 if rc == 0 else 1, None))
+
+    print("\n=== [5/7] trùng tên cấp cao nhất + tên đẩy ra window/globalThis ===")
+    ten, cong_khai = {}, {}
+    files = sorted(list(ROOT.rglob("js/**/*.js")) + [ROOT / "sw.js"])
+    for f in files:
+        rel = f.relative_to(ROOT).as_posix()
+        for ln in f.read_text(encoding="utf-8", errors="replace").splitlines():
+            m = TOP_DECL.match(ln)
+            if m:
+                ten.setdefault(m.group(1), []).append(rel)
+            for g in GLOBAL_ASSIGN.finditer(ln):
+                cong_khai.setdefault(g.group(1), []).append(rel)
+    trung = {k: v for k, v in ten.items() if len(v) > 1}
+    print("  %d tên cột 0 trong %d file — trùng: %d" % (len(ten), len(files), len(trung)))
+    for k, v in sorted(trung.items()):
+        print("  ! %s: %s" % (k, ", ".join(v)))
+    print("  Vì sao phải quét: <script> thường chia sẻ một phạm vi toàn cục, hai file cùng")
+    print("  khai một tên thì file nạp sau ĐÈ file nạp trước, và không có build step nào")
+    print("  báo hộ. Tên trùng in ra ở trên chưa chắc đã sai — có thể là hai biến cùng tên")
+    print("  trong hai IIFE — nhưng phải nhìn tận mắt mới được khép.")
+    # Phần bản cũ BỎ SÓT (nhược điểm 2, vòng 31-10): một tên KHAI BÊN TRONG IIFE
+    # nhưng được gán thẳng ra window/globalThis vẫn là tên toàn cục y hệt, chỉ khác
+    # là cột 0 của nó không còn là const/let/function nên TOP_DECL không bao giờ
+    # thấy. Hai file cùng `globalThis.X = ...` là một vụ đè IM LẶNG.
+    de_nghi = {k: v for k, v in cong_khai.items() if len(set(v)) > 1 or k in ten}
+    print("  tên đưa thẳng ra window/globalThis: %d — %s"
+          % (len(cong_khai), ", ".join(sorted(cong_khai)) or "(không có)"))
+    for k, v in sorted(de_nghi.items()):
+        print("  ! %s: gán ra window ở %s và %s"
+              % (k, "/".join(sorted(set(v))),
+                 "còn được gán ở một file khác" if len(set(v)) > 1
+                 else "TRÙNG với một khai báo cột 0"))
+    print("  Danh sách trên là các QUYẾT ĐỊNH có chủ ý (js/utils.js đưa numOf ra toàn cục")
+    print("  để mọi file định dạng số giống nhau). Danh sách dài thêm mà chưa bàn là dấu")
+    print("  hiệu một biến đang trốn khỏi phạm vi file — hoặc hai file đang giành nhau.")
+    results.append(("trùng tên + cửa sổ toàn cục", len(trung) + len(de_nghi), None))
+
+    print("\n=== [6/7] mọi id tham chiếu phải có node thật + 0 chỗ gán innerHTML ===")
+    # Đây là phần gần nhất với "E2E" mà dự án làm được MÀ KHÔNG thêm file và KHÔNG
+    # cần cài gì (trần 52/52 đã đầy; Playwright cần test/e2e.js + node_modules).
+    # Nó không chứng minh hành vi: nó chứng minh NỐI DÂY. Một id gõ sai trong
+    # js/labs/*.js là kiểu hỏng im lặng — phòng lab vẫn mở, vẫn vẽ, chỉ cái nút
+    # đó không có ai nghe, và không có test thuần logic nào bắt được vì hàm vẫn
+    # đúng khi chạy một mình.
+    sinh_id, dung_id = set(), {}
+    for f in files + [ROOT / "index.html"]:
+        rel = f.relative_to(ROOT).as_posix()
+        src = f.read_text(encoding="utf-8", errors="replace")
+        for m in ID_BORN.finditer(src):
+            sinh_id.add(next(g for g in m.groups() if g))
+    for f in files:
+        rel = f.relative_to(ROOT).as_posix()
+        src = f.read_text(encoding="utf-8", errors="replace")
+        for m in ID_USE.finditer(src):
+            dung_id.setdefault(next(g for g in m.groups() if g), set()).add(rel)
+    khong_co = {k: sorted(v) for k, v in dung_id.items() if k not in sinh_id}
+    print("  %d id được $()/getElementById tham chiếu — có node thật: %d, không: %d"
+          % (len(dung_id), len(dung_id) - len(khong_co), len(khong_co)))
+    for k, v in sorted(khong_co.items()):
+        print("  ! %s: %s" % (k, ", ".join(v)))
+    gan_html = []
+    for f in files:
+        src = f.read_text(encoding="utf-8", errors="replace")
+        if INNER_HTML.search(src):
+            gan_html.append(f.relative_to(ROOT).as_posix())
+    print("  chỗ gán .innerHTML = còn lại trong js/ + sw.js: %d%s"
+          % (len(gan_html), (" — " + ", ".join(sorted(gan_html))) if gan_html else ""))
+    print("  Vì sao chặn cả hai: id sai thì phòng lab câm đi một nửa mà không ai biết;")
+    print("  innerHTML là con đường duy nhất để chữ người dùng biến thành code, nên giữ")
+    print("  nó bằng một con số (0) chứ không bằng một lời hứa trong chú thích.")
+    print("  Giới hạn, nói thẳng: khối này KHÔNG thay được Playwright. Nó không bấm thử,")
+    print("  không đo thứ tự render, không biết một handler có ném lỗi hay không — muốn")
+    print("  có E2E thật phải thêm file test/ và cài trình duyệt điều khiển được, cả hai")
+    print("  đều cần người duyệt vì repo đã kín 52 suất.")
+    results.append(("nối id + innerHTML", len(khong_co) + len(gan_html), None))
+
+    print("\n=== [7/7] không có key Google trong file git theo dõi ===")
+    # Bệnh thật 30-10-2026: `git add -f .env` đẩy key lên repo CÔNG KHAI, và từ đó
+    # Google từ chối đúng chuỗi ấy (401) — "AI không chat được" mấy ngày liền mà
+    # không dòng code nào sai. .gitignore không chặn được `-f`; khối này thì có.
+    # Chỉ in file:dòng, KHÔNG BAO GIỜ in chuỗi tìm thấy.
+    import subprocess
+
+    if not shutil.which("git"):
+        print("BỎ QUA: không có git trong PATH.")
+        results.append(("không lộ key", None, "thiếu git"))
+    else:
+        lo, da_quet = [], set()
+        # server/ là repo lồng (deploy riêng lên Render) nên phải quét cả hai.
+        for repo in (ROOT, ROOT / "server"):
+            if not (repo / ".git").exists():
+                continue
+            ds = subprocess.run(["git", "-C", str(repo), "ls-files", "-z"],
+                                capture_output=True).stdout.decode("utf-8", "replace")
+            for rel in filter(None, ds.split("\0")):
+                f = repo / rel
+                ten_hien = f.relative_to(ROOT).as_posix()
+                if ten_hien in da_quet:
+                    continue
+                da_quet.add(ten_hien)
+                if f.name == ".env":
+                    lo.append("%s: file .env đang bị git theo dõi (git rm --cached)" % ten_hien)
+                    continue
+                if not f.is_file() or f.stat().st_size > 2_000_000:
+                    continue
+                try:
+                    noi = f.read_text(encoding="utf-8")
+                except (UnicodeDecodeError, OSError):
+                    continue
+                for so, dong in enumerate(noi.splitlines(), 1):
+                    if KEY_GOOGLE.search(dong):
+                        lo.append("%s:%d: có chuỗi dạng key Google" % (ten_hien, so))
+        print("  %s" % ("ĐẠT — không file nào lộ key" if not lo else "LỖI %d chỗ" % len(lo)))
+        for l in lo:
+            print("  ! %s" % l)
+        # Lịch sử thì không chặn được bằng một lần chạy: chỉ NÓI ra, vì sửa nó là
+        # viết lại lịch sử + force-push — quyết định của chủ repo, không của script.
+        rc, cu = chay(["git", "-C", str(ROOT), "log", "--all", "--format=%h %ad",
+                       "--date=short", "--", ".env"], tail=20)
+        if rc == 0 and cu:
+            print("  CẢNH BÁO: lịch sử git vẫn còn .env ở %d commit (%s) — key nào từng"
+                  % (len(cu), ", ".join(c.split()[0] for c in cu)))
+            print("  nằm trong đó phải coi là đã lộ: xoá nó ở AI Studio và dùng key mới.")
+        results.append(("không lộ key", len(lo), None))
+
+    bo_qua = [name for name, n, skip in results if skip]
+    loi = [name for name, n, skip in results if n]
+    print("\n" + "=" * 58)
+    for name, n, skip in results:
+        print("  %-16s %s" % (name, ("BỎ QUA (%s)" % skip) if skip else ("ĐẠT" if not n else "LỖI")))
+    if bo_qua:
+        print("  CẦN NÓI: %d khối CHƯA được kiểm — cái 'xanh' ở trên không phải toàn bộ."
+              % len(bo_qua))
+    print("=" * 58)
+    return 1 if loi else 0
 
 
 if __name__ == "__main__":
+    if "--ci" in sys.argv:
+        sys.exit(ci())
     main()

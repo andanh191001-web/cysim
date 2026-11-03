@@ -5,8 +5,9 @@
              màn hình. Chiến lược network-first cho file của chính app: luôn
              ưu tiên bản mới nhất trên máy chủ, chỉ dùng bộ nhớ đệm khi thực sự
              ngoại tuyến — nhờ vậy sửa code xong F5 là thấy thay đổi, không kẹt
-             bản cũ. Font chữ Google thì NGƯỢC LẠI (cache-first) vì chúng không
-             bao giờ tự đổi và mỗi lần tải lại là một lần cần mạng.
+             bản cũ. Đường font thì NGƯỢC LẠI (cache-first) vì một file .woff2
+             đã tải về là vĩnh viễn giống nhau — từ 30-10-2026 app dùng chữ hệ
+             thống nên đường này chỉ còn là hàng rào cho lần thêm font sau này.
    CHẠY     : app.js gọi navigator.serviceWorker.register("sw.js") khi trang nạp
              xong (chỉ khi chạy qua http/https, không chạy bằng file://).
              install -> ghi trước TOÀN BỘ file runtime vào cache; activate ->
@@ -20,21 +21,29 @@
              Điểm mấu chốt của bản cũ: CORE chỉ liệt kê khung + js/lang/*.json
              nên 15 file phòng lab chỉ vào được nếu đã ghé qua khi còn mạng —
              mất mạng lần đầu là bật ra màn hình trắng. Vì app không có bước
-             build, cách chắc nhất là liệt kê hết, và CORE bây giờ khớp từng
-             thẻ <script> ở cuối index.html.
+             build, cách chắc nhất là liệt kê hết, và CORE bây giờ liệt kê đủ
+             23 file JS: 8 thẻ <script> trong index.html cộng 15 file mà
+             js/app.js nạp chậm theo trang. ĐÓ LÀ LÝ DO CORE DÀI HƠN index.html:
+             nạp chậm là chậm theo hàng đợi của trang, không được phép biến thành
+             "ngoại tuyến thì phòng lab biến mất".
    TOÀN CẦU : không dùng biến toàn cục nào của app — ngữ cảnh Service Worker
-             tách riêng. Bỏ qua mọi request khác origin NGOẠI TRỪ hai máy chủ
-             font (fonts.googleapis.com / fonts.gstatic.com); API của bên thứ
-             ba (EmailJS, API dịch, tra cứu IP) và máy chủ AI trên cổng 8000 hoặc
-             ở một host công khai (Render / Railway / VPS)
-             KHÔNG bao giờ được cache — chữ của người dùng không được nằm lại
-             trong bộ nhớ đệm. Cùng quy tắc đó áp cho /api/* cùng origin (máy chủ
-             AI trên Netlify nằm ngay trên domain của app): trạng thái "máy chủ
-             có sống không" mà bị cache thì lần sau màn hình nói dối.
+             tách riêng. Bỏ qua mọi request khác origin, CHỈ trừ hai máy chủ font
+             (fonts.googleapis.com / fonts.gstatic.com). Từ 30-10-2026 app không
+             còn nạp chữ từ đó (xem comment ở <head> của index.html), nên đường
+             này thường không có traffic; nó ở lại làm hàng rào chứ không phải
+             tàn tích: ai đó thêm font web trở lại thì font vẫn được nhớ, còn API
+             thì không. API của bên thứ ba (EmailJS, API dịch, tra cứu IP) và máy
+             chủ AI trên cổng 8000 hoặc ở một host công khai (Render / Railway /
+             VPS) KHÔNG bao giờ được cache — chữ của người dùng không được nằm
+             lại trong bộ nhớ đệm. Cùng quy tắc đó áp cho /api/* cùng origin: đó
+             là đường rewrite tới máy chủ AI, còn proxy Python của dự án thì nằm
+             trên host khác (server/, xem README). Trạng thái "máy chủ có sống
+             không" mà bị cache thì lần sau màn hình nói dối.
    ========================================================= */
 
-/* Danh sách PHẢI khớp index.html: khung + style + manifest + icon + 22 thẻ
-   <script> + mọi file từ điển mà js/i18n.js fetch lúc đổi ngôn ngữ. */
+/* Danh sách PHẢI liệt kê đủ file runtime: khung + style + manifest + icon +
+   23 file JS (8 thẻ <script> trong index.html + 15 file js/app.js nạp chậm theo
+   trang) + mọi file từ điển mà js/i18n.js fetch lúc đổi ngôn ngữ. */
 const CORE = [
   "./",
   "./index.html",
@@ -47,6 +56,7 @@ const CORE = [
   "./js/app.js",
   "./js/auth.js",
   "./js/ai.js",
+  "./js/search.js",
   "./js/boot.js",
   "./js/labs/account.js",
   "./js/labs/sqli.js",
@@ -95,7 +105,7 @@ self.addEventListener("install", (event) => {
      sạch" — một thẻ <script> mới thêm mà chưa nạp lại index.html, hoặc một
      js/lang/*.json bị lỗi đánh máy tên, là cả bộ nhớ đệm ngoại tuyến biến mất
      mà trên màn hình không có dấu hiệu nào. Ở đây file hỏng chỉ bị ghi tên vào
-     log, 33 file còn lại vẫn nằm trong cache. */
+     log, 34 file còn lại vẫn nằm trong cache. */
   event.waitUntil(
     caches.open(CACHE).then(async (cache) => {
       const ketQua = await Promise.allSettled(CORE.map((u) => cache.add(u)));
@@ -166,7 +176,18 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/")) return;
 
   event.respondWith(
-    fetch(request)
+    /* "reload" là vì một cái bẫy đã làm người dùng hiểu lầm hai lần: mạng-first
+       mà để nguyên request thì lượt fetch này vẫn đi qua BỘ NHỚ ĐỆM HTTP của
+       trình duyệt. Server tĩnh (python -m http.server, và mọi host không gửi
+       Cache-Control) chỉ trả Last-Modified, nên Chrome tự tính tuổi cho phép =
+       10% thời gian kể từ lần sửa file — một file sửa từ hôm qua có thể được
+       coi là còn tươi suốt nhiều giờ. Kết quả: sửa style.css xong, người dùng
+       mở app vẫn thấy vòng quét quay nhanh và báo "đã sửa mà không ăn". Ở đây
+       không có build step, không có tên file đổi theo nội dung, nên cái giá của
+       một bản cũ là người học thấy một app khác với cái ta vừa sửa. Cache
+       Storage vẫn là lối lùi khi mất mạng (nhánh catch bên dưới) — chỉ là nó
+       không còn được phép chắn đường mạng khi mạng đang có. */
+    fetch(request, { cache: "reload" })
       .then((response) => {
         if (response.ok) {
           const copy = response.clone();

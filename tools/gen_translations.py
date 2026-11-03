@@ -249,7 +249,11 @@ def migrate_legacy_cache():
 
 
 def save_cache(cache):
-    CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False, indent=0), encoding="utf-8")
+    # Dòng cuối có ký tự xuống hàng: nếu không, `wc -l` đếm thiếu 1 so với số
+    # dòng thật, và con số ghi ở README §2 sẽ lệch mà không ai hiểu vì sao.
+    CACHE_FILE.write_text(
+        json.dumps(cache, ensure_ascii=False, indent=0) + "\n", encoding="utf-8"
+    )
 
 
 def bo_dau(text):

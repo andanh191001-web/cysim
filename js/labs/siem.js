@@ -97,7 +97,7 @@
     verdict.textContent =
       t("Chưa chính xác! ") +
       (found.size < ATTACKS_TO_FIND ? t("Mới phát hiện") + " " + found.size + "/3 " + t("loại tấn công. ") : "") +
-      (wrong > 0 ? t("Có") + " " + wrong + " " + t("dòng bị đánh dấu sai (dòng bình thường). ") : "") +
+      (wrong > 0 ? t("Có") + " " + wrong + " " + tdem(wrong, "dòng bị đánh dấu sai (dòng bình thường). ") : "") +
       t("Gợi ý: tìm brute force (nhiều Failed password liên tiếp), SQL Injection (UNION/OR 1=1), và XSS (<script>, onerror=).");
   });
 
@@ -109,8 +109,12 @@
   /* Chỉ dọn dòng kết luận, KHÔNG dựng lại danh sách log: người dùng có thể
      đánh dấu dở, rời trang xem lab khác rồi quay lại thì vẫn phải còn work
      in progress của mình. */
+  /* display:none chỉ ẩn được kết luận trên màn hình, còn chữ vẫn nằm trong
+     DOM: mở DevTools hoặc xem lại nguồn là đọc thấy verdict của lần chơi
+     trước. Xoá hẳn textContent, cùng khuôn với Labs.phishing.reset(). */
   function resetVerdict() {
     $("siemVerdict").className = "verdict";
+    $("siemVerdict").textContent = "";
   }
 
   render();

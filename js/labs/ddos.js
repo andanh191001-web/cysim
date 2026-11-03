@@ -18,7 +18,8 @@
    CHẠM TỚI : #btnStartDdos, #btnCloudflare, #btnAutoBlock, #ipGrid, #hpVal,
              #hpBar, #hpBarBox, #bwVal, #ddosVerdict; global t(), $(),
              complete(); đăng ký Labs.ddos = { stop, isRunning } để app.js
-             dừng vòng lặp khi rời view.
+             dừng vòng lặp khi rời view — stop() cũng bật lại #btnStartDdos và
+             tắt #btnCloudflare, nếu không quay lại trang là hết chơi được.
    ========================================================= */
 
 (function () {
@@ -62,11 +63,20 @@
     clearTimeout(winTimer);
     gameTimer = spawnTimer = winTimer = null;
     autoBtn().disabled = true;
+    /* app.js gọi đúng stop() khi rời trang. Nếu không bật lại #btnStartDdos thì
+       người học quay về lab DDoS chỉ thấy một nút Start xám và phải tải lại
+       trang mới chơi được lần hai; #btnCloudflare thì ngược lại — vẫn bấm được
+       mà toggleCloudflare() âm thầm return vì !active, thành một nút chết. Hai
+       dòng này đưa bàn điều khiển về đúng trạng thái khởi động trong index.html
+       (Start bật, hai nút kia tắt). finish() vẫn tự đặt lại sau khi gọi stop(). */
+    $("btnStartDdos").disabled = false;
+    $("btnCloudflare").disabled = true;
   }
 
   /* Một lần chặn: xả băng thông của một IP đang tấn công. Dùng chung cho
      nút BLOCK trên thẻ và nút Auto-Block để hai đường không lệch nhau. */
   function blockCard(card) {
+    if (!active) return; // ván đã dừng (rời trang rồi quay lại): thẻ cũ không còn thật
     card.remove();
     blocked++;
     bandwidth = Math.max(10, bandwidth - BANDWIDTH_PER_BLOCK);

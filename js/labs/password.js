@@ -13,7 +13,9 @@
              #checkSymbol #checkCommon, #strengthLabel, #timeToCrackValue,
              #timeToCrackBox, #entropyValue, #togglePassword; global t(),
              CyUtil.humanizeSeconds, complete(); đăng ký Labs.password.render
-             để app.js vẽ lại khi đổi ngôn ngữ.
+             để app.js vẽ lại khi đổi ngôn ngữ, và Labs.password.pure (bốn hàm
+             toán + nhãn) để test/labs.test.js chấm điểm offline — không cần
+             trình duyệt, không cần đụng ô nhập.
    ========================================================= */
 
 (function () {
@@ -47,7 +49,9 @@
   }
 
   function isRepeating(pw) {
-    return /^(.)\1+$/.test(pw);
+    /* Cờ `u`: không có thì "." ăn từng UTF-16 code unit, nên mật khẩu lặp emoji
+       ("😀😀") bị bỏ qua vì mỗi ký tự là hai nửa surrogate pair. */
+    return /^(.)\1+$/u.test(pw);
   }
   function isRun(pw) {
     const lower = pw.toLowerCase();
@@ -126,5 +130,11 @@
     $("togglePassword").textContent = t(reveal ? "Ẩn" : "Hiện");
   });
 
-  Labs.password = { render };
+  /* `pure` là những hàm toán học KHÔNG đụng DOM — tách ra cho test chạy được
+     bằng Node trần. Nhãn "Rất mạnh"/"Yếu" in lên màn hình một lời khuyên bảo
+     mật, nên nó phải do số đo chứng minh chứ không do mắt nhìn. */
+  Labs.password = {
+    render,
+    pure: { estimate, charsetSize, isRepeating, isRun, LABELS, commonCount: COMMON.length },
+  };
 })();

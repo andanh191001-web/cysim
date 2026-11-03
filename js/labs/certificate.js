@@ -45,8 +45,10 @@
     return localStorage.getItem(nameKey()) || guestName();
   }
 
-  /* exam.js được nạp SAU file này nên Labs.exam chỉ tồn tại lúc render(), không
-     phải lúc khai báo. */
+  /* Labs.exam luôn tồn tại lúc hàm này chạy: exam.js nằm trong 8 thẻ <script>
+     tĩnh của index.html (nó phải có mặt ngay để showView khóa điều hướng khi đang
+     thi), còn file này — kể cả trước 30-10-2026 — luôn là file nạp sau. Vế ?
+     vẫn ở lại vì nó rẻ và đúng cho mọi cách nạp. */
   function lockState() {
     const labs = labsDone();
     if (labs < TOTAL_LABS) return { key: "labs", labs };
@@ -87,7 +89,7 @@
      trong từ điển. #certStats được đánh dấu data-no-i18n và tự vẽ bằng t()
      mỗi lần đổi ngôn ngữ — vừa không gọi dịch máy, vừa luôn đúng thứ tiếng. */
   function paintStats(count) {
-    $("certStats").textContent = `${count} / ${TOTAL_MISSIONS} ${t("nhiệm vụ")} · ${count * 100} XP`;
+    $("certStats").textContent = `${count} / ${TOTAL_MISSIONS} ${tdem(count, "nhiệm vụ")} · ${count * 100} XP`;
   }
 
   /* #certLockMsg mang data-no-i18n: engine dịch không được đụng vào, còn JS thì
@@ -161,6 +163,15 @@
     canvas.height = 900;
     const ctx = canvas.getContext("2d");
 
+    /* Bộ chữ in lên ảnh chứng chỉ lấy đúng hai biến font của style.css.
+       Trước 30-10-2026 ở đây ghi tên 'Space Grotesk' / 'JetBrains Mono' — hai
+       font phải tải qua mạng. App đã chuyển sang chữ hệ thống, nên giữ tên cũ
+       chỉ khiến canvas âm thầm rơi về font mặc định của trình duyệt: mỗi máy
+       in ra một kiểu và không khớp với chữ trên trang. */
+    const cs = getComputedStyle(document.documentElement);
+    const CHU = cs.getPropertyValue("--sans").trim() || "sans-serif";
+    const MONO = cs.getPropertyValue("--mono").trim() || "monospace";
+
     const grad = ctx.createLinearGradient(0, 0, 1400, 900);
     grad.addColorStop(0, "#0d1424");
     grad.addColorStop(0.5, "#0a1929");
@@ -177,27 +188,27 @@
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#4de1ff";
-    ctx.font = "bold 28px 'Space Grotesk', sans-serif";
+    ctx.font = "bold 28px " + CHU;
     ctx.fillText("◈ CySim", 700, 130);
 
     ctx.fillStyle = "#e4ebf7";
-    ctx.font = "bold 52px 'Space Grotesk', sans-serif";
+    ctx.font = "bold 52px " + CHU;
     ctx.fillText("CERTIFICATE OF TRAINING", 700, 220);
 
     ctx.fillStyle = "#8593b0";
-    ctx.font = "18px 'Space Grotesk', sans-serif";
+    ctx.font = "18px " + CHU;
     ctx.fillText("CYBER SECURITY ANALYST PROGRAM", 700, 258);
 
     ctx.fillStyle = "#6ee7a8";
-    ctx.font = "bold 60px 'Space Grotesk', sans-serif";
+    ctx.font = "bold 60px " + CHU;
     ctx.fillText($("certName").textContent, 700, 400);
 
     ctx.fillStyle = "#4de1ff";
-    ctx.font = "italic 22px 'Space Grotesk', sans-serif";
+    ctx.font = "italic 22px " + CHU;
     ctx.fillText($("certRank").textContent, 700, 450);
 
     ctx.fillStyle = "#8593b0";
-    ctx.font = "18px 'JetBrains Mono', monospace";
+    ctx.font = "18px " + MONO;
     ctx.fillText($("certStats").textContent, 700, 500);
 
     /* Xếp loại tốt nghiệp do js/labs/exam.js ghi vào #certGrade sau khi chấm.
@@ -205,7 +216,7 @@
     const grade = $("certGrade").textContent;
     if (grade) {
       ctx.fillStyle = "#6ee7a8";
-      ctx.font = "bold 24px 'Space Grotesk', sans-serif";
+      ctx.font = "bold 24px " + CHU;
       ctx.fillText(grade, 700, 560);
     }
 
@@ -218,13 +229,13 @@
     ctx.setLineDash([]);
 
     ctx.fillStyle = "#8593b0";
-    ctx.font = "16px 'JetBrains Mono', monospace";
+    ctx.font = "16px " + MONO;
     ctx.textAlign = "left";
     ctx.fillText(t("Cấp ngày: ") + $("certDate").textContent, 120, 740);
     ctx.fillText(t("Mã chứng chỉ: ") + $("certCode").textContent, 120, 766);
     ctx.textAlign = "center";
     ctx.fillStyle = "#ff5c7a";
-    ctx.font = "italic 14px 'Space Grotesk', sans-serif";
+    ctx.font = "italic 14px " + CHU;
     ctx.fillText(
       "* This certificate is for training simulation purposes only and does not substitute industry-recognized certifications.",
       700, 806

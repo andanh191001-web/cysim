@@ -5,37 +5,37 @@
     "'người đã duyệt' (review) với 'máy dịch' (machine) ngay cạnh tên lá cờ.",
     "Từ điển thật nằm ở js/lang/<mã>.json; nguồn kiểm chứng nằm ở tools/translation_review.json."
   ],
-  "total": 1004,
-  "generated": "2026-10-29",
+  "total": 1197,
+  "generated": "2026-10-31",
   "langs": {
     "en": {
-      "review": 933,
+      "review": 1117,
       "machine": 0,
-      "code": 71,
+      "code": 80,
       "missing": 0
     },
     "zh": {
-      "review": 922,
+      "review": 1106,
       "machine": 0,
-      "code": 82,
+      "code": 91,
       "missing": 0
     },
     "fr": {
-      "review": 922,
+      "review": 1106,
       "machine": 0,
-      "code": 82,
+      "code": 91,
       "missing": 0
     },
     "es": {
-      "review": 922,
+      "review": 1106,
       "machine": 0,
-      "code": 82,
+      "code": 91,
       "missing": 0
     },
     "ja": {
-      "review": 922,
+      "review": 1106,
       "machine": 0,
-      "code": 82,
+      "code": 91,
       "missing": 0
     }
   }

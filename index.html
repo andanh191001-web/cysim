@@ -6,42 +6,106 @@
       CySim — index.html  ·  toàn bộ markup của ứng dụng
 
       LÀ GÌ   : Một trang duy nhất (SPA, không framework, không build) chứa
-                18 màn hình <section class="view"> — dashboard, Hướng dẫn,
-                Lý thuyết (12 chủ đề), 13 phòng lab, Leaderboard, Giám sát —
+                20 màn hình <section class="view"> — dashboard, Hướng dẫn,
+                Lý thuyết (12 chủ đề), 12 phòng lab, màn Chứng chỉ, Leaderboard,
+                Giám sát,
+                Cài đặt (#settings, kiểu nhìn của máy) và Quản trị (#admin,
+                chỉ mở với tài khoản có role admin) —
                 cộng màn hình đăng nhập #authOverlay, khung chat AI #aiPanel
                 (dòng trạng thái máy chủ #aiStatus, khay ảnh #aiImages, ô độ sâu
-                #aiDepth, nút phóng to #aiExpand), biển mất mạng #netFlag và toast.
+                #aiDepth, nút phóng to #aiExpand), palette tìm kiếm #searchPalette
+                (nút #searchOpen + Ctrl+K — js/search.js vẽ danh sách vào
+                #searchResults), biển mất mạng #netFlag và toast.
       CHẠY     : JS không tự tạo khung cảnh: nó tra id trong các section này
                 rồi bật/tắt .active. showView("ddos") trong app.js đổi đúng
                 section có id="ddos"; đổi id ở đây mà không đổi ở JS là
                 trang đó thành màn hình trắng.
-                Cuối <body> là 22 thẻ <script> THEO THỨ TỰ BẮT BUỘC:
-                utils -> i18n-curated -> i18n -> app -> auth -> 15 file lab ->
-                ai -> boot. Vì các file chia sẻ biến toàn cầu (khai báo const/let
-                ở cấp cao nhất) nên đảo thứ tự là vỡ app, không có module
-                loader nào cứu được.
+                Cuối <body> là 8 thẻ <script> THEO THỨ TỰ BẮT BUỘC:
+                utils -> i18n-curated -> i18n -> app -> auth -> labs/exam ->
+                search -> boot. Vì các file chia sẻ biến toàn cầu (khai
+                báo const/let ở cấp cao nhất) nên đảo thứ tự là vỡ app, không
+                có module loader nào cứu được. 15 file còn lại (14 phòng lab +
+                js/ai.js) không còn là thẻ ở đây: app.js nạp chúng đúng lúc
+                người dùng mở trang cần — xem LAB_SCRIPT/VIEW_SCRIPT trong
+                js/app.js.
+                Trong <head> có MỘT script nội tuyến nhỏ: nó áp nền sáng/cỡ chữ
+                đã lưu trước khi trình duyệt vẽ, để người đổi giao diện không
+                phải nhìn màn hình tối nháy lên mỗi lần mở.
       QUY ƯỚC : Chữ tiếng Việt ở đây là NGUỒN dịch; tools/i18n_scan.py đọc
                 file này để lập danh sách chuỗi cần dịch. Phần tử có
                 data-no-i18n = không dịch (nhật ký, payload demo);
                 data-i18n-src="chuỗi\nchuỗi" = khai báo chuỗi động mà
                 JS ghép lúc chạy, scanner không nhìn thấy trong JS.
+                Một element nằm GIỮA câu sẽ cắt text node thành hai mảnh vô
+                nghĩa với bộ máy dịch — nên <b>, <code>, nút.linkbtn luôn nằm
+                CUỐI vế, không chèn giữa câu.
       =========================================================
     -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- interactive-widget=resizes-content: khi bàn phím ảo hiện lên thì nó THU
+         CHIỀU CAO KHUNG NHÌN thật (window.innerHeight), thay vì chỉ đè lên như
+         một lớp vẽ. Đây là chỗ dựa của hai thứ: khung chat AI kẹp bottom nên nó
+         tự nhô lên trên bàn phím, và js/app.js cuộn ô nhập đang gõ lên giữa
+         màn hình dựa vào chiều cao đã trừ bàn phím. Android Chrome 108+; iOS
+         không hỗ trợ nên vẫn còn handler cuộn kia — hai lớp, không lớp nào một
+         mình là đủ. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+    />
     <meta name="theme-color" content="#070b14" />
     <!-- Thêm PWA Manifest -->
     <link rel="manifest" href="manifest.json" />
     <title>CySim — Hệ sinh thái đào tạo an ninh mạng toàn diện</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- 30-10-2026: KHÔNG còn nạp chữ từ Google. Trước đây ở đây có ba thẻ
+         (2 preconnect + 1 stylesheet) tải Space Grotesk + JetBrains Mono, tức
+         là 7 request và 94,6 KB CHẶN VẼ trước khi người dùng thấy chữ — và một
+         lần mở app là một lần fonts.gstatic.com biết bạn vừa mở app. Font hệ
+         thống (style.css: --sans/--mono) ngay trên máy đã đẹp, offline vẫn giữ
+         được kiểu chữ, và không bên nào biết ai đang học. Muốn thử lại font
+         riêng thì tự host file .woff2 về fonts/ rồi khai @font-face trong
+         style.css, đừng đưa một host thứ ba vào trang. -->
     <link rel="stylesheet" href="style.css" />
+    <!-- Nền sáng/cỡ chữ là thứ NGƯỜI DÙNG CHỌN và style.css đọc nó từ <html>.
+         js/app.js chỉ chạy ở cuối <body>, nên nếu không áp dụng ở đây thì
+         người chọn nền sáng thấy cả màn hình tối trong lúc tải. Settings.apply()
+         trong app.js vẫn là bản chính thức; đoạn này chỉ ghi sớm 4 giá trị đã
+         kiểm tra danh sách hợp lệ — giá trị lạ bị bỏ, không rơi vào CSS. -->
+    <script>
+      try {
+        var s = JSON.parse(localStorage.getItem("cysim-settings") || "{}");
+        var hopLe = {
+          theme: { dem: 1, sang: 1 },
+          fs: { vua: 1, lon: 1, rong: 1 },
+          motion: { bat: 1, tat: 1 },
+          contrast: { cao: 1, thuong: 1 },
+        };
+        var el = document.documentElement;
+        for (var k in hopLe) if (s[k] && hopLe[k][s[k]]) el.dataset[k] = s[k];
+      } catch (e) {
+        /* localStorage bị chặn hoặc chứa rác: để nguyên mặc định nền tối. */
+      }
+    </script>
   </head>
   <body>
+    <!-- Tắt JavaScript là gì, nói thẳng một lần thay vì để người dùng ngồi nhìn
+         màn hình chết và tự đoán. Toàn bộ ứng dụng do JS trong máy này tính:
+         15 phòng lab, khung chat AI, đăng nhập, tiến độ, bảng xếp hạng. Không
+         có máy chủ nào vẽ hộ, nên không có JavaScript thì chỉ còn markup tĩnh.
+         Để nguyên tiếng Việt: tầng dịch cũng là JavaScript, tắt JS thì không
+         còn đường đổi ngôn ngữ, đừng giả vờ ngược lại ngay chỗ này. -->
+    <noscript>
+      <div
+        style="margin:0;padding:18px 22px;background:#3b0d12;color:#ffe1e4;border-bottom:2px solid #ff5c7a;font:16px/1.55 system-ui,sans-serif"
+      >
+        <b>CySim cần JavaScript để chạy.</b> Mười lăm phòng lab, khung chat AI,
+        màn hình đăng nhập, bảng tiến độ và chứng chỉ đều được tính ngay trong
+        trình duyệt của bạn, không có máy chủ nào vẽ hộ. Trình duyệt này đang tắt
+        JavaScript nên trang chỉ còn là chữ tĩnh và mọi nút bấm đều vô dụng: bật
+        JavaScript (hoặc cho phép riêng với địa chỉ này) rồi nạp lại trang. Bản
+        hiển thị ở đây là tiếng Việt, vì bộ máy dịch cũng cần JavaScript.
+      </div>
+    </noscript>
     <!-- Mobile Menu Button (Thêm aria-label cho Accessibility) -->
     <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Mở menu">
       ☰
@@ -58,7 +122,7 @@
         <div class="uinfo" data-no-i18n>
           <b id="userName">—</b><small id="userEmail">—</small>
         </div>
-        <button class="btn ghost sm" id="accountBtn" type="button" data-goto="account">
+        <button class="btn ghost sm" id="accountBtn" type="button" data-goto="settings">
           Tài khoản
         </button>
         <button class="btn ghost sm" id="logoutBtn" type="button">
@@ -92,6 +156,10 @@
       <symbol id="i-key" viewBox="0 0 24 24">
         <circle cx="8" cy="15" r="4" />
         <path d="M11 12l9-9M16 7l3 3M14 9l2 2" />
+      </symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.6" />
+        <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" />
       </symbol>
       <symbol id="i-shield" viewBox="0 0 24 24">
         <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" />
@@ -159,6 +227,11 @@
         <circle cx="8.5" cy="9.5" r="1.5" />
         <path d="M21 16l-4.5-5L9 20" />
       </symbol>
+      <!-- Kính lúp cho ô tìm kiếm toàn văn (js/search.js) -->
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="M15.5 15.5L21 21" />
+      </symbol>
     </svg>
 
     <div class="app">
@@ -186,13 +259,32 @@
         </div>
 
         <!-- Language Selector -->
+        <!-- Nhãn "🌐 LANGUAGE / NGÔN NGỮ" đã bỏ khỏi màn hình: ô chọn tự đọc tên
+             ngôn ngữ đang dùng nên dòng đó chỉ chiếm thêm một hàng trong cái
+             cột chật nhất app. Trang Cài đặt cũng có một ô chọn ngôn ngữ riêng
+             (#setLang). Máy đọc màn hình vẫn có tên nhờ aria-label dưới đây. -->
         <div class="lang-switch">
-          <label for="langSelect">🌐 Language / Ngôn ngữ</label>
           <!-- Danh sách ngôn ngữ do initI18n() trong js/i18n.js tạo ra -->
           <select id="langSelect" aria-label="Chọn ngôn ngữ giao diện"></select>
         </div>
 
+        <!-- Tìm kiếm toàn văn: cùng một lối vào với Ctrl+K. Palette thật nằm
+             ở cuối body (#searchPalette), file này chỉ chứa nút mở. -->
+        <button
+          class="search-open"
+          id="searchOpen"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="searchPalette"
+          aria-keyshortcuts="Control+K Meta+K"
+        >
+          <svg aria-hidden="true"><use href="#i-search" /></svg>
+          <span>Tìm kiếm</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+
         <nav aria-label="Điều hướng chính">
+          <p class="nav-cap">Chính</p>
           <button class="nav-btn active" data-view="dashboard">
             <svg><use href="#i-home" /></svg>Tổng quan
           </button>
@@ -202,71 +294,83 @@
           <button class="nav-btn" data-view="theory">
             <svg><use href="#i-list" /></svg>Lý thuyết
           </button>
-          <button class="nav-btn" data-view="account" data-k="acct">
-            <svg><use href="#i-user" /></svg>Tài khoản demo<span class="tick"
+          <!-- 11 phòng lab nằm sau một nút gập. Lý do thật, từ người dùng: cột
+               trái liệt kê cùng lúc 20 hàng chữ nhỏ, mở lên không biết hôm nay
+               mình cần gì. Gập lại KHÔNG giấu bài học đi đâu — trang Tổng quan
+               vẫn có thẻ riêng cho từng lab, Ctrl+K vẫn tìm thấy cả 11 trang vì
+               js/search.js đọc .nav-btn[data-view] bất kể nó có đang hiển thị.
+               js/app.js: nhớ trạng thái gập (cysim-nav-labs), đếm số lab ngay từ
+               DOM thay vì viết chết số 11 vào đây, và tự mở ra khi trang đang
+               xem là một lab để dấu ✓ hoàn thành không biến mất. -->
+          <button type="button" class="nav-fold-btn" id="navLabsToggle" aria-expanded="false">
+            <span class="nav-fold-arrow" aria-hidden="true"></span><span class="nav-fold-name">Phòng lab</span> <span class="nav-count" id="navLabsCount"></span>
+          </button>
+          <button class="nav-btn" data-view="sqli" data-k="sqli" data-lab>
+            <svg><use href="#i-db" /></svg>SQL Injection<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="sqli" data-k="sqli">
-            <svg><use href="#i-db" /></svg>SQL Injection<span class="tick"
+          <button class="nav-btn" data-view="phishing" data-k="phish" data-lab>
+            <svg><use href="#i-fish" /></svg>Bẫy Phishing<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="phishing" data-k="phish">
-            <svg><use href="#i-fish" /></svg>Bẫy Phishing<span class="tick"
+          <button class="nav-btn" data-view="ddos" data-k="ddos" data-lab>
+            <svg><use href="#i-zap" /></svg>Đánh chặn DDoS<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="ddos" data-k="ddos">
-            <svg><use href="#i-zap" /></svg>Đánh chặn DDoS<span class="tick"
+          <button class="nav-btn" data-view="password" data-k="pwd" data-lab>
+            <svg><use href="#i-key" /></svg>Kiểm tra mật khẩu<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="password" data-k="pwd">
-            <svg><use href="#i-key" /></svg>Kiểm tra mật khẩu<span class="tick"
+          <button class="nav-btn" data-view="firewall" data-k="fw" data-lab>
+            <svg><use href="#i-shield" /></svg>Phòng thủ mạng<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="firewall" data-k="fw">
-            <svg><use href="#i-shield" /></svg>Phòng thủ mạng<span class="tick"
+          <button class="nav-btn" data-view="real-ip-lab" data-k="realip" data-lab>
+            <svg><use href="#i-pulse" /></svg>Tra cứu IP<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="real-ip-lab" data-k="realip">
-            <svg><use href="#i-pulse" /></svg>Tra cứu IP<span class="tick"
-              >✓</span
-            >
-          </button>
-          <button class="nav-btn" data-view="antivirus" data-k="av">
+          <button class="nav-btn" data-view="antivirus" data-k="av" data-lab>
             <svg><use href="#i-virus" /></svg>Quét virus máy tính<span
-              class="tick"
+              class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="csrf" data-k="csrf">
-            <svg><use href="#i-link" /></svg>Lỗ hổng CSRF<span class="tick"
+          <button class="nav-btn" data-view="csrf" data-k="csrf" data-lab>
+            <svg><use href="#i-link" /></svg>Lỗ hổng CSRF<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="idor" data-k="idor">
+          <button class="nav-btn" data-view="idor" data-k="idor" data-lab>
             <svg><use href="#i-user" /></svg>Broken Access Control<span
-              class="tick"
+              class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="xss" data-k="xss">
-            <svg><use href="#i-code" /></svg>Lỗ hổng XSS<span class="tick"
+          <button class="nav-btn" data-view="xss" data-k="xss" data-lab>
+            <svg><use href="#i-code" /></svg>Lỗ hổng XSS<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
-          <button class="nav-btn" data-view="siem" data-k="siem">
+          <button class="nav-btn" data-view="siem" data-k="siem" data-lab>
             <svg><use href="#i-list" /></svg>Phân tích log SIEM<span
-              class="tick"
+              class="tick" aria-hidden="true"
+              >✓</span
+            >
+          </button>
+          <p class="nav-cap">Tiện ích</p>
+          <button class="nav-btn" data-view="account" data-k="acct">
+            <svg><use href="#i-user" /></svg>Tài khoản demo<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
           <button class="nav-btn" data-view="certificate" data-k="cert">
-            <svg><use href="#i-award" /></svg>Chứng chỉ<span class="tick"
+            <svg><use href="#i-award" /></svg>Chứng chỉ<span class="tick" aria-hidden="true"
               >✓</span
             >
           </button>
@@ -275,6 +379,16 @@
           </button>
           <button class="nav-btn" data-view="monitor">
             <svg><use href="#i-pulse" /></svg>Giám sát trực tiếp
+          </button>
+          <!-- Hai nút tiện ích, đặt cuối danh sách vì chúng không phải bài học.
+               "Quản trị" bị ẩn với mọi tài khoản thường (js/auth.js quyết định
+               bằng role), còn "Cài đặt" luôn có mặt — ai cũng phải chỉnh được
+               màn hình của mình. -->
+          <button class="nav-btn" data-view="settings">
+            <svg><use href="#i-gear" /></svg>Cài đặt
+          </button>
+          <button class="nav-btn" data-view="admin" id="navAdmin" hidden>
+            <svg><use href="#i-key" /></svg>Quản trị
           </button>
         </nav>
         <!-- Ô tài khoản + Đăng xuất đã chuyển lên .acct-dock góc trên bên phải -->
@@ -296,9 +410,11 @@
               <div>
                 <h1>Tự tay thử tấn công, rồi học cách chặn nó.</h1>
                 <p>
-                  Hệ sinh thái đào tạo an ninh mạng toàn diện với mô phỏng
-                  Phishing, DDoS, SQL Injection, XSS, CSRF, IDOR, SIEM Log
-                  Analysis, Truy vấn IP thực tế và Cấp chứng chỉ hoàn thành.
+                  Bạn không cần biết trước gì về an ninh mạng. Mỗi phòng lab bên
+                  dưới là một bài có hướng dẫn từng bước: bạn gây ra một cú tấn
+                  công thật sự — trong môi trường giả lập, an toàn — rồi tự tay
+                  chặn nó lại. Mỗi bài khoảng 10 phút, chạy ngay trong trình
+                  duyệt, không cần cài đặt gì.
                 </p>
                 <button class="btn" data-goto="account">
                   Bắt đầu nhiệm vụ đầu tiên
@@ -312,20 +428,58 @@
                 </button>
               </div>
               <div class="radar" aria-hidden="true">
+                <!-- Bốn chấm "phát hiện" trên radar. animation-delay chia đều
+                     24s của một vòng (0 / -6 / -12 / -18s) để có đúng một chấm
+                     sáng lên mỗi sáu giây, thay vì bốn chấm nổ cùng lúc rồi
+                     màn hình đứng im 20 giây — người dùng thật nói mấy cái vòng
+                     tròn sáng lên đó nhanh quá (30-10-2026). -->
                 <span class="blip" style="left: 68%; top: 22%"></span>
                 <span
                   class="blip"
-                  style="left: 24%; top: 38%; animation-delay: -1.6s"
+                  style="left: 24%; top: 38%; animation-delay: -6s"
                 ></span>
                 <span
                   class="blip"
-                  style="left: 76%; top: 64%; animation-delay: -3s"
+                  style="left: 76%; top: 64%; animation-delay: -12s"
                 ></span>
                 <span
                   class="blip"
-                  style="left: 40%; top: 78%; animation-delay: -4s"
+                  style="left: 40%; top: 78%; animation-delay: -18s"
                 ></span>
               </div>
+            </div>
+
+            <!-- ===== "Bắt đầu ở đây" =====
+                 Người mới mở app này thường gặp một màn hình đầy chữ SQL
+                 Injection, DDoS, IDOR và không biết bấm vào đâu trước. Ba dòng
+                 dưới đây nói bằng thứ tiếng ai cũng hiểu, và chỉ đường tới hai
+                 chỗ thật sự cần: một bài lab, và khung trợ lý AI cho những
+                 câu chưa hiểu. -->
+            <div class="card s12 batdau">
+              <h3>Bắt đầu ở đây — ba bước</h3>
+              <ol>
+                <li>
+                  Bấm một thẻ bài học bên dưới. Thẻ nào cũng mở ra một màn hình
+                  có sẵn hướng dẫn, bạn chỉ việc làm theo.
+                </li>
+                <li>
+                  Tự tay gõ và bấm, đừng chỉ đọc. Cú tấn công chỉ thật sự hiểu
+                  khi chính bạn gây ra nó rồi chặn nó lại.
+                </li>
+                <li>
+                  Gặp chữ gì lạ? Gõ câu hỏi vào khung Trợ lý AI ở góc dưới trái
+                  — nó biết 13 bài trong app này và trả lời đúng thứ tiếng bạn
+                  đang dùng.
+                </li>
+              </ol>
+              <!-- Nút chuyển trang nằm CUỐI vế đầu, không nằm giữa câu: bộ máy
+                   dịch cần một text node là một câu trọn vẹn, ghép chữ giữa hai
+                   mảnh vỡ ra tiếng Anh thì đúng mà tiếng Nhật thì lộn xộn. -->
+              <p class="mute">
+                Đọc chữ nhỏ thấy mệt? Chọn nền sáng và cỡ chữ to ở trang
+                <button type="button" class="linkbtn" data-goto="settings">Cài đặt</button>
+                — không mất bài học nào cả.
+              </p>
             </div>
 
             <button class="card mission s4" data-goto="account" data-k="acct">
@@ -1187,6 +1341,23 @@
               Tạo tài khoản, rồi tự tay chạy đúng đoạn code mà một công cụ dò
               mật khẩu thật sự dùng.
             </p>
+            <p class="mute">
+              Nói thẳng về chính app này, vì đây là phòng lab dạy bảo mật: mật
+              khẩu bạn vừa đặt chỉ để mở giao diện trên máy này. Nó được băm bằng
+              PBKDF2-SHA256 với muối ngẫu nhiên 16 byte và 150.000 vòng, nên không
+              ai lấy lại được mật khẩu từ file.
+            </p>
+            <p class="mute">
+              Nhưng tiến độ, khung chat và chứng chỉ thì KHÔNG được mã hoá: chúng
+              nằm nguyên trong localStorage của máy, mở DevTools là đọc và sửa
+              được.
+            </p>
+            <p class="mute">
+              Muốn khoá thật sự thì cần một máy chủ đứng giữa, hoặc ít nhất Web
+              Crypto AES-GCM với khoá dẫn xuất từ mật khẩu. Bản này cố ý không
+              làm, vì cái giá phải trả là mất đúng thứ khiến nó dùng được trong
+              lớp học: mở là chạy, không tài khoản thật, không cần internet.
+            </p>
           </div>
           <div class="grid">
             <div class="card s7">
@@ -1222,11 +1393,7 @@
                     font-size: 13px;
                   "
                 >
-                  <input
-                    type="checkbox"
-                    id="mfaToggle"
-                    style="width: 16px; height: 16px"
-                  />
+                  <input type="checkbox" id="mfaToggle" />
                   Bật xác thực đa yếu tố (MFA) cho tài khoản này
                 </label>
               </form>
@@ -1404,17 +1571,35 @@
                 <h4 style="color: var(--red); margin: 15px 0 5px">
                   ⚠️ Dữ liệu bị rò rỉ:
                 </h4>
-                <table class="db-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Username</th>
-                      <th>Password (Hash)</th>
-                      <th>Role</th>
-                    </tr>
-                  </thead>
-                  <tbody id="dbTableBody"></tbody>
-                </table>
+                <!-- .table-scroll là chỗ dựa của .db-table{min-width:480px}: ở
+                     khung 360px hộp chứa chỉ rộng 262px, không cuộn thì bảng bị
+                     cắt mất cột "Role" — mà cột đó chính là bài học (admin ở
+                     đâu). Bảng này KHÔNG đổi thành thẻ như Bảng xếp hạng vì bốn
+                     ô của nó là dữ liệu do lab sinh, người đọc phải SO SÁNH
+                     theo cột, không phải xem từng dòng một.
+                     tabindex/role là vì lý do đó: một vùng overflow-x:auto mà
+                     không nằm trong tab order thì người dùng bàn phím chạm được
+                     ID và Username nhưng KHÔNG bao giờ thấy cột Role — đúng cái
+                     cột mà lab này muốn dạy. Con trỏ chuột lăn được, bàn phím thì
+                     phải có phần tử để focus. -->
+                <div
+                  class="table-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Bảng dữ liệu bị rò rỉ (cuộn ngang để xem đủ cột)"
+                >
+                  <table class="db-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Password (Hash)</th>
+                        <th>Role</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dbTableBody"></tbody>
+                  </table>
+                </div>
               </div>
               <div class="verdict" id="sqliVerdict"></div>
             </div>
@@ -1911,6 +2096,26 @@
               <div class="balance-box">
                 Số dư: <span id="bankBalance">10,000,000 VND</span>
               </div>
+              <p class="mute">
+                Bốn công tắc dưới đây là cấu hình thật của máy chủ. Kết quả tấn
+                công do chúng quyết định, không có kịch bản nào được gõ sẵn.
+              </p>
+              <p class="row">
+                <label for="csrfSame">Cookie SameSite</label>
+                <select id="csrfSame" data-no-i18n></select>
+              </p>
+              <label class="opt"
+                ><input type="checkbox" id="csrfSecure" /> Cookie có cờ
+                Secure</label
+              >
+              <label class="opt"
+                ><input type="checkbox" id="csrfTokenCheck" /> Máy chủ bắt buộc
+                CSRF token</label
+              >
+              <label class="opt"
+                ><input type="checkbox" id="csrfOriginCheck" /> Máy chủ kiểm tra
+                Origin</label
+              >
               <div class="notice">
                 Trình duyệt của bạn hiện đang giữ Cookie xác thực hợp lệ cho
                 trang ngân hàng này.
@@ -1921,9 +2126,20 @@
               <p class="mute">Một trang web giả mạo quà tặng.</p>
               <div class="attacker-site">
                 <h4>🎉 Chúc mừng! Bạn nhận được 500k</h4>
-                <button class="btn danger" id="csrfAttackBtn">
-                  Nhận quà ngay
-                </button>
+                <div class="row">
+                  <button class="btn danger" id="csrfAttackBtn">
+                    form POST
+                  </button>
+                  <button class="btn danger" id="csrfFetchBtn">
+                    fetch JSON
+                  </button>
+                  <button class="btn danger" id="csrfLinkBtn">link GET</button>
+                </div>
+                <div class="row" style="margin-top: 10px">
+                  <button class="btn ghost" id="csrfLockBtn">
+                    Kiểm tra cả ba cửa
+                  </button>
+                </div>
               </div>
               <div class="term" style="margin-top: 14px">
                 <div class="term-bar">
@@ -1932,11 +2148,14 @@
                 <div
                   class="term-body"
                   id="csrfTerm"
-                  style="height: 150px; color: var(--mute)"
-                 data-no-i18n></div>
+                  style="height: 170px; color: var(--mute)"
+                  data-no-i18n
+                ></div>
               </div>
             </div>
             <div class="card s12">
+              <h3>Bảng phân tích ba cửa</h3>
+              <div id="csrfMatrix" class="query" data-no-i18n></div>
               <div class="verdict" id="csrfVerdict"></div>
             </div>
           </div>
@@ -1980,6 +2199,8 @@
                   </div>
                 </div>
               </div>
+              <h3>Bảng sáu ID, cùng một luật</h3>
+              <div id="idorLog" class="query" data-no-i18n></div>
               <div class="verdict" id="idorVerdict"></div>
             </div>
             <div class="card s4">
@@ -1989,7 +2210,22 @@
                 Kẻ tấn công chỉ cần thay đổi <code>user_id=1</code> thành
                 <code>user_id=2</code> để xem dữ liệu của admin.
               </p>
-              <div class="notice">Hãy thử thay đổi ID và xem kết quả!</div>
+              <p class="row">
+                <label for="idorMode">Chế độ máy chủ</label>
+                <select id="idorMode" data-no-i18n></select>
+              </p>
+              <label class="opt"
+                ><input type="checkbox" id="idorLoggedIn" checked /> Phiên này
+                đã đăng nhập</label
+              >
+              <div class="row" style="margin-top: 12px">
+                <button class="btn ghost" id="idorScanBtn">Quét cả sáu ID</button>
+                <button class="btn ghost" id="idorLockBtn">Chế độ này kín chưa?</button>
+              </div>
+              <div class="notice">
+                Bạn đang xem bằng phiên của nguyenvana, user_id 2. Hãy thử mở hồ
+                sơ của người khác, rồi tìm chế độ mà cả sáu ID đều không lộ.
+              </div>
             </div>
           </div>
         </section>
@@ -2065,6 +2301,7 @@
               </h4>
               <iframe
                 id="xssPreview"
+                title="Khung render bình luận: mã độc được cô lập trong iframe sandbox"
                 sandbox="allow-scripts"
                 style="
                   width: 100%;
@@ -2316,10 +2553,18 @@
               của bạn là tiến độ học thật, và toàn bộ nằm trong trình duyệt máy
               này chứ không trên máy chủ nào.
             </p>
+            <p>
+              Vì vậy một lớp 30 máy là 30 bảng xếp hạng riêng biệt, không phải
+              một bảng của cả lớp: muốn xếp hạng chung thì cần một nơi chứa dữ
+              liệu dùng chung, tức một backend — thứ mà bản không-cài-đặt này cố
+              ý không có.
+            </p>
           </div>
           <div class="grid">
             <div class="card s12">
-              <table class="lb-table">
+              <!-- id để khối CSS mobile chỉ nhắm bảng xếp hạng: bảng "Tài khoản
+                   trên máy này" cùng dùng .lb-table nhưng phải giữ dạng bảng. -->
+              <table class="lb-table" id="lbTable">
                 <thead>
                   <tr>
                     <th>Hạng</th>
@@ -2338,6 +2583,181 @@
         </section>
 
         <!-- MONITOR -->
+        <!-- =========================================================
+             Cài đặt — người dùng tự chỉnh màn hình của mình.
+             Mọi điều khiển ở đây chỉ ĐỌC/GHI hai khoá trong
+             localStorage: "cysim-settings" (kiểu nhìn, của cả máy) và dữ
+             liệu học tập theo tài khoản. js/app.js vẽ lại ngay khi bấm,
+             không cần tải lại trang.
+             ========================================================= -->
+        <section class="view" id="settings">
+          <div class="pagehead">
+            <h2>Cài đặt</h2>
+            <p>
+              Chỉnh cho màn hình vừa mắt bạn. Mọi thay đổi lưu ngay trên máy
+              này và không gửi đi đâu cả.
+            </p>
+          </div>
+          <div class="grid">
+            <div class="card s12">
+              <h3>Tài khoản của bạn</h3>
+              <p id="setAccountInfo" data-no-i18n></p>
+              <div class="row">
+                <button type="button" class="btn ghost sm" id="setLogout">
+                  Đăng xuất
+                </button>
+                <button
+                  type="button"
+                  class="btn ghost sm"
+                  id="setAdminLink"
+                  data-goto="admin"
+                  hidden
+                >
+                  Mở trang Quản trị
+                </button>
+              </div>
+              <p class="mute" id="setAccountWhy">
+                Tài khoản trong CySim là gì: một cái tên để máy này biết dữ liệu
+                nào là của bạn. Tiến độ, điểm thi và hội thoại AI gắn theo tên
+                đăng nhập; chứng chỉ tốt nghiệp in đúng tên bạn gõ. Nó KHÔNG phải
+                hàng rào bảo mật — mọi thứ nằm trong trình duyệt của máy này,
+                không có máy chủ nào đứng sau, và ai ngồi đúng máy này với DevTools
+                mở ra đều xem được.
+              </p>
+            </div>
+            <div class="card s6">
+              <h3>Màu màn hình</h3>
+              <div class="row seg" id="setThemeRow" role="group" aria-label="Chủ đề màu">
+                <button type="button" class="btn ghost sm" data-choice="theme" data-value="dem">Tối</button>
+                <button type="button" class="btn ghost sm" data-choice="theme" data-value="sang">Sáng</button>
+              </div>
+              <p class="mute">
+                Nền tối là màu thật của một phòng trực an ninh. Thấy khó đọc
+                thì đổi sang nền sáng — bài học không đổi gì cả.
+              </p>
+              <h3>Cỡ chữ</h3>
+              <div class="row seg" id="setFsRow" role="group" aria-label="Cỡ chữ">
+                <button type="button" class="btn ghost sm" data-choice="fs" data-value="vua">Vừa</button>
+                <button type="button" class="btn ghost sm" data-choice="fs" data-value="lon">Lớn</button>
+                <button type="button" class="btn ghost sm" data-choice="fs" data-value="rong">Rất lớn</button>
+              </div>
+              <h3>Đọc dễ hơn</h3>
+              <label class="opt"
+                ><input type="checkbox" id="setMotion" /> Có hiệu ứng chuyển động
+              </label>
+              <label class="opt"
+                ><input type="checkbox" id="setContrast" /> Chữ đậm hơn, viền rõ
+                hơn
+              </label>
+              <h3>Ngôn ngữ</h3>
+              <select id="setLang" aria-label="Ngôn ngữ giao diện"></select>
+            </div>
+            <div class="card s6">
+              <h3>Dữ liệu của bạn</h3>
+              <p id="setDataInfo" class="mute"></p>
+              <div class="row">
+                <button type="button" class="btn ghost sm" id="setExport">
+                  Tải một bản sao dữ liệu
+                </button>
+                <button type="button" class="btn ghost sm" id="setImport">
+                  Nạp lại từ file
+                </button>
+                <input
+                  type="file"
+                  id="setImportFile"
+                  accept=".json,application/json"
+                  hidden
+                />
+              </div>
+              <p class="mute">
+                Bản sao là file .json chứa tiến độ, điểm thi và lịch sử chat
+                của riêng bạn. Có nó thì sang máy khác bạn vẫn còn công học.
+              </p>
+              <h3>Khi nào cần tới trang này?</h3>
+              <ul class="check">
+                <li class="pass">Mở to chữ lên khi đọc không rõ.</li>
+                <li class="pass">Tắt hiệu ứng nếu chữ chạy làm bạn chóng mặt.</li>
+                <li class="pass">Tải bản sao trước khi xoá lịch sử trình duyệt.</li>
+                <li>Đăng xuất không xoá dữ liệu — chỉ xoá mới mất.</li>
+              </ul>
+              <button type="button" class="btn danger sm" id="setWipe">
+                Xoá toàn bộ dữ liệu của tài khoản này trên máy
+              </button>
+            </div>
+          </div>
+        </section>
+        <!-- =========================================================
+             Quản trị — trang dành cho giáo viên / người trông coi máy này.
+             Chỉ hiện khi tài khoản đang đăng nhập có role "admin"
+             (đặt trong js/auth.js). Các công tắc ở đây KHÔNG trang trí:
+             js/app.js chặn showView() và js/ai.js từ chối gửi câu hỏi khi
+             công tắc đang tắt.
+             ========================================================= -->
+        <section class="view" id="admin">
+          <div class="pagehead">
+            <h2>Quản trị</h2>
+            <p>
+              Bật hoặc tắt tính năng cho mọi tài khoản trên máy này và xem mọi
+              người đã học tới đâu.
+            </p>
+          </div>
+          <div class="auth-notice demo">
+            <!-- Hai đoạn này là chữ TĨNH, js/app.js không vẽ lại: engine i18n
+                 dịch trọn text node, nên câu không bị cắt thành mảnh vô nghĩa
+                 khi đổi ngôn ngữ. -->
+            <p>
+              Mọi thiết lập ở trang này chỉ áp dụng cho máy này, lưu trong
+              trình duyệt của máy này.
+            </p>
+            <p>
+              Một app chạy hoàn toàn trong trình duyệt không thể giữ bí mật với
+              chính người ngồi trước màn hình: mở DevTools là xem và sửa được
+              tất cả. Đây là công cụ để một người lớn trông một lớp trên chung
+              một máy, không phải cơ chế phân quyền thật.
+            </p>
+          </div>
+          <div class="grid">
+            <div class="card s6">
+              <h3>Tính năng</h3>
+              <div id="adminFlags"></div>
+              <h3>Giới hạn hỏi AI</h3>
+              <label class="opt" for="adminAiLimit"
+                >Số lượt hỏi tối đa một ngày cho mỗi tài khoản (0 = không
+                giới hạn)</label
+              >
+              <input type="number" id="adminAiLimit" min="0" max="999" step="1" />
+              <p class="mute" id="adminAiUsed"></p>
+            </div>
+            <div class="card s6">
+              <h3>Tài khoản trên máy này</h3>
+              <div class="table-scroll">
+                <table class="lb-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Tên</th>
+                      <th scope="col">Vai trò</th>
+                      <th scope="col">Đã hoàn thành</th>
+                      <th scope="col">Việc của quản trị</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUsers"></tbody>
+                </table>
+              </div>
+              <p class="mute" id="adminNoAdmin"></p>
+              <div class="row">
+                <input
+                  type="password"
+                  id="adminCodeInput"
+                  autocomplete="new-password"
+                  placeholder="Mã quản trị tự đặt"
+                />
+                <button type="button" class="btn ghost sm" id="adminClaim">
+                  Đặt mã và lên quản trị
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
         <section class="view" id="monitor">
           <div class="pagehead">
             <h2>Giám sát trực tiếp (SOC Dashboard)</h2>
@@ -2451,11 +2871,48 @@
             autocomplete="current-password"
             placeholder="Mật khẩu"
           />
+          <p class="mute auth-note">
+            Mật khẩu chỉ để mở giao diện trên máy này, không khoá dữ liệu: tiến
+            độ và lịch sử chat của bạn nằm trong trình duyệt dưới dạng đọc được,
+            và không có máy chủ nào đứng sau.
+          </p>
           <label class="auth-remember" for="authRemember">
             <input id="authRemember" type="checkbox" />
             Ghi nhớ đăng nhập trên máy này (30 ngày)
           </label>
+          <p class="mute auth-note">
+            Tích "Ghi nhớ đăng nhập" nghĩa là ai mở trình duyệt này trong 30 ngày
+            tới cũng vào đúng tài khoản của bạn. Máy dùng chung thì bỏ tích.
+          </p>
+          <!-- Ô mã quản trị để GẤP, không trải ra cho mọi người thấy: 99% học
+               viên không cần nó, và một ô "mã quản trị" ngay trên màn hình đăng
+               nhập đầu tiên chỉ khiến người mới tưởng mình thiếu thứ gì đó.
+               Giáo viên hoặc phụ trách máy tính mở ra là đủ. -->
+          <details class="auth-more">
+            <summary>Bạn phụ trách máy này? Nhập mã quản trị</summary>
+            <label for="authLoginAdmin">Mã quản trị (để trống nếu bạn là học viên)</label>
+            <input
+              id="authLoginAdmin"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Tự đặt, ít nhất 8 ký tự"
+            />
+            <p class="mute">
+              Máy chưa có mã nào: lần nhập đầu tiên sẽ đặt luôn mã cho máy. Có
+              mã rồi: nhập đúng thì tài khoản này lên quản trị và mở được trang
+              Quản trị để bật/tắt tính năng cho cả lớp.
+            </p>
+          </details>
           <button class="btn" type="submit">Đăng nhập</button>
+          <button class="btn ghost" type="button" data-auth-guest>
+            Vào học ngay, không cần tài khoản
+          </button>
+          <p class="mute auth-why">
+            Không có tài khoản thì vẫn làm được 12 phòng lab. Có tài khoản để
+            tiến độ và lịch sử chat AI mang theo tên bạn, để bảng xếp hạng ghi
+            đúng người, và để tấm chứng chỉ tốt nghiệp mang tên thật thay vì chữ
+            "Khách".
+          </p>
           <!-- Danh sách tài khoản đang thực sự nằm trong localStorage của máy
                này, do JS vẽ (có sẵn bản dịch) nên đánh dấu data-no-i18n. -->
           <div class="auth-saved" id="authSaved" data-no-i18n></div>
@@ -2497,7 +2954,30 @@
             autocomplete="new-password"
             placeholder="Nhập lại mật khẩu"
           />
+          <p class="mute auth-note">
+            Không có cách lấy lại mật khẩu: CySim không có máy chủ nên không có
+            email đặt lại. Quên mật khẩu là phải tạo tài khoản khác, và bản sao
+            dữ liệu ở trang Cài đặt là thứ duy nhất mang theo được.
+          </p>
+          <details class="auth-more">
+            <summary>Bạn phụ trách máy này? Nhập mã quản trị</summary>
+            <label for="authRegAdmin">Mã quản trị (để trống nếu bạn là học viên)</label>
+            <input
+              id="authRegAdmin"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Tự đặt, ít nhất 8 ký tự"
+            />
+            <p class="mute">
+              Tài khoản tạo ra sẽ là quản trị và mở được trang Quản trị cho cả
+              lớp. Máy chưa có mã thì lần khai đầu đặt luôn mã cho máy.
+            </p>
+          </details>
           <button class="btn" type="submit">Đăng ký</button>
+          <p class="mute auth-why">
+            Bạn đang học dở ở chế độ khách? Tiến độ và hội thoại AI của lượt
+            khách đó sẽ tự chuyển sang tài khoản mới này.
+          </p>
           <p class="auth-switch mute">
             Đã có tài khoản?
             <button type="button" class="linkbtn" data-auth-go="login">
@@ -2650,6 +3130,36 @@
       />
     </section>
 
+    <!-- PALETTE TÌM KIẾM TOÀN VĂN — js/search.js. Danh sách kết quả do JS vẽ
+         bằng textContent từ chính nhãn ĐÃ hiển thị trên màn hình, nên khối
+         danh sách mang data-no-i18n: để engine đi dịch lại lần hai là biến bản
+         dịch thành chuỗi lạ. Gợi ý phím ở đây toàn ký hiệu (↑ ↓ Enter Esc) để
+         không phải dịch một câu chữ nào cả. -->
+    <div
+      class="palette"
+      id="searchPalette"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="searchTitle"
+      hidden
+    >
+      <div class="palette-box">
+        <p class="palette-title" id="searchTitle">Tìm trong CySim</p>
+        <input
+          id="searchInput"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="120"
+          placeholder="Nhiệm vụ, chủ đề lý thuyết, trang…"
+          aria-label="Từ khoá tìm kiếm"
+        />
+        <p class="palette-count" id="searchCount" data-no-i18n></p>
+        <ul class="palette-list" id="searchResults" data-no-i18n></ul>
+        <p class="palette-hint"><kbd>↑</kbd><kbd>↓</kbd>·<kbd>Enter</kbd>·<kbd>Esc</kbd></p>
+      </div>
+    </div>
+
     <div class="toast" id="toast" data-no-i18n>
       <span id="toastXp" class="toast-xp">+100 XP</span>
       <span id="toastMsg"></span>
@@ -2663,25 +3173,28 @@
     <script src="js/app.js"></script>
     <!-- Đăng nhập + xác minh email -->
     <script src="js/auth.js"></script>
-    <!-- Labs -->
-    <script src="js/labs/account.js"></script>
-    <script src="js/labs/sqli.js"></script>
-    <script src="js/labs/phishing.js"></script>
-    <script src="js/labs/ddos.js"></script>
-    <script src="js/labs/password.js"></script>
-    <script src="js/labs/firewall.js"></script>
-    <script src="js/labs/realip.js"></script>
-    <script src="js/labs/antivirus.js"></script>
-    <script src="js/labs/csrf.js"></script>
-    <script src="js/labs/idor.js"></script>
-    <script src="js/labs/xss.js"></script>
-    <script src="js/labs/siem.js"></script>
-    <script src="js/labs/certificate.js"></script>
+    <!-- Kỳ thi tốt nghiệp: nằm trong số ít file nạp ngay tuy chỉ có một trang dùng,
+         vì showView() phải đọc Labs.exam.dangLam() để khóa điều hướng NGAY LẬP TỨC
+         khi người dùng F5 giữa giờ làm bài. File này nạp chậm được nghĩa là trong
+         lúc chờ tải script thì cửa phòng thi mở toang — xem khối "nạp script của
+         từng trang" trong js/app.js. -->
     <script src="js/labs/exam.js"></script>
-    <script src="js/labs/guide.js"></script>
-    <!-- Trợ lý AI (cần $, CyUtil, t, setText, Auth, showToast đã có) -->
-    <script src="js/ai.js"></script>
+    <!-- Tìm kiếm toàn văn Ctrl+K: cần showView + VIEW_FLAG + Flags + Auth (app.js,
+         auth.js) và t/tdem (i18n.js) nên nạp sau các file trên, trước boot.js.
+         Giữ nguyên ở đây vì Ctrl+K là lối điều hướng chính của người dùng bàn
+         phím: chậm một nhịp vì chờ tải file thì bàn phím hỏng. -->
+    <script src="js/search.js"></script>
     <!-- Boot (phải load cuối) -->
     <script src="js/boot.js"></script>
+    <!-- 30-10-2026 — 15 file không còn thẻ <script> ở đây, app.js nạp chúng đúng
+         lúc trang tương ứng được mở (số đo: 172,9 KB trong tổng 416,1 KB JS).
+         Danh sách, và trang nào cần file nào, nằm trong LAB_SCRIPT / VIEW_SCRIPT
+         ở js/app.js:
+           js/labs/{account,sqli,phishing,ddos,password,firewall,realip,
+                    antivirus,csrf,idor,xss,siem,certificate,guide}.js
+           js/ai.js          -> mở bằng cú bấm đầu tiên vào #aiFab
+         sw.js vẫn liệt kê đủ 15 file trong CORE nên mất mạng vẫn vào được phòng
+         lab: file đã nằm sẵn trong bộ nhớ đệm, "nạp chậm" chỉ là chậm theo
+         hàng đợi của trang, không phải chậm theo mạng. -->
   </body>
 </html>

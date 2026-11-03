@@ -622,7 +622,7 @@
       body.append(el("h3", null, t("Kỳ thi tốt nghiệp CySim")));
       body.append(el("p", "mute", t("Kỳ thi chỉ mở khi bạn đã hoàn thành đủ 12 nhiệm vụ phòng lab.")));
       body.append(el("p", "mute", `${t("Lượt thi thử (không tính điểm) mở từ")} ${THI_THU_TU_SO_LAB} ${t("nhiệm vụ")}`));
-      body.append(el("p", "exam-lock", `${labsDone()} / ${TOTAL_LABS} ${t("nhiệm vụ đã hoàn thành")}`));
+      body.append(el("p", "exam-lock", `${labsDone()} / ${TOTAL_LABS} ${tdem(labsDone(), "nhiệm vụ đã hoàn thành")}`));
       return;
     }
     if (nop) nop.hidden = false;
@@ -740,7 +740,7 @@
       });
       if (daCham) {
         const diemCau = kq.dungTN[qi] ? DIEM_TN_CAU : 0;
-        q.append(el("p", "exam-note", (kq.dungTN[qi] ? t("Đúng") : t("Sai")) + ` — ${diemCau} / ${DIEM_TN_CAU} ${t("điểm")}`));
+        q.append(el("p", "exam-note", (kq.dungTN[qi] ? t("Đúng") : t("Sai")) + ` — ${diemCau} / ${DIEM_TN_CAU} ${tdem(diemCau, "điểm")}`));
       }
       body.append(q);
     });
@@ -771,7 +771,7 @@
           ul.append(li);
         });
         q.append(ul);
-        q.append(el("p", "exam-note", `${chiTiet.filter(Boolean).length * DIEM_TL_Y} / ${de.y.length * DIEM_TL_Y} ${t("điểm")}`));
+        q.append(el("p", "exam-note", `${chiTiet.filter(Boolean).length * DIEM_TL_Y} / ${de.y.length * DIEM_TL_Y} ${tdem(chiTiet.filter(Boolean).length * DIEM_TL_Y, "điểm")}`));
       }
       body.append(q);
     });

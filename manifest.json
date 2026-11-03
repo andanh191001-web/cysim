@@ -1,6 +1,7 @@
 {
   "name": "CySim — Hệ sinh thái đào tạo an ninh mạng",
   "short_name": "CySim",
+  "version": "1.0.0",
   "description": "Phòng lab an ninh mạng chạy hoàn toàn trong trình duyệt: SQL Injection, XSS, CSRF, phishing, firewall và hơn thế nữa.",
   "start_url": "./index.html",
   "scope": "./",

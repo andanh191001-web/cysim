@@ -6,7 +6,8 @@
              đó vào text node / thuộc tính của trang đang hiển thị.
 
    CHẠY     : initI18n() chạy ngay khi nạp: vẽ danh sách ngôn ngữ vào
-             #langSelect, nạp js/lang/<mã>.json nếu đang chọn ngoại ngữ.
+             #langSelect, nạp js/lang/<mã>.json của NGÔN NGỮ ĐANG CHỌN (bốn từ
+             điển còn lại nạp sau, lúc máy rảnh — xem ghi chú trong initI18n).
              Người dùng đổi ngôn ngữ -> applyLanguage(): renderDocument() đi
              hết cây DOM thay chữ, watchDom() bật MutationObserver để chữ do
              JS sinh sau (kết quả lab, toast) cũng được dịch. Chuỗi nào cả 3
@@ -325,8 +326,126 @@ function t(viText) {
   return source;
 }
 
+/* ---------- danh từ đi sau một con số ----------
+   Vì sao phải có hàm riêng: một mảnh câu như "mục dữ liệu trên máy này" chỉ có
+   MỘT dạng ngữ pháp trong từ điển, nên ghép số vào là ra "1 entrées de données"
+   (số ít đọc bằng tiếng Pháp) và "2 suspicious file" (số nhiều đọc bằng tiếng
+   Anh — dạng này có thật trong js/lang/en.json). Tiếng Việt không chia số nhiều
+   nên code cũ không thấy vấn đề; người dùng chuyển sang tiếng Pháp thì thấy ngay.
+
+   Luật: bảng này CHỈ chứa dạng mà từ điển đang thiếu. Dạng còn lại vẫn do
+   t() / translation_review.json quyết, để không có hai nguồn sự thật cho cùng
+   một chuỗi. Ngôn ngữ không chia số nhiều (vi, zh, ja) không có mặt ở đây và
+   tự động rơi về t(). */
+// i18n-skip-begin
+const DANG_DEM = {
+  "mục dữ liệu trên máy này": {
+    en: { one: "data entry on this machine" },
+    fr: { one: "entrée de données" },
+    es: { one: "elemento de datos" },
+  },
+  "mục. Đang tải lại màn hình.": {
+    en: { one: "item. Reloading the screen." },
+    fr: { one: "entrée. Rechargement de l'écran." },
+    es: { one: "elemento. Recargando la pantalla." },
+  },
+  "hội thoại AI": {
+    en: { one: "AI chat" },
+    fr: { one: "conversation IA" },
+    es: { one: "conversación con la IA" },
+  },
+  "ký tự": { en: { one: "character" }, fr: { one: "caractère" }, es: { one: "carácter" } },
+  "ảnh": { en: { one: "image" }, es: { one: "imagen" } },
+  "ảnh đã gửi kèm lượt này · không còn trong bộ nhớ, hỏi tiếp phải đính lại ảnh": {
+    en: { one: "image was attached to this exchange · it is no longer in memory, re-attach it for the next question" },
+    fr: { one: "image jointe à cet échange · elle n'est plus en mémoire, joignez-la à nouveau pour la question suivante" },
+    es: { one: "imagen adjunta a este intercambio · ya no está en memoria, vuelve a adjuntarla para la siguiente pregunta" },
+  },
+  "lần thử": { en: { one: "attempt" }, fr: { one: "tentative" }, es: { one: "intento" } },
+  "MÃ ĐỘC — Hãy xóa ngay và không mở các file này!": {
+    en: { one: "MALWARE file — Delete it immediately and do not open it!" },
+    fr: { one: "CODE MALVEILLANT — Supprimez-le immédiatement et ne l'ouvrez pas !" },
+    es: { one: "archivo MALWARE — ¡Elimínelo de inmediato y no lo abra!" },
+  },
+  "file nghi vấn — Kiểm tra kỹ trước khi mở.": {
+    en: { other: "suspicious files — Inspect them carefully before opening." },
+    fr: { other: "fichiers suspects — Vérifiez-les attentivement avant de les ouvrir." },
+    es: { other: "archivos sospechosos — Revíselos detenidamente antes de abrirlos." },
+  },
+  "file — không phát hiện mã độc.": {
+    en: { other: "files — no malware detected." },
+    fr: { other: "fichiers — aucun logiciel malveillant détecté." },
+    es: { other: "archivos — no se detectó malware." },
+  },
+  "nhiệm vụ": { en: { one: "mission" }, fr: { one: "mission" }, es: { one: "misión" } },
+  "nhiệm vụ đã hoàn thành": {
+    en: { one: "mission completed" },
+    fr: { one: "mission terminée" },
+    es: { one: "misión completada" },
+  },
+  "điểm": { en: { one: "point" }, fr: { one: "point" }, es: { one: "punto" } },
+  "phút": { en: { one: "minute" }, fr: { one: "minute" }, es: { one: "minuto" } },
+  "hạng trên đều là dữ liệu mẫu — đăng nhập và làm nhiệm vụ để có tên ở đây.": {
+    en: { one: "rank is sample data — sign in and complete a mission to appear here." },
+    fr: { one: "place est une donnée d'exemple — connecte-toi et fais une mission pour apparaître ici." },
+    es: { one: "puesto es un dato de ejemplo: inicia sesión y completa una misión para aparecer aquí." },
+  },
+  "hạng còn lại là dữ liệu mẫu": {
+    en: { one: "remaining rank is sample data" },
+    fr: { one: "place restante est une donnée d'exemple" },
+    es: { one: "puesto restante es un dato de ejemplo" },
+  },
+  "lượt hôm nay — chưa đặt giới hạn nên không lượt nào bị chặn.": {
+    en: { one: "question today — no limit is set, so none are blocked." },
+    fr: { one: "question aujourd'hui — aucune limite n'est fixée, rien n'est bloqué." },
+    es: { one: "pregunta hoy — no hay límite fijado, así que no se bloquea ninguna." },
+  },
+  "lượt hôm nay — còn": {
+    en: { one: "question today —" },
+    fr: { one: "question aujourd'hui, il reste" },
+    es: { one: "pregunta hoy, quedan" },
+  },
+  "lượt.": {
+    fr: { one: "question." },
+    es: { one: "pregunta." },
+  },
+  "mục dữ liệu của chế độ khách vào tài khoản này.": {
+    en: { one: "guest-mode data entry into this account." },
+    fr: { one: "donnée du mode invité vers ce compte." },
+    es: { one: "elemento de datos del modo invitado a esta cuenta." },
+  },
+  "dòng bị đánh dấu sai (dòng bình thường). ": {
+    en: { one: "incorrectly flagged line (normal line). " },
+    fr: { one: "ligne incorrectement signalée (ligne normale). " },
+    es: { one: "línea marcada incorrectamente (línea normal). " },
+  },
+  "kết quả tìm được": {
+    en: { one: "result found" },
+    fr: { one: "résultat trouvé" },
+    es: { one: "resultado encontrado" },
+  },
+};
+// i18n-skip-end
+
+
+/* tdem(1, "ký tự") -> "character"; tdem(42, "ký tự") -> bản dịch trong từ điển.
+   n không phải số (chuỗi ghép nhầm) thì coi như số nhiều, không ném lỗi. */
+function tdem(n, viText) {
+  const c = DANG_DEM[viText] && DANG_DEM[viText][currentLang];
+  if (c) {
+    const soIt = Number(n) === 1;
+    if (soIt && c.one) return c.one;
+    if (!soIt && c.other) return c.other;
+  }
+  return t(viText);
+}
+
 /* ---------- áp dụng vào DOM ---------- */
-const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "OPTION", "NOSCRIPT", "TEXTAREA"]);
+/* KBD = nhãn phím (Ctrl, K, Esc, Enter, ↑). Máy dịch sẽ biến "Enter" thành
+   "Entrée" và hỏng một gợi ý phím — ký hiệu phím là tên riêng của hệ điều hành,
+   không phải văn bản, nên nó đứng ngoài mọi từ điển. tools/i18n_scan.py bỏ thẻ
+   này khỏi danh sách chuỗi cần dịch đúng theo cùng một lý do. */
+const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "OPTION", "NOSCRIPT", "TEXTAREA", "KBD"]);
 const sourceOf = new WeakMap(); // text node -> chuỗi tiếng Việt gốc
 const attrSourceOf = new WeakMap();
 let currentLang = localStorage.getItem("cysim-lang") || "vi";
@@ -513,6 +632,12 @@ async function applyLanguage(lang) {
   // Phải có từ điển sinh sẵn trước khi vẽ, nếu không mọi chuỗi sẽ bị đẩy vào
   // hàng đợi dịch máy dù file js/lang/<lang>.json đã có sẵn bản dịch.
   await ensureBundled(lang);
+  /* `await` ở trên là một lượt fetch (5 file JSON, vài trăm ms trên mạng chậm).
+     Nếu trong lúc đó người dùng chuyển ngôn ngữ lần nữa thì `currentLang` đã là
+     ngôn ngữ MỚI và lần chuyển mới đó tự vẽ lấy; ở đây mà vẽ tiếp bằng `lang` cũ
+     thì nội dung đúng bị đè bằng nội dung sai — triệu chứng là chuyển Việt → Anh
+     → Nhật thật nhanh rồi màn hình đứng ở tiếng Anh. */
+  if (currentLang !== lang) return;
   /* provenance() và lớp "review" của báo lỗi cần js/lang/reviewed.json. Nạp
      luôn lúc chuyển ngôn ngữ (ensureReviewed tự khoá, mỗi phiên chỉ tải một
      lần) — nếu không thì chuỗi ĐÃ qua mắt người vẫn bị ghi nhãn "machine". */
@@ -554,11 +679,11 @@ function ensureBundled(lang) {
   return job;
 }
 
-async function loadBundledDictionaries() {
-  const results = await Promise.all(TRANSLATABLE.map(ensureBundled));
-  const loaded = TRANSLATABLE.filter((_, i) => results[i]);
-  const missing = TRANSLATABLE.filter((l) => !loaded.includes(l));
-  if (currentLang !== "vi") {
+async function loadBundledDictionaries(langs) {
+  const results = await Promise.all(langs.map(ensureBundled));
+  const loaded = langs.filter((_, i) => results[i]);
+  const missing = langs.filter((l) => !loaded.includes(l));
+  if (currentLang !== "vi" && langs.includes(currentLang)) {
     renderDocument(currentLang);
     /* Bắt buộc phải bắn lại sự kiện ở đây. renderDocument chỉ đi theo DOM tĩnh;
        còn mọi vùng data-no-i18n (nhãn "Bạn"/"CySim AI" trong khung chat, bảng
@@ -567,6 +692,9 @@ async function loadBundledDictionaries() {
        ở kết quả tra được lúc khởi động: bản dịch máy cũ trong localStorage, hoặc
        nguyên tiếng Việt ngay trên giao diện tiếng Nhật. */
     document.dispatchEvent(new CustomEvent("cysim:language", { detail: { lang: currentLang } }));
+  }
+  if (missing.length) {
+    console.info("[i18n] Chưa có từ điển sinh sẵn cho " + missing.join(", ") + " — sẽ dịch tự động khi cần.");
   }
   return { loaded, missing };
 }
@@ -578,22 +706,40 @@ async function loadBundledDictionaries() {
    chất lượng) — vài chục KB thì không nên tải mỗi lần mở app. */
 const reviewedSets = new Map(); // lang -> Set(chuỗi nguồn đã kiểm chứng)
 let reviewedFile = null;
+let reviewedPending = null;
 
-async function ensureReviewed() {
-  if (reviewedFile) return reviewedFile;
-  try {
-    const res = await fetch("js/lang/reviewed.json");
-    if (!res.ok) return null;
-    reviewedFile = await res.json();
-    for (const [lang, names] of Object.entries(reviewedFile.langs || {})) {
-      const set = new Set();
-      for (const name of names) for (const s of reviewedFile.sets?.[name] || []) set.add(s);
-      reviewedSets.set(lang, set);
-    }
-    return reviewedFile;
-  } catch {
-    return null; // chưa chạy lại tools/gen_translations.py -> coi như chưa biết
+/* KHOÁ BẰNG PROMISE, KHÔNG BẰNG DỮ LIỆU. Bản cũ chỉ kiểm `if (reviewedFile)`
+   rồi await ở dòng tiếp theo, mà `reviewedFile` chỉ được gán SAU khi
+   `res.json()` xong — nên hai lời gọi gần như cùng lúc cùng lọt qua chốt và
+   mỗi lời gọi tải cả file. Đo thật 30-10-2026: đổi ngôn ngữ lúc trang Hướng
+   dẫn đang mở = HAI lần fetch js/lang/reviewed.json, 101,8 KB × 2 = 203,6 KB
+   cho cùng một nội dung (i18n.js gọi ở lần chuyển ngôn ngữ, guide.js gọi
+   trong `Promise.all`). Giờ lời gọi thứ hai nhận đúng promise đang chạy.
+   Thất bại thì xoá khoá để lần sau thử lại: giữ promise lỗi ở lại là đóng
+   băng tình trạng "không biết tầng nào" suốt phiên. */
+function ensureReviewed() {
+  if (reviewedFile) return Promise.resolve(reviewedFile);
+  if (!reviewedPending) {
+    reviewedPending = loadReviewed()
+      .catch(() => null)
+      .then((value) => {
+        if (!value) reviewedPending = null;
+        return value;
+      });
   }
+  return reviewedPending;
+}
+
+async function loadReviewed() {
+  const res = await fetch("js/lang/reviewed.json");
+  if (!res.ok) return null;
+  reviewedFile = await res.json();
+  for (const [lang, names] of Object.entries(reviewedFile.langs || {})) {
+    const set = new Set();
+    for (const name of names) for (const s of reviewedFile.sets?.[name] || []) set.add(s);
+    reviewedSets.set(lang, set);
+  }
+  return reviewedFile;
 }
 
 function isReviewedSource(lang, source) {
@@ -982,10 +1128,47 @@ function initI18n() {
   }
   document.documentElement.lang = currentLang;
   if (currentLang !== "vi") {
-    loadBundledDictionaries().then(({ missing }) => {
-      if (missing.length) {
-        console.info("[i18n] Chưa có từ điển sinh sẵn cho " + missing.join(", ") + " — sẽ dịch tự động khi cần.");
+    /* Khởi động chỉ nạp từ điển của NGÔN NGỮ ĐANG DÙNG. Năm file nặng tổng
+       cộng 703 KB (ja 156 KB là file lớn nhất, en 134 KB, fr 146 KB, es 144 KB,
+       zh 130 KB — số đo encodedBodySize ngày 30-10-2026) và người mở app bằng
+       tiếng Nhật cần đúng MỘT file; tải cả năm trước khi màn hình vẽ xong là
+       tự chiếm băng thông của chính lần vẽ đó. Bốn file còn lại nạp lúc máy
+       rảnh để lần đổi ngôn ngữ kế tiếp khỏi chờ.
+       Không có gì phụ thuộc vào việc tải đủ năm cùng lúc: hàng rào chống
+       "dịch bản dịch" nằm ở dấu tiếng Việt (xem VI_MARKS) chứ không nằm ở
+       từ điển, còn reverseSource() chỉ cần từ điển của ngôn ngữ đang hiển thị.
+       Hai điều kiện THẬT quyết định có nạp nền hay không, thay cho một con số
+       đoán:
+       - navigator.connection.saveData = true: người dùng đã bảo trình duyệt
+         "đừng tốn dữ liệu hộ tôi". Nạp thêm hơn nửa MB từ điển không ai hỏi là
+         cãi lại đúng cái cờ đó.
+       - effectiveType slow-2g/2g/3g: trên một đường chậm, bốn file nằm chờ
+         chính là chiếm băng thông của thao tác người dùng đang làm.
+       Cả hai trường hợp đều KHÔNG mất tính năng: applyLanguage await
+       ensureBundled(ngôn ngữ mới) ngay lúc bấm, chỉ phải chờ một lượt fetch
+       thay vì có sẵn. Safari/Firefox desktop không có navigator.connection —
+       thiếu API không được coi là mạng chậm, nếu không hai trình duyệt đó mất
+       luôn preload.
+       requestIdleCallback (Chrome/Edge) tự chọn lúc máy rảnh, nhưng bản cũ không
+       đưa timeout nên một trang bận có thể làm nó ĐÓI vĩnh viễn: bốn file im
+       lặng không bao giờ được nạp và lần đổi ngôn ngữ kế tiếp vẫn phải chờ.
+       Thêm {timeout: 4000} -> muộn chứ không mất. Safari không có API đó: con
+       số 1500 ms tuỳ tiện của bản cũ thay bằng một mốc có thật, trang đã nạp
+       xong tài nguyên thì mới xếp hàng cuối event loop. */
+    const rest = TRANSLATABLE.filter((l) => l !== currentLang);
+    const net = navigator.connection || {};
+    const NAP_NEN = !net.saveData && !/^(slow-2g|2g|3g)$/.test(net.effectiveType || "");
+    function khi_may_ranh(cb) {
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(cb, { timeout: 4000 });
+      } else if (document.readyState === "complete") {
+        setTimeout(cb, 0);
+      } else {
+        window.addEventListener("load", () => setTimeout(cb, 0), { once: true });
       }
+    }
+    loadBundledDictionaries([currentLang]).then(() => {
+      if (NAP_NEN) khi_may_ranh(() => loadBundledDictionaries(rest));
     });
   }
 }
