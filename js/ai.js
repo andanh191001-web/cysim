@@ -39,10 +39,10 @@
               cho nút này. Máy mất mạng cũng tự vẽ lại dòng đó nhờ hai
               listener "online"/"offline" — không phải mở lại khung chat.
               BẰNG CHỨNG NGAY TRÊN DÒNG LỖI (01-11-2026): ở "bad_key", chip kỹ
-              thuật in luôn hình dạng chuỗi mà MÁY CHỦ đang đọc từ .env — ".env:
-              AQ.A…(53)" — vì câu "GEMINI_API_KEY không hợp lệ" bị cãi lại là
-              "key này hợp lệ mà": người đọc đang cầm một chuỗi khác với chuỗi
-              trong file, và 4 ký tự đầu + độ dài đủ để so tại chỗ mà không lộ key.
+              thuật in hình dạng chuỗi MÁY CHỦ đang đọc — ".env: AQ.A…(53)"; bản
+              công khai in tên host Render thay ".env" — vì câu "GEMINI_API_KEY
+              không hợp lệ" bị cãi lại là "key này hợp lệ mà": người đọc đang cầm
+              chuỗi khác, và 4 ký tự đầu + độ dài đủ để so tại chỗ mà không lộ key.
               Cùng ngày: mọi chỗ focus ô gõ đi qua vaoO() = focus({preventScroll})
               vì .ai-panel là hộp overflow:hidden NHƯNG VẪN CUỘN ĐƯỢC bằng code,
               và cú cuộn đó chính là thứ đẩy nút ✕ ra khỏi mép (đo: scrollTop 221px,
@@ -688,8 +688,8 @@
     ready: () => t("Đã nối được máy chủ AI."),
     no_key: () => t("Máy chủ đã chạy nhưng file .env chưa có GEMINI_API_KEY."),
     /* Bệnh KHÁC hẳn no_key: ở đó là thiếu một dòng, dán vào là xong; ở đây là có
-       key trong file mà CHÍNH GOOGLE đuổi (401/403) — thường vì dán nhầm loại
-       credential, một access token OAuth không dùng được ở chỗ API key. Không có
+       key mà CHÍNH GOOGLE đuổi (401/403) — chuỗi đúng định dạng nhưng đã bị xoá,
+       thu hồi hoặc chặn vì lộ công khai. Không có
        trạng thái này thì /api/health vẫn báo "ready" (nó chỉ nhìn "có chuỗi sau
        dấu bằng hay không") và người dùng chỉ biết bệnh sau khi gõ câu hỏi + ngồi
        chờ — đúng cái vòng mà cả khối chẩn đoán này sinh ra để cắt. Chuỗi vẽ lại
@@ -736,9 +736,17 @@
        <code> khác ở đây. Từ 01-11, chip còn in HÌNH DẠNG chuỗi máy chủ đang đọc
        ("AQ.…(53)"): câu "key không hợp lệ" bị cãi lại là "key này hợp lệ mà" vì
        người đọc đang cầm một chuỗi khác với chuỗi trong file — chỉ cần 4 ký tự
-       đầu + độ dài là so được tại chỗ, và vẫn không lộ key. */
-    else if (serverState === "bad_key")
-      tech.textContent = serverKeyShape ? `.env: ${serverKeyShape}` : ".env";
+       đầu + độ dài là so được tại chỗ, và vẫn không lộ key. Máy chủ ở host khác
+       (Render) thì không có .env nào để sửa: chip in tên host đang giữ key. */
+    else if (serverState === "bad_key") {
+      let noiKey = ".env";
+      if (mayChuBenNgoai()) {
+        try {
+          noiKey = new URL(noiGoi(), location.href).host;
+        } catch (e) {}
+      }
+      tech.textContent = serverKeyShape ? `${noiKey}: ${serverKeyShape}` : noiKey;
+    }
     /* Bản công khai phải IN RA đúng URL đã gọi: người deploy cần biết là app đang
        gõ cửa "/api/gemini" cùng nguồn hay một host khai ở MAI_CONG_KHAI — hai bệnh
        khác nhau, sửa ở hai chỗ khác nhau. Định danh kỹ thuật nên nằm ngoài t(),

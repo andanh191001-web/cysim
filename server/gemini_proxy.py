@@ -671,13 +671,15 @@ def _vi_sao_bi_tu_choi(key):
     đã bị xoá, bị thu hồi, hoặc bị Google chặn vì lộ công khai. Bấm "Thử lại" với
     cùng chuỗi ấy sẽ nhận đúng kết quả cũ, nên câu này nói thẳng việc phải làm.
     """
+    # Trên PaaS (có PORT) key nằm ở Environment của host, không có .env để dán vào.
+    noi_dan = "biến GEMINI_API_KEY ở Environment của host (Render)" if os.environ.get("PORT") else ".env"
     if key.startswith(("AQ.", "AIza")):
         return (
             "Google không nhận CHÍNH chuỗi này (đã bị xoá/thu hồi hoặc bị chặn vì lộ "
-            "công khai) — tạo key MỚI ở AI Studio > Get API key, chỉ dán vào .env, "
+            f"công khai) — tạo key MỚI ở AI Studio > Get API key, chỉ dán vào {noi_dan}, "
             "không commit .env, rồi bấm Thử lại"
         )
-    return "Chuỗi không phải key Google — dán lại key lấy từ AI Studio > Get API key vào .env"
+    return f"Chuỗi không phải key Google — dán lại key lấy từ AI Studio > Get API key vào {noi_dan}"
 
 
 def _hinh_key(key):
